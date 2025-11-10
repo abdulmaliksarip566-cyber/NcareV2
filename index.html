@@ -1,506 +1,362 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NurseCare+ Diagnostic Assistant (Ncare)</title>
-    <!-- Load Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Use Inter font -->
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            /* Canva-Inspired Background: Dark, professional theme */
-            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-            min-height: 100vh;
-        }
-        /* Custom styles for the nursing theme */
-        .primary-color { background-color: #2c77d0; } /* Deep Blue */
-        .secondary-color { background-color: #6ed02c; } /* Vibrant Green */
-        .text-primary-color { color: #2c77d0; }
-        .text-secondary-color { color: #6ed02c; }
-        
-        /* Utility for consistent card styling */
-        .app-card {
-            background-color: #ffffff;
-            border-radius: 1rem; /* More rounded corners */
-            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* Stronger, professional shadow */
-            transition: transform 0.2s;
-        }
+import React, { useState } from "react";
 
-        /* Animation for loading state */
-        .loader {
-            border-top-color: #ffffff;
-            border-left-color: #ffffff;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+// NurseCarePlus - single-file React component
+// TailwindCSS utility classes assumed available in the project
+// Uses simple rule-based "AI" engine for diagnosis suggestions (replaceable by real AI API)
 
-        /* Responsive Hero container for contrast on dark background */
-        .hero-container {
-            background-color: #f3f4f6; /* Light gray for contrast */
-            border-radius: 1rem;
-        }
-        
-    </style>
-    <!-- Lucide Icons for better UI -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-</head>
-<body class="flex flex-col">
+export default function NurseCarePlus() {
+  const [tab, setTab] = useState("home");
+  const [patient, setPatient] = useState({
+    name: "",
+    age: "",
+    sex: "",
+    diagnosis: "",
+    contact: "",
+  });
 
-    <!-- Navbar -->
-    <header class="primary-color shadow-lg sticky top-0 z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo/App Name -->
-                <div class="flex-shrink-0">
-                    <span class="text-white text-3xl font-extrabold tracking-wider">Ncare<span class="text-secondary-color">+</span></span>
-                </div>
-                <!-- Desktop Menu -->
-                <nav class="hidden md:flex space-x-2">
-                    <button onclick="showPage('home')" class="nav-btn text-white hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-lg text-sm font-medium transition duration-150 flex items-center">
-                        <i data-lucide="home" class="w-4 h-4 mr-1"></i> Home
-                    </button>
-                    <button onclick="showPage('about')" class="nav-btn text-white hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-lg text-sm font-medium transition duration-150 flex items-center">
-                        <i data-lucide="info" class="w-4 h-4 mr-1"></i> About
-                    </button>
-                    <button onclick="showPage('assessment')" class="nav-btn text-white hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-lg text-sm font-medium transition duration-150 flex items-center">
-                        <i data-lucide="clipboard-list" class="w-4 h-4 mr-1"></i> Assessment
-                    </button>
-                    <button onclick="showPage('diagnosis')" class="nav-btn text-white font-extrabold px-3 py-2 rounded-lg text-sm transition duration-150 bg-white bg-opacity-30 flex items-center">
-                        <i data-lucide="stethoscope" class="w-4 h-4 mr-1"></i> Diagnosis
-                    </button>
-                    <button onclick="showPage('contact')" class="nav-btn text-white hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-lg text-sm font-medium transition duration-150 flex items-center">
-                        <i data-lucide="mail" class="w-4 h-4 mr-1"></i> Contact
-                    </button>
-                </nav>
-                <!-- Mobile Menu Button -->
-                <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
+  const initialAssessment = {
+    bp: "",
+    hr: "",
+    rr: "",
+    temp: "",
+    o2: "",
+    subjective: "",
+    objective: "",
+    location: "",
+    onset: "",
+    character: "",
+    intensity: "",
+    duration: "",
+    aggravating: "",
+    alleviating: "",
+    associated: "",
+    prevTreatment: "",
+    prevTreatmentResult: "",
+    ob_lmp: "",
+    ob_edc: "",
+  };
+
+  const [assessment, setAssessment] = useState(initialAssessment);
+  const [diagnoses, setDiagnoses] = useState([]);
+  const [references, setReferences] = useState([
+    { title: "World Health Organization (WHO)", url: "https://www.who.int" },
+    { title: "PubMed (NIH)", url: "https://pubmed.ncbi.nlm.nih.gov" },
+    { title: "Philippine DOH", url: "https://doh.gov.ph" },
+  ]);
+
+  // Simple rule-based diagnosis generator. Replace this function with an AI call to OpenAI or other model
+  function generateDiagnosesFromAssessment(a) {
+    const results = [];
+    const temp = parseFloat(a.temp);
+    const rr = parseInt(a.rr);
+    const hr = parseInt(a.hr);
+    const o2 = parseFloat(a.o2);
+
+    // Risk checks
+    if (!isNaN(o2) && o2 < 92) {
+      results.push({
+        code: "RESP-HYPOXIA",
+        title: "Hypoxemia / Impaired Gas Exchange",
+        reasons: [
+          `Oxygen saturation ${o2}% on room air (low)`,
+          "Tachypnea or accessory muscle use noted",
+        ],
+        carePlan: [
+          "Administer supplemental oxygen as ordered to maintain SpO2 ≥ 94% (or target per MD).",
+          "Raise head of bed to semi-Fowler's position to ease breathing.",
+          "Continuous pulse oximetry until stable.",
+        ],
+        vitalsSchedule: "Monitor SpO2 and RR every 15–30 minutes until stable, then hourly.",
+        teaching: [
+          "Explain oxygen therapy purpose to patient/guardian.",
+          "Advise on deep-breathing exercises and positioning to improve oxygenation.",
+        ],
+      });
+    }
+
+    if (!isNaN(temp) && temp >= 38) {
+      results.push({
+        code: "INF-FEVER",
+        title: "Fever (Possible Infectious Process)",
+        reasons: [`Temperature ${temp}°C`],
+        carePlan: [
+          "Ensure adequate hydration and ambient cooling measures.",
+          "Administer antipyretics per order (e.g., acetaminophen) and re-check temperature in 30–60 minutes.",
+        ],
+        vitalsSchedule: "Check temperature every 1–2 hours until afebrile or stable.",
+        teaching: ["Explain fever management and when to seek urgent care (difficulty breathing, seizures)."],
+      });
+    }
+
+    // Pneumonia suggestion rules
+    const productiveCough = /sputum|productive|yellow|green|thick/i.test(a.subjective + " " + a.objective);
+    const chestCrackles = /crackles|rales|wheeze|bronchial/i.test(a.objective);
+    if ((productiveCough || chestCrackles) && (rr >= 20 || temp >= 38 || o2 < 95)) {
+      const severity = o2 < 90 || rr >= 30 || hr >= 120 ? "Severe" : "Moderate";
+      results.push({
+        code: "RESP-PNEUMONIA",
+        title: `Pneumonia (${severity} severity) — likely lower respiratory tract infection`,
+        reasons: [
+          productiveCough ? "Productive cough noted" : null,
+          chestCrackles ? "Crackles on lung auscultation" : null,
+          !isNaN(rr) ? `RR ${rr} breaths/min` : null,
+          !isNaN(temp) ? `Temp ${temp}°C` : null,
+          !isNaN(o2) ? `SpO2 ${o2}%` : null,
+        ].filter(Boolean),
+        carePlan: [
+          "Collect sputum sample if ordered and send for gram stain/culture as indicated.",
+          "Administer antibiotics as prescribed by physician (give first dose promptly).",
+          "Provide oxygen therapy if SpO2 < 94% and per orders.",
+          "Encourage coughing and deep breathing, provide chest physiotherapy if available.",
+          "Monitor intake/output and maintain hydration.",
+        ],
+        vitalsSchedule: o2 < 92 ? "Continuous SpO2 monitoring; vitals q15–30min" : "Vitals q4h or as ordered",
+        teaching: [
+          "Finish full course of antibiotics and return if breathing worsens.",
+          "Signs of worsening: increased work of breathing, cyanosis, persistent high fever — seek urgent care.",
+        ],
+      });
+    }
+
+    // Dehydration / poor intake
+    const lowIntake = /decreased appetite|no appetite|reduced intake|vomit|unable to eat/i.test(a.subjective);
+    if (lowIntake) {
+      results.push({
+        code: "FLUID-DEFICIT",
+        title: "Risk for Deficient Fluid Volume",
+        reasons: ["Decreased oral intake reported", "Fever increases insensible losses"],
+        carePlan: ["Encourage small, frequent sips; consider IV fluids per order if oral intake insufficient"],
+        vitalsSchedule: "I&O and vitals q4h; check for weight changes and skin turgor.",
+        teaching: ["Offer favorite fluids, explain importance of hydration when febrile."],
+      });
+    }
+
+    if (results.length === 0) {
+      results.push({
+        code: "OBS",
+        title: "Observation / Routine Care",
+        reasons: ["No clear rule-based triggers met; continue monitoring and document changes."],
+        carePlan: ["Monitor vitals per facility protocol; re-assess if symptoms change."],
+        vitalsSchedule: "Vitals q4–8h or per facility protocol.",
+        teaching: ["Keep patient comfortable and report changes immediately."],
+      });
+    }
+
+    return results;
+  }
+
+  function handleGenerate(e) {
+    e.preventDefault();
+    const generated = generateDiagnosesFromAssessment(assessment);
+    // Add patient/assessment snapshot to each diagnosis
+    const timestamp = new Date().toISOString();
+    const enriched = generated.map((d) => ({ ...d, patient: { ...patient }, assessment: { ...assessment }, createdAt: timestamp }));
+    setDiagnoses((prev) => [...enriched, ...prev]);
+    setTab("diagnoses");
+  }
+
+  function downloadJSON() {
+    const payload = { patient, assessment, diagnoses };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
+    const dlAnchor = document.createElement("a");
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", `${patient.name || "patient"}_nursecare_export.json`);
+    document.body.appendChild(dlAnchor);
+    dlAnchor.click();
+    dlAnchor.remove();
+  }
+
+  function resetForm() {
+    setPatient({ name: "", age: "", sex: "", diagnosis: "", contact: "" });
+    setAssessment(initialAssessment);
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6 text-gray-800">
+      <header className="max-w-6xl mx-auto mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">NurseCare+ — Nursing Care Plan Assistant</h1>
+            <p className="text-sm text-gray-600">Create assessments, generate nursing diagnoses, and build care plans — single-file demo app</p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm">Contact: abdulmaliksarip566@gmail.com</p>
+            <p className="text-sm">Phone: +63 981 042 0232</p>
+          </div>
+        </div>
+        <nav className="mt-4 flex gap-2">
+          {[
+            ["home", "Home"],
+            ["about", "About"],
+            ["assessment", "Health Assessment"],
+            ["diagnoses", "Diagnoses"],
+            ["resources", "Resources"],
+            ["contact", "Contact"],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={`px-3 py-1 rounded ${tab === key ? "bg-indigo-600 text-white" : "bg-white border"}`}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+      </header>
+
+      <main className="max-w-6xl mx-auto">
+        {tab === "home" && (
+          <section className="bg-white p-6 rounded shadow">
+            <h2 className="text-xl font-semibold mb-2">Welcome</h2>
+            <p className="mb-2">This app helps nursing students and clinicians collect health assessments and generate evidence-informed nursing diagnoses and care plans. The content mirrors what you'd place on a nursing portfolio or clinical tool.</p>
+            <h3 className="font-medium mt-4">About (also on About tab)</h3>
+            <p className="text-sm text-gray-700">Tool created as a single-file React demo. Replace the rule-based engine with an AI API (OpenAI or others) for more advanced suggestions. Use the Resources tab for curated references (WHO, PubMed, DOH).</p>
+          </section>
+        )}
+
+        {tab === "about" && (
+          <section className="bg-white p-6 rounded shadow">
+            <h2 className="text-xl font-semibold mb-2">About NurseCare+</h2>
+            <p>NurseCare+ is a teaching/demo app that demonstrates how to collect structured assessment data (vital signs, subjective/objective), run a diagnosis engine, and present nursing care plans, vitals schedule, and teaching points. Intended for student practice and portfolio use.</p>
+          </section>
+        )}
+
+        {tab === "assessment" && (
+          <section className="bg-white p-6 rounded shadow">
+            <h2 className="text-xl font-semibold mb-4">Health Assessment</h2>
+            <form onSubmit={handleGenerate} className="grid gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input placeholder="Patient Name" value={patient.name} onChange={(e) => setPatient({ ...patient, name: e.target.value })} className="p-2 border rounded" />
+                <input placeholder="Age" value={patient.age} onChange={(e) => setPatient({ ...patient, age: e.target.value })} className="p-2 border rounded" />
+                <input placeholder="Sex" value={patient.sex} onChange={(e) => setPatient({ ...patient, sex: e.target.value })} className="p-2 border rounded" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+                <input placeholder="BP (e.g., 120/80 mmHg)" value={assessment.bp} onChange={(e) => setAssessment({ ...assessment, bp: e.target.value })} className="p-2 border rounded" />
+                <input placeholder="HR (bpm)" value={assessment.hr} onChange={(e) => setAssessment({ ...assessment, hr: e.target.value })} className="p-2 border rounded" />
+                <input placeholder="RR (breaths/min)" value={assessment.rr} onChange={(e) => setAssessment({ ...assessment, rr: e.target.value })} className="p-2 border rounded" />
+                <input placeholder="Temp (°C)" value={assessment.temp} onChange={(e) => setAssessment({ ...assessment, temp: e.target.value })} className="p-2 border rounded" />
+                <input placeholder="O2 Sat (%)" value={assessment.o2} onChange={(e) => setAssessment({ ...assessment, o2: e.target.value })} className="p-2 border rounded" />
+              </div>
+
+              <textarea placeholder="Subjective data (chief complaint, HPI)" value={assessment.subjective} onChange={(e) => setAssessment({ ...assessment, subjective: e.target.value })} className="p-2 border rounded h-24" />
+              <textarea placeholder="Objective data (observations, exam findings)" value={assessment.objective} onChange={(e) => setAssessment({ ...assessment, objective: e.target.value })} className="p-2 border rounded h-24" />
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input placeholder="Location (e.g., lungs - bilateral lower lobes)" value={assessment.location} onChange={(e) => setAssessment({ ...assessment, location: e.target.value })} className="p-2 border rounded" />
+                <input placeholder="Onset (e.g., 3 days ago)" value={assessment.onset} onChange={(e) => setAssessment({ ...assessment, onset: e.target.value })} className="p-2 border rounded" />
+                <input placeholder="Character (e.g., productive cough)" value={assessment.character} onChange={(e) => setAssessment({ ...assessment, character: e.target.value })} className="p-2 border rounded" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input placeholder="Intensity (1-10)" value={assessment.intensity} onChange={(e) => setAssessment({ ...assessment, intensity: e.target.value })} className="p-2 border rounded" />
+                <input placeholder="Duration" value={assessment.duration} onChange={(e) => setAssessment({ ...assessment, duration: e.target.value })} className="p-2 border rounded" />
+                <input placeholder="Aggravation" value={assessment.aggravating} onChange={(e) => setAssessment({ ...assessment, aggravating: e.target.value })} className="p-2 border rounded" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <input placeholder="Alleviation" value={assessment.alleviating} onChange={(e) => setAssessment({ ...assessment, alleviating: e.target.value })} className="p-2 border rounded" />
+                <input placeholder="Associated symptoms" value={assessment.associated} onChange={(e) => setAssessment({ ...assessment, associated: e.target.value })} className="p-2 border rounded" />
+              </div>
+
+              <textarea placeholder="Previous treatments (e.g., antibiotics)" value={assessment.prevTreatment} onChange={(e) => setAssessment({ ...assessment, prevTreatment: e.target.value })} className="p-2 border rounded" />
+              <input placeholder="Previous treatment results" value={assessment.prevTreatmentResult} onChange={(e) => setAssessment({ ...assessment, prevTreatmentResult: e.target.value })} className="p-2 border rounded" />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <input placeholder="OB - LMP (YYYY-MM-DD)" value={assessment.ob_lmp} onChange={(e) => setAssessment({ ...assessment, ob_lmp: e.target.value })} className="p-2 border rounded" />
+                <input placeholder="OB - EDC (YYYY-MM-DD)" value={assessment.ob_edc} onChange={(e) => setAssessment({ ...assessment, ob_edc: e.target.value })} className="p-2 border rounded" />
+              </div>
+
+              <div className="flex gap-2 mt-2">
+                <button type="submit" className="bg-indigo-600 text-white px-4 py-2 rounded">Generate Diagnosis</button>
+                <button type="button" onClick={resetForm} className="border px-4 py-2 rounded">Reset</button>
+              </div>
+            </form>
+          </section>
+        )}
+
+        {tab === "diagnoses" && (
+          <section className="bg-white p-6 rounded shadow">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Diagnoses & Care Plans</h2>
+              <div className="flex gap-2">
+                <button onClick={downloadJSON} className="border px-3 py-1 rounded">Export JSON</button>
+                <button onClick={() => { setDiagnoses([]); }} className="border px-3 py-1 rounded">Clear</button>
+              </div>
             </div>
-        </div>
-        <!-- Mobile Menu (Hidden by default) -->
-        <div id="mobile-menu" class="hidden md:hidden">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <button onclick="showPage('home'); toggleMobileMenu()" class="mobile-nav-btn text-white block px-3 py-2 rounded-md text-base font-medium w-full text-left hover:bg-white hover:bg-opacity-20 flex items-center"><i data-lucide="home" class="w-5 h-5 mr-2"></i> Home</button>
-                <button onclick="showPage('about'); toggleMobileMenu()" class="mobile-nav-btn text-white block px-3 py-2 rounded-md text-base font-medium w-full text-left hover:bg-white hover:bg-opacity-20 flex items-center"><i data-lucide="info" class="w-5 h-5 mr-2"></i> About</button>
-                <button onclick="showPage('assessment'); toggleMobileMenu()" class="mobile-nav-btn text-white block px-3 py-2 rounded-md text-base font-medium w-full text-left hover:bg-white hover:bg-opacity-20 flex items-center"><i data-lucide="clipboard-list" class="w-5 h-5 mr-2"></i> Assessment</button>
-                <button onclick="showPage('diagnosis'); toggleMobileMenu()" class="mobile-nav-btn text-white block px-3 py-2 rounded-md text-base font-medium w-full text-left bg-white bg-opacity-20 flex items-center"><i data-lucide="stethoscope" class="w-5 h-5 mr-2"></i> Diagnosis</button>
-                <button onclick="showPage('contact'); toggleMobileMenu()" class="mobile-nav-btn text-white block px-3 py-2 rounded-md text-base font-medium w-full text-left hover:bg-white hover:bg-opacity-20 flex items-center"><i data-lucide="mail" class="w-5 h-5 mr-2"></i> Contact</button>
-            </div>
-        </div>
-    </header>
 
-    <!-- Main Content Area -->
-    <main class="flex-grow w-full">
+            {diagnoses.length === 0 && <p className="text-gray-600">No diagnoses yet. Create an assessment to generate suggestions.</p>}
 
-        <!-- Page: Home (Hero Section) -->
-        <div id="page-home" class="page-content py-16 md:py-24 hidden">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <div class="hero-container p-8 md:p-12 app-card">
-                    <div class="mb-4">
-                        <i data-lucide="heart-pulse" class="w-16 h-16 text-primary-color mx-auto stroke-[1.5]"></i>
+            <div className="space-y-4">
+              {diagnoses.map((d, idx) => (
+                <div key={idx} className="border rounded p-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-bold">{d.title} <span className="text-sm text-gray-500">({d.code})</span></h3>
+                      <p className="text-sm text-gray-600">Generated for: <strong>{d.patient.name || "(unnamed)"}</strong> — {new Date(d.createdAt).toLocaleString()}</p>
                     </div>
-                    <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
-                        Your Clinical Decision Partner: <span class="text-primary-color">NurseCare+</span>
-                    </h1>
-                    <p class="text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto mb-8">
-                        Bridging patient assessment data to actionable, evidence-based nursing care plans and diagnoses, quickly and simply.
-                    </p>
-                    
-                    <button onclick="showPage('diagnosis')" class="secondary-color text-white font-bold py-3 px-8 text-lg rounded-full hover:bg-opacity-90 transition duration-300 shadow-xl transform hover:scale-105">
-                        Start Diagnosis Now <i data-lucide="arrow-right" class="inline-block w-5 h-5 ml-2"></i>
-                    </button>
+                    <div className="text-right text-sm">
+                      <p>Vitals plan: <strong>{d.vitalsSchedule}</strong></p>
+                    </div>
+                  </div>
+
+                  <div className="mt-2 grid md:grid-cols-3 gap-3">
+                    <div>
+                      <h4 className="font-medium">Reasons</h4>
+                      <ul className="list-disc ml-5 text-sm">
+                        {d.reasons.map((r, i) => <li key={i}>{r}</li>)}
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Nursing Care / Treatment</h4>
+                      <ul className="list-disc ml-5 text-sm">
+                        {d.carePlan.map((c, i) => <li key={i}>{c}</li>)}
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Teaching & Notes</h4>
+                      <ul className="list-disc ml-5 text-sm">
+                        {d.teaching.map((t, i) => <li key={i}>{t}</li>)}
+                      </ul>
+                    </div>
+                  </div>
                 </div>
-
-                <div class="mt-16 grid md:grid-cols-3 gap-6 text-left">
-                    <div class="app-card p-6 border-t-4 border-primary-color">
-                        <i data-lucide="trending-up" class="w-8 h-8 text-primary-color mb-3"></i>
-                        <h3 class="font-bold text-xl mb-2 text-gray-800">Streamlined Workflow</h3>
-                        <p class="text-gray-600">Enter data using the familiar S.O.A.P. format for rapid analysis.</p>
-                    </div>
-                    <div class="app-card p-6 border-t-4 border-secondary-color">
-                        <i data-lucide="clipboard-check" class="w-8 h-8 text-secondary-color mb-3"></i>
-                        <h3 class="font-bold text-xl mb-2 text-gray-800">Grounded Interventions</h3>
-                        <p class="text-gray-600">All results are validated with citations from leading clinical guidelines.</p>
-                    </div>
-                    <div class="app-card p-6 border-t-4 border-primary-color">
-                        <i data-lucide="graduation-cap" class="w-8 h-8 text-primary-color mb-3"></i>
-                        <h3 class="font-bold text-xl mb-2 text-gray-800">Educational Support</h3>
-                        <p class="text-gray-600">An excellent learning tool for students to master the nursing process.</p>
-                    </div>
-                </div>
+              ))}
             </div>
-        </div>
+          </section>
+        )}
 
-        <!-- Page: About -->
-        <div id="page-about" class="page-content py-16 hidden">
-            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="app-card p-8 md:p-12">
-                    <h1 class="text-4xl font-extrabold text-primary-color mb-6 flex items-center">
-                        <i data-lucide="info" class="w-8 h-8 mr-3 stroke-[2]"></i> About Ncare+
-                    </h1>
-                    <p class="text-gray-700 leading-relaxed text-lg">
-                        NurseCare+ (Ncare) was created to streamline the often complex process of clinical judgment and care planning. We understand that for busy nursing students and practitioners, **clarity and speed are crucial**. 
-                        <br><br>
-                        Our engine uses advanced AI, continually updated and grounded with real-time web searches, to provide preliminary nursing diagnoses and intervention suggestions. This guidance is built upon recognized standards from organizations like **NANDA**, the **WHO**, and local DOH guidelines.
-                        <br><br>
-                        <strong class="text-red-500">Disclaimer:</strong> Ncare+ is a powerful learning and decision-support tool, but it must always complement, not replace, your professional clinical judgment. Always verify findings with your clinical instructor or senior nurse.
-                    </p>
-                </div>
+        {tab === "resources" && (
+          <section className="bg-white p-6 rounded shadow">
+            <h2 className="text-xl font-semibold mb-2">Resources</h2>
+            <p className="mb-3">Curated resources for evidence-based nursing practice. The app can be extended to query these resources or an AI model for citation-backed outputs.</p>
+            <ul className="list-disc ml-5">
+              {references.map((r, i) => (
+                <li key={i}><a className="underline" href={r.url} target="_blank" rel="noreferrer">{r.title}</a></li>
+              ))}
+            </ul>
+            <div className="mt-4">
+              <h4 className="font-medium">How to connect to AI / evidence sources</h4>
+              <p className="text-sm text-gray-700">To make diagnosis generation AI-powered and citation-backed: set up a server-side function that calls an LLM (OpenAI / Anthropic / Azure) and returns suggested diagnoses plus citations from PubMed/WHO. Never embed secret API keys on the client — use a backend.</p>
             </div>
-        </div>
+          </section>
+        )}
 
-        <!-- Page: Health Assessment -->
-        <div id="page-assessment" class="page-content py-16 hidden">
-            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="app-card p-8 md:p-12">
-                    <h1 class="text-4xl font-extrabold text-primary-color mb-8 flex items-center">
-                        <i data-lucide="clipboard-list" class="w-8 h-8 mr-3 stroke-[2]"></i> Health Assessment Guide
-                    </h1>
-                    <p class="text-gray-700 mb-8 text-lg">A solid assessment is the foundation of quality nursing care. Use this guide to ensure you collect all the essential data points before generating a diagnosis:</p>
-                    <div class="space-y-6">
-                        <div class="p-6 bg-blue-50 rounded-lg border-l-4 border-primary-color">
-                            <h3 class="font-bold text-xl text-primary-color flex items-center mb-2">
-                                <i data-lucide="user-square" class="w-6 h-6 mr-2"></i> Subjective Data (S: The Client's Story)
-                            </h3>
-                            <ul class="list-disc list-inside ml-4 text-gray-700 text-base space-y-1">
-                                <li>**Chief Complaint:** The primary reason for seeking care.</li>
-                                <li>**History of Present Illness:** Detailed description of the symptoms using **PQRST** or **COLDSPA**.</li>
-                                <li>**Past History:** Relevant medical conditions, surgeries, and family history.</li>
-                            </ul>
-                        </div>
-                        <div class="p-6 bg-green-50 rounded-lg border-l-4 border-secondary-color">
-                            <h3 class="font-bold text-xl text-secondary-color flex items-center mb-2">
-                                <i data-lucide="activity" class="w-6 h-6 mr-2"></i> Objective Data (O: The Findings)
-                            </h3>
-                            <ul class="list-disc list-inside ml-4 text-gray-700 text-base space-y-1">
-                                <li>**Vital Signs:** Precise measurements of BP, HR, RR, Temp, and O2 Saturation.</li>
-                                <li>**Physical Exam:** Observation (e.g., skin color), Palpation (e.g., pulse quality), Auscultation (e.g., lung sounds).</li>
-                                <li>**Diagnostic Data:** Key lab results (e.g., Hemoglobin) and imaging findings.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {tab === "contact" && (
+          <section className="bg-white p-6 rounded shadow">
+            <h2 className="text-xl font-semibold mb-2">Contact</h2>
+            <p className="mb-2">This demo site belongs to <strong>Abdulmalik Sarip</strong>. Use the contact details below for inquiries or collaborations.</p>
+            <ul className="list-disc ml-5">
+              <li>Email: <a className="underline" href="mailto:abdulmaliksarip566@gmail.com">abdulmaliksarip566@gmail.com</a></li>
+              <li>Phone: <a className="underline" href="tel:+639810420232">+63 981 042 0232</a></li>
+            </ul>
+          </section>
+        )}
+      </main>
 
-        <!-- Page: Contact (Personalized Content Confirmed) -->
-        <div id="page-contact" class="page-content py-16 hidden">
-            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="app-card p-8 md:p-12 text-center">
-                    <h1 class="text-4xl font-extrabold text-primary-color mb-8 flex items-center justify-center">
-                        <i data-lucide="send" class="w-8 h-8 mr-3 stroke-[2]"></i> Contact & Feedback
-                    </h1>
-                    <p class="text-gray-700 mb-6 text-lg">We welcome your suggestions and feedback to continuously improve NurseCare+ for the nursing community.</p>
-                    
-                    <div class="mt-8 space-y-4">
-                        <!-- Student Details -->
-                        <div class="text-gray-900">
-                            <p class="font-bold text-xl text-primary-color">Sarip, Abdulmalik G.</p>
-                            <p class="text-gray-600">BS Nursing, 20241062</p>
-                            <p class="text-gray-600">PEACI College of Nursing</p>
-                        </div>
-                        
-                        <!-- Contact Information -->
-                        <div class="pt-6 border-t border-gray-100 space-y-3">
-                            <p class="text-lg font-medium text-gray-800 flex items-center justify-center">
-                                <i data-lucide="mail" class="w-5 h-5 mr-2 text-secondary-color"></i> 
-                                Email: <a href="mailto:abdulmaliksarip566@gmail.com" class="text-primary-color hover:underline ml-2">abdulmaliksarip566@gmail.com</a>
-                            </p>
-                            <p class="text-lg font-medium text-gray-800 flex items-center justify-center">
-                                <i data-lucide="phone" class="w-5 h-5 mr-2 text-secondary-color"></i> 
-                                Mobile: <a href="tel:+639810420232" class="text-primary-color hover:underline ml-2">09810420232</a>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <!-- Page: Diagnosis (The main interactive page) -->
-        <div id="page-diagnosis" class="page-content py-16 hidden">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h1 class="text-4xl font-extrabold text-white mb-10 flex items-center justify-center">
-                    <i data-lucide="stethoscope" class="w-9 h-9 mr-3 text-secondary-color stroke-[2]"></i> Client Diagnosis Tool
-                </h1>
-                
-                <div class="grid lg:grid-cols-2 gap-8">
-                    <!-- Input Form -->
-                    <div class="app-card p-8 border-t-8 border-secondary-color">
-                        <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center">1. Enter Client Data (S.O.A.P.)</h2>
-                        
-                        <label for="vitals" class="block text-sm font-medium text-gray-700 mt-4 mb-1">Vital Signs (O: Objective Data - The Basics):</label>
-                        <textarea id="vitals" rows="2" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary-color focus:border-primary-color transition duration-150" placeholder="Example: BP 140/90, HR 105, RR 24, Temp 38.5°C, O2Sat 90%"></textarea>
-                        
-                        <label for="subjective" class="block text-sm font-medium text-gray-700 mt-4 mb-1">Subjective Data (S: The Client's Words):</label>
-                        <textarea id="subjective" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary-color focus:border-primary-color transition duration-150" placeholder="Example: 'I feel short of breath and tired.'"></textarea>
-
-                        <label for="objective" class="block text-sm font-medium text-gray-700 mt-4 mb-1">Objective Data (O: Your Exam Findings - The Details):</label>
-                        <textarea id="objective" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary-color focus:border-primary-color transition duration-150" placeholder="Example: Crackles in both lung bases, pale, using accessory muscles to breathe."></textarea>
-
-                        <button id="diagnose-btn" onclick="generateDiagnosis()" class="w-full secondary-color text-white font-bold py-4 px-4 mt-8 rounded-xl hover:bg-opacity-90 transition duration-150 shadow-lg flex items-center justify-center">
-                            <span id="button-text">Generate Diagnosis & Care Plan</span>
-                            <div id="loader" class="loader w-6 h-6 border-4 border-gray-200 border-b-secondary-color rounded-full ml-3 hidden"></div>
-                        </button>
-
-                        <p id="error-message" class="text-sm text-red-600 mt-3 hidden text-center font-medium"></p>
-                    </div>
-
-                    <!-- Results Output -->
-                    <div class="app-card p-8 border-t-8 border-primary-color">
-                        <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center">2. Nursing Care Generated</h2>
-                        <div id="results-output" class="min-h-[250px] space-y-4">
-                            <div class="p-4 bg-gray-50 rounded-lg text-center">
-                                <i data-lucide="zap" class="w-8 h-8 mx-auto text-secondary-color mb-2"></i>
-                                <p class="text-gray-500 italic font-medium">Enter patient data on the left and click 'Generate' to see a preliminary diagnosis and suggested care plan here.</p>
-                            </div>
-                        </div>
-
-                        <!-- Citations Section -->
-                        <div id="citations-area" class="mt-8 pt-4 border-t border-gray-100 hidden">
-                            <h3 class="font-bold text-sm text-primary-color mb-3 flex items-center">
-                                <i data-lucide="book-open" class="w-4 h-4 mr-2"></i> Sources (Grounded Information):
-                            </h3>
-                            <ul id="citations-list" class="text-xs text-gray-600 list-disc list-inside space-y-1">
-                                <!-- Citations will be added here -->
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white p-6 mt-12">
-        <div class="max-w-7xl mx-auto text-center text-sm">
-            &copy; 2024 NurseCare+ (Ncare). Decision Support Tool. Always verify findings with your instructor and institution policies.
-        </div>
-    </footer>
-
-    <script type="module">
-        // --- Setup for Lucide Icons ---
-        // Ensures icons and JavaScript functions initialize after the page loads.
-        window.onload = function() {
-            lucide.createIcons();
-            // Start on the diagnosis page by default
-            showPage('diagnosis'); 
-        }
-
-        // Gemini API Configuration (Leave as empty string; Canvas will provide key at runtime)
-        const apiKey = "";
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-
-        // Utility functions
-        function getElement(id) { return document.getElementById(id); }
-
-        // --- View Management ---
-        const pageContents = document.querySelectorAll('.page-content');
-        const navButtons = document.querySelectorAll('.nav-btn');
-        const mobileMenu = getElement('mobile-menu');
-
-
-        function showPage(pageId) {
-            // Hide all pages
-            pageContents.forEach(page => page.classList.add('hidden'));
-            
-            // Show the requested page
-            const targetPage = getElement(`page-${pageId}`);
-            if (targetPage) {
-                // We use flex to ensure the main content is laid out correctly
-                targetPage.classList.remove('hidden');
-                targetPage.style.display = 'block'; 
-            }
-
-            // Update active state for desktop nav buttons
-            navButtons.forEach(btn => {
-                // Extract the page ID from the onclick attribute string
-                const btnPageIdMatch = btn.onclick.toString().match(/showPage\('([^']+)'\)/);
-                const btnPageId = btnPageIdMatch ? btnPageIdMatch[1] : null;
-
-                if (btnPageId === pageId) {
-                    btn.classList.remove('hover:bg-white', 'hover:bg-opacity-20');
-                    btn.classList.add('bg-white', 'bg-opacity-30', 'font-extrabold');
-                } else {
-                    btn.classList.add('hover:bg-white', 'hover:bg-opacity-20');
-                    btn.classList.remove('bg-white', 'bg-opacity-30', 'font-extrabold');
-                }
-            });
-
-            // If the mobile menu is open, close it (UX improvement)
-            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
-                toggleMobileMenu();
-            }
-        }
-
-        const mobileMenuBtn = getElement('mobile-menu-btn');
-        
-
-        function toggleMobileMenu() {
-            if (mobileMenu) {
-                mobileMenu.classList.toggle('hidden');
-            }
-        }
-        if (mobileMenuBtn) {
-             mobileMenuBtn.addEventListener('click', toggleMobileMenu);
-        }
-
-        // --- Exponential Backoff for API Retries ---
-        async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (response.status === 429 && i < retries - 1) { // Too many requests
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        delay *= 2; // Exponential increase
-                        continue;
-                    }
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response;
-                } catch (error) {
-                    if (i === retries - 1) throw error;
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    delay *= 2;
-                }
-            }
-        }
-
-
-        // --- Core Diagnosis Functionality ---
-
-        async function generateDiagnosis() {
-            const vitals = getElement('vitals').value.trim();
-            const subjective = getElement('subjective').value.trim();
-            const objective = getElement('objective').value.trim();
-            const resultsOutput = getElement('results-output');
-            const citationsArea = getElement('citations-area');
-            const errorMessage = getElement('error-message');
-            const loader = getElement('loader');
-            const buttonText = getElement('button-text');
-
-            if (!vitals && !subjective && !objective) {
-                errorMessage.textContent = 'Please enter at least one piece of client data (Vitals, Subjective, or Objective).';
-                errorMessage.classList.remove('hidden');
-                return;
-            }
-            errorMessage.classList.add('hidden');
-            
-            // Set Loading State
-            resultsOutput.innerHTML = `<div class="text-center mt-12"><div class="loader w-10 h-10 border-4 border-gray-200 border-b-secondary-color rounded-full mx-auto mb-3"></div><p class="text-primary-color font-semibold">Analyzing data and searching for clinical guidelines...</p></div>`;
-            citationsArea.classList.add('hidden');
-            loader.classList.remove('hidden');
-            buttonText.textContent = 'Analyzing...';
-            getElement('diagnose-btn').disabled = true;
-
-
-            const userQuery = `
-                Client Data:
-                - VITAL SIGNS: ${vitals}
-                - SUBJECTIVE DATA: ${subjective}
-                - OBJECTIVE DATA: ${objective}
-
-                Based on this data, provide a clear, simple, and non-jargonized response in three sections:
-                1. Preliminary Nursing Diagnosis (e.g., Ineffective Airway Clearance related to...):
-                2. Key Nursing Interventions (What to do, step-by-step):
-                3. Monitoring Schedule (Suggested frequency for Vitals and Meds):
-            `;
-
-            // System prompt emphasizes using real-time, authoritative medical sources and keeping the language simple.
-            const systemPrompt = "You are an experienced, empathetic, and professional Nursing Diagnostic Assistant. You adhere to the principles of evidence-based practice and use official medical sources (like NANDA, WHO, DOH, and recent clinical studies) to ground your advice. Your response must be extremely simple, short, and avoid medical jargon. Focus on practical, safe steps. If data is limited, state that the diagnosis is only preliminary.";
-
-            const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                // Crucially, use Google Search for grounding (references)
-                tools: [{ "google_search": {} }],
-                systemInstruction: {
-                    parts: [{ text: systemPrompt }]
-                },
-            };
-
-            try {
-                const response = await fetchWithBackoff(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-                const candidate = result.candidates?.[0];
-
-                if (candidate && candidate.content?.parts?.[0]?.text) {
-                    const text = candidate.content.parts[0].text;
-                    resultsOutput.innerHTML = formatGeneratedText(text);
-                    
-                    // Extract and display citations (the references)
-                    displayCitations(candidate);
-                } else {
-                    const errorDetails = result.error?.message || 'Unknown API error.';
-                    throw new Error(`Could not generate a response. Details: ${errorDetails}`);
-                }
-            } catch (error) {
-                console.error("API call failed:", error);
-                errorMessage.textContent = `An error occurred: ${error.message}. Please check your input and try again.`;
-                resultsOutput.innerHTML = `<p class="text-center text-red-500 mt-12">Diagnosis failed. Check error message above.</p>`;
-                errorMessage.classList.remove('hidden');
-            } finally {
-                // Reset Loading State
-                loader.classList.add('hidden');
-                buttonText.textContent = 'Generate Diagnosis & Care Plan';
-                getElement('diagnose-btn').disabled = false;
-            }
-        }
-
-        // --- Formatting and Citation Display ---
-        function formatGeneratedText(text) {
-            // Replace bold Markdown headers with styled HTML headers for better display
-            return text.replace(/(\*\*\d+\. [^\*]+\*\*)/g, '<h3 class="font-bold text-xl mt-4 text-primary-color border-b pb-1 border-gray-100">$1</h3>')
-                       .replace(/\*\*/g, '') // Remove remaining markdown bold
-                       .replace(/\n/g, '<br>'); // Convert newlines to breaks
-        }
-
-        function displayCitations(candidate) {
-            let sources = [];
-            const groundingMetadata = candidate.groundingMetadata;
-
-            if (groundingMetadata && groundingMetadata.groundingAttributions) {
-                sources = groundingMetadata.groundingAttributions
-                    .map(attribution => ({
-                        uri: attribution.web?.uri,
-                        title: attribution.web?.title,
-                    }))
-                    .filter(source => source.uri && source.title);
-            }
-
-            const citationsList = getElement('citations-list');
-            citationsList.innerHTML = ''; 
-
-            if (sources.length > 0) {
-                sources.forEach((source, index) => {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'hover:text-primary-color transition duration-150';
-                    listItem.innerHTML = `<a href="${source.uri}" target="_blank" class="underline">${source.title}</a>`;
-                    citationsList.appendChild(listItem);
-                });
-                getElement('citations-area').classList.remove('hidden');
-            } else {
-                const listItem = document.createElement('li');
-                listItem.textContent = 'No specific sources were cited, but the response is based on general clinical knowledge.';
-                citationsList.appendChild(listItem);
-                getElement('citations-area').classList.remove('hidden');
-            }
-        }
-    </script>
-</body>
-</html>
+      <footer className="max-w-6xl mx-auto mt-6 text-center text-sm text-gray-500">
+        <p>© NurseCare+ Demo — Use responsibly for educational purposes. Replace the rule-based engine with a secured AI backend for production use.</p>
+      </footer>
+    </div>
+  );
+}
