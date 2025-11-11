@@ -2463,7 +2463,22 @@
   </script>
  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99cacbada63ddb1e',t:'MTc2MjgzMjcxNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
-// AI Diagnosis Reference Data (New Constant)
+<div id="ai-diagnosis" class="tab-content">
+  <h3>AI Diagnosis Engine</h3>
+  <p style="color: #718096; margin-bottom: 2rem;">Review the AI-generated nursing diagnoses, care plan, and expected outcomes based on your comprehensive assessment.</p>
+  
+  <div class="ai-diagnosis-output" id="ai-diagnosis-output">
+      <p style="text-align: center; padding: 2rem; color: #718096;">Submit an assessment in the <strong>Assessment Console</strong> tab to generate a diagnosis.</p>
+  </div> 
+
+  <div style="margin-top: 3rem; border-top: 2px solid #e2e8f0; padding-top: 2rem;">
+    <h4 style="margin-top: 0; font-size: 1.25rem;"> 📚 Reference Guidelines for AI in Nursing</h4>
+    <p style="color: #718096; margin-bottom: 1.5rem;">These are the foundational and regulatory bodies guiding the ethical and evidence-based use of AI-driven diagnostic tools in healthcare.</p>
+    <div id="ai-references-list">
+      </div>
+  </div>
+  </div>
+  // AI Diagnosis Reference Data (NANDA, WHO, PubMed, DOH)
 const AI_DIAGNOSIS_REFERENCES = [
   {
     resource: "World Health Organization (WHO)",
@@ -2491,6 +2506,96 @@ const AI_DIAGNOSIS_REFERENCES = [
   }
 ];
 
+// Fully Functional AI-Powered Diagnosis Logic (REPLACE OLD FUNCTION)
+function generateAIDiagnoses(caseData) {
+    const diagnoses = [];
+    const { 
+        chief_complaint = '', subjective = '', objective = '', 
+        vitals_hr = 0, vitals_rr = 0, vitals_spo2 = 100, vitals_temp = 98.6, vitals_bp = '120/80', vitals_pain = 0, 
+        system_respiratory = '', system_cardiovascular = '', system_integumentary = '', difficulty_level = ''
+    } = caseData;
+
+    const [bp_sys] = vitals_bp.split('/').map(n => parseInt(n.trim()));
+
+    // --- HIGH PRIORITY (Simulated Clinical Reasoning) ---
+
+    // 1. Impaired Gas Exchange (Check low SpO2 or high RR/abnormal breath sounds)
+    if (vitals_spo2 < 92 || vitals_rr > 24 || system_respiratory.toLowerCase().includes('crackles') || system_respiratory.toLowerCase().includes('wheezes')) {
+        diagnoses.push({
+            title: 'Impaired Gas Exchange (NANDA-I)',
+            priority: 'High',
+            rationale: `Vitals show SpO2 at ${vitals_spo2}% and/or RR at ${vitals_rr}/min. Respiratory findings suggest compromise in oxygenation.`,
+            interventions: ['Monitor SpO2 continuously', 'Assess lung sounds hourly', 'Position patient in semi-Fowler\'s', 'Administer O2 as prescribed'],
+            outcomes: 'Patient maintains SpO2 >94% within 24 hours.'
+        });
+    }
+
+    // 2. Decreased Cardiac Output / Hypotension (Check low BP or high HR)
+    if (bp_sys < 90 || vitals_hr > 110 || system_cardiovascular.toLowerCase().includes('weak pulse')) {
+        diagnoses.push({
+            title: 'Decreased Cardiac Output (NANDA-I)',
+            priority: 'High',
+            rationale: `Hemodynamic instability (BP: ${vitals_bp}, HR: ${vitals_hr}) indicates compromised circulatory status.`,
+            interventions: ['Ensure IV access is patent', 'Monitor for signs of shock', 'Collaborate with provider for medication adjustment'],
+            outcomes: 'Patient maintains Systolic BP > 100 mmHg and HR < 100 bpm within 6 hours.'
+        });
+    }
+    
+    // --- MEDIUM PRIORITY ---
+
+    // 3. Acute Pain (Check high pain score)
+    if (vitals_pain >= 7 || chief_complaint.toLowerCase().includes('severe pain')) {
+        diagnoses.push({
+            title: 'Acute Pain (NANDA-I)',
+            priority: 'Medium',
+            rationale: `Patient reports severe pain (Pain Score: ${vitals_pain}/10) requiring immediate comfort measures.`,
+            interventions: ['Administer prescribed analgesics', 'Implement non-pharmacological comfort measures', 'Monitor for pain effectiveness'],
+            outcomes: 'Patient reports pain reduced to 4/10 or less within 2 hours.'
+        });
+    }
+
+    // 4. Risk for Infection/Hyperthermia (Check temp or integumentary signs)
+    if (vitals_temp > 100.4 || system_integumentary.toLowerCase().includes('pus')) {
+        diagnoses.push({
+            title: 'Risk for Infection (or Hyperthermia)',
+            priority: 'Medium',
+            rationale: `Elevated temperature or local signs of infection (wound drainage) indicate a moderate risk that requires monitoring.`,
+            interventions: ['Monitor WBC count', 'Maintain strict aseptic technique', 'Administer antipyretics and antibiotics as prescribed'],
+            outcomes: 'Patient maintains a temperature < 100.0°F within 48 hours.'
+        });
+    }
+    
+    // --- LOW PRIORITY ---
+
+    // 5. Knowledge Deficit / Education Need (Check difficulty or patient statement)
+    if (difficulty_level === 'beginner' || subjective.toLowerCase().includes('i don\'t know')) {
+        diagnoses.push({
+            title: 'Deficient Knowledge (Condition/Treatment)',
+            priority: 'Low',
+            rationale: 'The case is a beginner level or patient statements indicate a need for comprehensive patient education.',
+            interventions: ['Assess patient\'s current knowledge', 'Provide condition-specific education using simple language', 'Ask for teach-back'],
+            outcomes: 'Patient verbalizes understanding of their condition before discharge.'
+        });
+    }
+
+    // Fallback/Default Diagnosis
+    if (diagnoses.length === 0) {
+        diagnoses.push({
+            title: 'Health-Seeking Behavior',
+            priority: 'Low',
+            rationale: 'Assessment data suggests a stable patient actively seeking to improve health outcomes, making education a core focus.',
+            interventions: ['Encourage active participation in care planning', 'Provide information on follow-up appointments', 'Focus on health promotion'],
+            outcomes: 'Patient demonstrates increased motivation and understanding of long-term health goals.'
+        });
+    }
+
+    // Final Action: Sort by Priority
+    const priorityOrder = { 'High': 1, 'Medium': 2, 'Low': 3 };
+    diagnoses.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+    
+    return diagnoses;
+}
+
 // Function to render the new AI Diagnosis References
 function renderAIReferences() {
   const container = document.getElementById('ai-references-list');
@@ -2509,26 +2614,62 @@ function renderAIReferences() {
   `).join('');
 }
 
-// Ensure the references are loaded when the section is shown
-// Look for the existing showSection function and add a line to call this new function:
-function showSection(tabId) {
-  // ... existing code ...
-  if (tabId === 'ai-diagnosis') {
-    renderAIReferences(); // <--- ADD THIS LINE HERE
-  }
-  // ... existing code ...
+// Function to render the AI Diagnosis Results
+function renderAIDiagnosis(diagnoses) {
+    const outputContainer = document.getElementById('ai-diagnosis-output');
+    if (!outputContainer) return;
+    
+    if (diagnoses.length === 0) {
+        outputContainer.innerHTML = '<p class="text-center" style="color: #718096;">AI engine did not generate any diagnoses. Check input data quality.</p>';
+        return;
+    }
+
+    const diagnosisHTML = diagnoses.map(d => `
+        <div class="diagnosis-item" style="margin-bottom: 2rem;">
+            <h5 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700; font-size: 1.25rem;">
+                ${d.title}
+                <span class="priority-badge priority-${d.priority.toLowerCase().replace(' ', '-')}" style="margin-left: 1rem; position: relative; top: -2px;">${d.priority} Priority</span>
+            </h5>
+            <p><strong>Rationale:</strong> ${d.rationale}</p>
+            <p style="font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem;">Interventions (Care Plan):</p>
+            <ul style="list-style: disc; margin-left: 1.5rem; padding-left: 0; color: #4a5568;">
+                ${d.interventions.map(i => `<li style="margin-bottom: 0.25rem;">${i}</li>`).join('')}
+            </ul>
+            <p style="margin-top: 1rem;"><strong>Expected Outcome:</strong> ${d.outcomes}</p>
+        </div>
+    `).join('');
+
+    outputContainer.innerHTML = diagnosisHTML;
 }
-     <div id="ai-diagnosis" class="tab-content">
-  <h3>AI Diagnosis Engine</h3>
-  <p style="color: #718096; margin-bottom: 2rem;">...</p>
+             function showSection(tabId) {
+    // ... existing code ...
+    document.getElementById(tabId).classList.add('active'); 
+    if (tabId === 'case-explorer') { 
+        filterCases(); 
+    } 
+    if (tabId === 'ai-diagnosis') { // <--- ADD THIS CHECK
+        renderAIReferences();     // <--- ADD THIS LINE
+    }
+}
+         document.getElementById('assessment-form').addEventListener('submit', async function(e) { 
+    e.preventDefault(); 
+    // ... existing code ...
 
-  <div class="ai-diagnosis-output" id="ai-diagnosis-output">
-      </div> 
+    // --- CORE AI DIAGNOSIS CALL (REPLACE OLD LOGIC) ---
+    const aiDiagnoses = generateAIDiagnoses(caseData);
+    caseData.ai_diagnosis = aiDiagnoses;
+    // --- END CORE AI DIAGNOSIS CALL ---
 
-  </div>
-  <div style="margin-top: 3rem; border-top: 2px solid #e2e8f0; padding-top: 2rem;">
-  <h4 style="margin-top: 0; font-size: 1.25rem;"> 📚 Reference Guidelines for AI in Nursing</h4>
-  <p style="color: #718096; margin-bottom: 1.5rem;">These are the foundational and regulatory bodies guiding the ethical and evidence-based use of AI-driven diagnostic tools in healthcare.</p>
-  <div id="ai-references-list">
-    </div>
-</div>
+    // Save data and render results
+    await data_sdk.save(caseData);
+    allCases = await data_sdk.load();
+
+    renderAIDiagnosis(aiDiagnoses); // <--- CALL THE NEW RENDER FUNCTION
+
+    updateDashboard();
+
+    isSubmitting = false;
+    // ... existing code to restore button text ...
+
+    showSection('ai-diagnosis'); // Make sure this switches the view
+});
