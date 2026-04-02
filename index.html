@@ -1,2465 +1,2028 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
- <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NurseCare+ AI Education Platform</title>
-  <script src="/_sdk/element_sdk.js"></script>
-  <script src="/_sdk/data_sdk.js"></script>
-  <style>
-    body {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #2d3748;
-      height: 100%;
-      overflow-x: hidden;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    /* Navigation */
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: rgba(255, 255, 255, 0.98);
-      backdrop-filter: blur(10px);
-      padding: 1rem 2rem;
-      z-index: 1000;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-
-    nav .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    nav .logo {
-      font-size: 1.5rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 2rem;
-      margin: 0;
-      padding: 0;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    nav a {
-      color: #4a5568;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s;
-      cursor: pointer;
-    }
-
-    nav a:hover {
-      color: #667eea;
-    }
-
-    .nav-button {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 0.5rem 1.5rem;
-      border-radius: 25px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .nav-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-    }
-
-    /* Hero Section */
-    .hero {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 8rem 2rem 6rem;
-      text-align: center;
-      margin-top: 70px;
-    }
-
-    .hero h1 {
-      font-size: 3.5rem;
-      margin: 0 0 0.5rem;
-      font-weight: 800;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }
-
-    .hero .tagline {
-      font-size: 1.5rem;
-      margin: 0 0 2rem;
-      font-weight: 400;
-      opacity: 0.95;
-    }
-
-    .hero p {
-      max-width: 1000px;
-      margin: 0 auto 3rem;
-      font-size: 1.125rem;
-      line-height: 1.8;
-      opacity: 0.9;
-    }
-
-    .cta-button {
-      background: white;
-      color: #667eea;
-      padding: 1rem 3rem;
-      font-size: 1.125rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      text-decoration: none;
-      display: inline-block;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-    }
-
-    .cta-button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-    }
-
-    /* Auth Modal */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 2000;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal {
-      background: white;
-      border-radius: 20px;
-      padding: 3rem;
-      max-width: 450px;
-      width: 90%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      max-height: 90%;
-      overflow-y: auto;
-    }
-
-    .modal h3 {
-      margin: 0 0 2rem;
-      font-size: 2rem;
-      text-align: center;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .modal .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .modal label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: #4a5568;
-    }
-
-    .modal input, .modal select {
-      width: 100%;
-      padding: 0.875rem;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 1rem;
-      transition: border-color 0.3s;
-    }
-
-    .modal input:focus, .modal select:focus {
-      outline: none;
-      border-color: #667eea;
-    }
-
-    .modal-buttons {
-      display: flex;
-      gap: 1rem;
-      margin-top: 2rem;
-    }
-
-    .modal-button {
-      flex: 1;
-      padding: 0.875rem;
-      border: none;
-      border-radius: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .modal-button.primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-
-    .modal-button.primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-    }
-
-    .modal-button.secondary {
-      background: #e2e8f0;
-      color: #4a5568;
-    }
-
-    .modal-button.secondary:hover {
-      background: #cbd5e0;
-    }
-
-    /* Main Content Area */
-    .main-content {
-      display: none;
-      padding: 5rem 2rem 2rem;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    .main-content.active {
-      display: block;
-    }
-
-    /* Dashboard */
-    .dashboard-header {
-      background: white;
-      border-radius: 20px;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-
-    .dashboard-header h2 {
-      margin: 0 0 0.5rem;
-      font-size: 2rem;
-      color: #2d3748;
-    }
-
-    .dashboard-header p {
-      margin: 0;
-      color: #718096;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .stat-card {
-      background: white;
-      border-radius: 15px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      text-align: center;
-      transition: transform 0.3s;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-5px);
-    }
-
-    .stat-number {
-      font-size: 2.5rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0;
-    }
-
-    .stat-label {
-      color: #718096;
-      margin: 0.5rem 0 0;
-      font-size: 0.95rem;
-    }
-
-    /* Feature Cards Grid */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-      margin-bottom: 3rem;
-    }
-
-    .feature-card {
-      background: white;
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      transition: all 0.3s;
-      cursor: pointer;
-      border: 2px solid transparent;
-    }
-
-    .feature-card:hover {
-      transform: translateY(-5px);
-      border-color: #667eea;
-      box-shadow: 0 8px 30px rgba(102, 126, 234, 0.2);
-    }
-
-    .feature-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-
-    .feature-card h3 {
-      margin: 0 0 1rem;
-      font-size: 1.5rem;
-      color: #2d3748;
-    }
-
-    .feature-card p {
-      margin: 0;
-      color: #718096;
-      line-height: 1.6;
-    }
-
-    /* Case Library */
-    .case-library-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2rem;
-    }
-
-    .case-card {
-      background: white;
-      border-radius: 15px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      transition: all 0.3s;
-      cursor: pointer;
-      border: 2px solid transparent;
-      position: relative;
-    }
-
-    .case-card:hover {
-      border-color: #667eea;
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.2);
-    }
-
-    .case-card.bookmarked {
-      border-color: #f6ad55;
-    }
-
-    .bookmark-icon {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      font-size: 1.5rem;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-
-    .bookmark-icon:hover {
-      transform: scale(1.2);
-    }
-
-    .case-card h4 {
-      margin: 0 0 0.5rem;
-      color: #2d3748;
-      font-size: 1.125rem;
-      padding-right: 2rem;
-    }
-
-    .case-card p {
-      margin: 0.25rem 0;
-      color: #718096;
-      font-size: 0.9rem;
-    }
-
-    .difficulty-badge {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 15px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      margin-top: 0.5rem;
-    }
-
-    .difficulty-beginner {
-      background: #c6f6d5;
-      color: #22543d;
-    }
-
-    .difficulty-intermediate {
-      background: #feebc8;
-      color: #7c2d12;
-    }
-
-    .difficulty-advanced {
-      background: #fed7d7;
-      color: #742a2a;
-    }
-
-    .priority-badge {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 15px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      margin-left: 0.5rem;
-    }
-
-    .priority-high {
-      background: #fed7d7;
-      color: #742a2a;
-    }
-
-    .priority-medium {
-      background: #feebc8;
-      color: #7c2d12;
-    }
-
-    .priority-low {
-      background: #bee3f8;
-      color: #2c5282;
-    }
-
-    .case-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 1rem;
-    }
-
-    .case-action-btn {
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.875rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .case-action-btn.view {
-      background: #667eea;
-      color: white;
-    }
-
-    .case-action-btn.view:hover {
-      background: #5568d3;
-    }
-
-    .case-action-btn.delete {
-      background: #fc8181;
-      color: white;
-    }
-
-    .case-action-btn.delete:hover {
-      background: #f56565;
-    }
-
-    /* Assessment Toolkit */
-    .toolkit-container {
-      background: white;
-      border-radius: 20px;
-      padding: 3rem;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .form-group label {
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      font-size: 0.95rem;
-      color: #4a5568;
-    }
-
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-      padding: 0.875rem;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-family: inherit;
-      background: white;
-      transition: border-color 0.3s;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus,
-    .form-group select:focus {
-      outline: none;
-      border-color: #667eea;
-    }
-
-    .form-group textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .collapsible-section {
-      border: 2px solid #e2e8f0;
-      border-radius: 15px;
-      margin-bottom: 2rem;
-      overflow: hidden;
-      background: white;
-    }
-
-    .collapsible-header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 1.25rem;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 600;
-      font-size: 1.125rem;
-    }
-
-    .collapsible-header:hover {
-      opacity: 0.9;
-    }
-
-    .collapsible-content {
-      padding: 2rem;
-      display: none;
-    }
-
-    .collapsible-content.active {
-      display: block;
-    }
-
-    .arrow {
-      transition: transform 0.3s;
-    }
-
-    .arrow.rotated {
-      transform: rotate(180deg);
-    }
-
-    /* AI Diagnosis Section */
-    .ai-diagnosis-container {
-      background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-      border-radius: 15px;
-      padding: 2rem;
-      margin-top: 2rem;
-      border: 2px solid #667eea;
-    }
-
-    .ai-diagnosis-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .ai-diagnosis-header h4 {
-      margin: 0;
-      font-size: 1.5rem;
-      color: #2d3748;
-    }
-
-    .ai-badge {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 0.25rem 0.75rem;
-      border-radius: 15px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    .diagnosis-item {
-      background: white;
-      border-radius: 10px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      border-left: 4px solid #667eea;
-    }
-
-    .diagnosis-item h5 {
-      margin: 0 0 0.5rem;
-      color: #2d3748;
-      font-size: 1.125rem;
-    }
-
-    .diagnosis-item p {
-      margin: 0.5rem 0;
-      color: #4a5568;
-      line-height: 1.6;
-    }
-
-    .diagnosis-item strong {
-      color: #2d3748;
-    }
-
-    /* Buttons */
-    .primary-button {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 1rem 2rem;
-      font-size: 1rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    }
-
-    .primary-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-    }
-
-    .primary-button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .secondary-button {
-      background: white;
-      color: #667eea;
-      padding: 1rem 2rem;
-      font-size: 1rem;
-      font-weight: 600;
-      border: 2px solid #667eea;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .secondary-button:hover {
-      background: #667eea;
-      color: white;
-    }
-
-    /* Tabs */
-    .tabs-container {
-      background: white;
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      margin-bottom: 2rem;
-    }
-
-    .tabs-header {
-      display: flex;
-      gap: 1rem;
-      border-bottom: 2px solid #e2e8f0;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-    }
-
-    .tab-button {
-      padding: 1rem 2rem;
-      background: none;
-      border: none;
-      border-bottom: 3px solid transparent;
-      cursor: pointer;
-      font-weight: 600;
-      color: #718096;
-      transition: all 0.3s;
-    }
-
-    .tab-button.active {
-      color: #667eea;
-      border-bottom-color: #667eea;
-    }
-
-    .tab-button:hover {
-      color: #667eea;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* Knowledge Hub */
-    .resource-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .resource-card {
-      background: white;
-      border-radius: 15px;
-      padding: 2rem;
-      text-align: center;
-      transition: all 0.3s;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-
-    .resource-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    }
-
-    .resource-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-
-    .resource-card h4 {
-      margin: 0 0 0.5rem;
-      color: #2d3748;
-    }
-
-    .resource-card a {
-      color: #667eea;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .resource-card a:hover {
-      text-decoration: underline;
-    }
-
-    /* Progress Analytics */
-    .progress-section {
-      background: white;
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      margin-bottom: 2rem;
-    }
-
-    .progress-bar-container {
-      margin: 1.5rem 0;
-    }
-
-    .progress-label {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-      color: #4a5568;
-    }
-
-    .progress-bar {
-      width: 100%;
-      height: 20px;
-      background: #e2e8f0;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      transition: width 0.5s ease;
-    }
-
-    /* Badges */
-    .badges-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2rem;
-    }
-
-    .badge-item {
-      text-align: center;
-      padding: 1rem;
-      background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-      border-radius: 15px;
-      transition: all 0.3s;
-    }
-
-    .badge-item:hover {
-      transform: scale(1.05);
-    }
-
-    .badge-icon {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .badge-name {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: #4a5568;
-    }
-
-    .badge-locked {
-      opacity: 0.4;
-      filter: grayscale(100%);
-    }
-
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 3rem;
-      color: #a0aec0;
-    }
-
-    .empty-state-icon {
-      font-size: 4rem;
-      margin-bottom: 1rem;
-    }
-
-    /* Section Headers */
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .section-header h2 {
-      margin: 0;
-      font-size: 2rem;
-      color: white;
-    }
-
-    .section-header h3 {
-      margin: 0;
-      font-size: 1.5rem;
-      color: #2d3748;
-    }
-
-    /* Contact Section */
-    .contact-section {
-      background: white;
-      border-radius: 20px;
-      padding: 3rem;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    }
-
-    .contact-section h3 {
-      font-size: 2rem;
-      margin: 0 0 2rem;
-      text-align: center;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .contact-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-    }
-
-    .contact-item {
-      text-align: center;
-      padding: 1.5rem;
-      background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-      border-radius: 15px;
-    }
-
-    .contact-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .contact-item h4 {
-      margin: 0 0 0.5rem;
-      color: #2d3748;
-      font-size: 1.125rem;
-    }
-
-    .contact-item a {
-      color: #667eea;
-      text-decoration: none;
-      font-weight: 600;
-      word-break: break-all;
-    }
-
-    .contact-item a:hover {
-      text-decoration: underline;
-    }
-
-    /* Footer */
-    footer {
-      background: rgba(255, 255, 255, 0.95);
-      color: #4a5568;
-      text-align: center;
-      padding: 2rem;
-      margin-top: 5rem;
-    }
-
-    /* Loading State */
-    .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Toast Notification */
-    .toast {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: white;
-      color: #2d3748;
-      padding: 1rem 1.5rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      display: none;
-      align-items: center;
-      gap: 0.75rem;
-      z-index: 3000;
-      animation: slideIn 0.3s ease-out;
-    }
-
-    .toast.active {
-      display: flex;
-    }
-
-    .toast.success {
-      border-left: 4px solid #48bb78;
-    }
-
-    .toast.error {
-      border-left: 4px solid #f56565;
-    }
-
-    @keyframes slideIn {
-      from {
-        transform: translateX(400px);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
-    /* Filter Controls */
-    .filter-controls {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-    }
-
-    .filter-controls select,
-    .filter-controls input {
-      padding: 0.75rem;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 1rem;
-      background: white;
-    }
-
-    .filter-controls input {
-      flex: 1;
-      min-width: 250px;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      nav ul {
-        gap: 1rem;
-        font-size: 0.9rem;
-      }
-
-      .hero h1 {
-        font-size: 2.5rem;
-      }
-
-      .hero .tagline {
-        font-size: 1.25rem;
-      }
-
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .main-content {
-        padding: 3rem 1.5rem;
-      }
-
-      .toolkit-container {
-        padding: 2rem 1.5rem;
-      }
-
-      .modal {
-        padding: 2rem;
-      }
-
-      .tabs-header {
-        overflow-x: auto;
-      }
-
-      .filter-controls {
-        flex-direction: column;
-      }
-
-      .filter-controls input {
-        width: 100%;
-      }
-    }
-  </style>
-  <style>@view-transition { navigation: auto; }</style>
-  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
- </head>
- <body>
-  <nav>
-   <div class="container">
-    <div class="logo" id="nav-logo">
-     🧠 NurseCare+
-    </div>
-    <ul>
-     <li><a onclick="showSection('home')">Home</a></li>
-     <li><a onclick="showSection('dashboard')">Dashboard</a></li>
-     <li><a onclick="showSection('features')">Features</a></li>
-     <li><a onclick="showSection('contact')">Contact</a></li>
-     <li id="auth-nav-item"><button class="nav-button" id="auth-button" onclick="showAuthModal()">Sign In</button></li>
-    </ul>
-   </div>
-  </nav><!-- Auth Modal -->
-  <div class="modal-overlay" id="auth-modal">
-   <div class="modal">
-    <h3 id="auth-modal-title">Create Your Account</h3>
-    <form id="auth-form">
-     <div class="form-group"><label for="auth-email">Email Address</label> <input type="email" id="auth-email" required placeholder="your.email@example.com">
-     </div>
-     <div class="form-group"><label for="auth-name">Full Name</label> <input type="text" id="auth-name" required placeholder="Your Name">
-     </div>
-     <div class="form-group"><label for="auth-level">Experience Level</label> <select id="auth-level" required> <option value="">Select your level...</option> <option value="beginner">Beginner - First Year Student</option> <option value="intermediate">Intermediate - 2nd-3rd Year</option> <option value="advanced">Advanced - Final Year/Graduate</option> </select>
-     </div>
-     <div class="modal-buttons"><button type="button" class="modal-button secondary" onclick="closeAuthModal()">Cancel</button> <button type="submit" class="modal-button primary" id="auth-submit-btn"> <span id="auth-submit-text">Get Started</span> </button>
-     </div>
-    </form>
-    <p style="text-align: center; margin-top: 1.5rem; color: #718096; font-size: 0.9rem;">Create a secure account to save progress, manage portfolios, and receive personalized updates.</p>
-   </div>
-  </div><!-- Home Section -->
-  <section id="home" class="main-content active">
-   <div class="hero">
-    <h1 id="hero-title">🧠 NurseCare+</h1>
-    <p class="tagline" id="hero-tagline">AI-Powered Nursing Education</p>
-    <p id="hero-description">NurseCare+ is a next-generation AI-powered nursing education platform that provides an immersive, interactive experience for students, combining advanced simulation, personalized learning, and comprehensive skill development. Access dynamic case scenarios, smart assessment tools, AI-generated diagnoses and care plans, multimedia resources, adaptive learning modules, collaborative spaces, and detailed progress analytics—all designed to prepare you for real-world nursing practice.</p><button class="cta-button" onclick="showAuthModal()">Start Learning Today</button>
-   </div>
-   <div style="padding: 4rem 2rem; max-width: 1400px; margin: 0 auto;">
-    <h2 style="text-align: center; color: white; font-size: 2.5rem; margin-bottom: 3rem;">Platform Features</h2>
-    <div class="features-grid">
-     <div class="feature-card" onclick="showSection('case-explorer')">
-      <div class="feature-icon">
-       🔍
-      </div>
-      <h3>Dynamic Case Explorer</h3>
-      <p>Explore diverse patient scenarios across pediatrics, adult care, geriatrics, obstetrics, and specialty units with varying complexity levels.</p>
-     </div>
-     <div class="feature-card" onclick="showSection('assessment-console')">
-      <div class="feature-icon">
-       📋
-      </div>
-      <h3>Smart Assessment Console</h3>
-      <p>Document comprehensive patient data including system-specific findings, symptom patterns, lab results, and obstetrical history (LMP/EDC).</p>
-     </div>
-     <div class="feature-card" onclick="showSection('ai-diagnosis')">
-      <div class="feature-icon">
-       🤖
-      </div>
-      <h3>AI Diagnosis Engine</h3>
-      <p>Generate evidence-based nursing diagnoses, care plans, and interventions with priority levels, rationale, and expected outcomes.</p>
-     </div>
-     <div class="feature-card" onclick="showSection('multimedia')">
-      <div class="feature-icon">
-       🎥
-      </div>
-      <h3>Multimedia Resources</h3>
-      <p>Access interactive tutorials, 3D anatomical models, instructional videos, infographics, and virtual skill demonstrations.</p>
-     </div>
-     <div class="feature-card" onclick="showSection('adaptive-learning')">
-      <div class="feature-icon">
-       📚
-      </div>
-      <h3>Adaptive Learning</h3>
-      <p>Experience personalized learning modules that adjust complexity based on your performance with AI-guided reasoning exercises.</p>
-     </div>
-     <div class="feature-card" onclick="showSection('collaboration')">
-      <div class="feature-icon">
-       👥
-      </div>
-      <h3>Collaborative Spaces</h3>
-      <p>Engage in team-based case discussions, peer review, and scenario-based competitions to enhance analytical skills.</p>
-     </div>
-     <div class="feature-card" onclick="showSection('knowledge-hub')">
-      <div class="feature-icon">
-       📖
-      </div>
-      <h3>Resource Library</h3>
-      <p>Access trusted guidelines from PubMed, WHO, DOH, NANDA International, and other evidence-based sources.</p>
-     </div>
-     <div class="feature-card" onclick="showSection('progress')">
-      <div class="feature-icon">
-       📊
-      </div>
-      <h3>Progress Analytics</h3>
-      <p>Track performance, completed cases, skill mastery, and bookmark favorite scenarios for revision with detailed insights.</p>
-     </div>
-    </div>
-   </div>
-  </section><!-- Dashboard Section -->
-  <section id="dashboard" class="main-content">
-   <div class="dashboard-header">
-    <h2>Welcome back, <span id="user-name-display">Student</span>! 👋</h2>
-    <p>Track your progress and continue your AI-powered nursing education journey</p>
-   </div>
-   <div class="stats-grid">
-    <div class="stat-card">
-     <p class="stat-number" id="total-cases">0</p>
-     <p class="stat-label">Cases Completed</p>
-    </div>
-    <div class="stat-card">
-     <p class="stat-number" id="badges-earned">0</p>
-     <p class="stat-label">Badges Earned</p>
-    </div>
-    <div class="stat-card">
-     <p class="stat-number" id="avg-score">0%</p>
-     <p class="stat-label">Average Score</p>
-    </div>
-    <div class="stat-card">
-     <p class="stat-number" id="skill-level">Beginner</p>
-     <p class="stat-label">Current Level</p>
-    </div>
-    <div class="stat-card">
-     <p class="stat-number" id="bookmarked-cases">0</p>
-     <p class="stat-label">Bookmarked Cases</p>
-    </div>
-    <div class="stat-card">
-     <p class="stat-number" id="hours-practiced">0</p>
-     <p class="stat-label">Hours Practiced</p>
-    </div>
-   </div>
-   <div class="progress-section">
-    <h3>Your Learning Progress</h3>
-    <div class="progress-bar-container">
-     <div class="progress-label"><span>Assessment Skills</span> <span id="assessment-progress">0%</span>
-     </div>
-     <div class="progress-bar">
-      <div class="progress-fill" id="assessment-bar" style="width: 0%"></div>
-     </div>
-    </div>
-    <div class="progress-bar-container">
-     <div class="progress-label"><span>Care Planning</span> <span id="planning-progress">0%</span>
-     </div>
-     <div class="progress-bar">
-      <div class="progress-fill" id="planning-bar" style="width: 0%"></div>
-     </div>
-    </div>
-    <div class="progress-bar-container">
-     <div class="progress-label"><span>Clinical Reasoning</span> <span id="reasoning-progress">0%</span>
-     </div>
-     <div class="progress-bar">
-      <div class="progress-fill" id="reasoning-bar" style="width: 0%"></div>
-     </div>
-    </div>
-    <div class="progress-bar-container">
-     <div class="progress-label"><span>Skill Mastery</span> <span id="mastery-progress">0%</span>
-     </div>
-     <div class="progress-bar">
-      <div class="progress-fill" id="mastery-bar" style="width: 0%"></div>
-     </div>
-    </div>
-   </div>
-   <div class="progress-section">
-    <div class="section-header">
-     <h3>Achievement Badges</h3>
-    </div>
-    <div class="badges-grid">
-     <div class="badge-item" id="badge-first-case">
-      <div class="badge-icon">
-       🎯
-      </div>
-      <div class="badge-name">
-       First Case
-      </div>
-     </div>
-     <div class="badge-item badge-locked" id="badge-five-cases">
-      <div class="badge-icon">
-       ⭐
-      </div>
-      <div class="badge-name">
-       5 Cases
-      </div>
-     </div>
-     <div class="badge-item badge-locked" id="badge-ten-cases">
-      <div class="badge-icon">
-       🏆
-      </div>
-      <div class="badge-name">
-       10 Cases
-      </div>
-     </div>
-     <div class="badge-item badge-locked" id="badge-assessment-master">
-      <div class="badge-icon">
-       📋
-      </div>
-      <div class="badge-name">
-       Assessment Master
-      </div>
-     </div>
-     <div class="badge-item badge-locked" id="badge-ai-expert">
-      <div class="badge-icon">
-       🤖
-      </div>
-      <div class="badge-name">
-       AI Expert
-      </div>
-     </div>
-     <div class="badge-item badge-locked" id="badge-collaborator">
-      <div class="badge-icon">
-       👥
-      </div>
-      <div class="badge-name">
-       Team Player
-      </div>
-     </div>
-    </div>
-   </div>
-   <div class="tabs-container">
-    <div class="tabs-header"><button class="tab-button active" onclick="switchTab('my-cases')">My Cases</button> <button class="tab-button" onclick="switchTab('bookmarked')">Bookmarked</button> <button class="tab-button" onclick="switchTab('recent-activity')">Recent Activity</button>
-    </div>
-    <div id="my-cases" class="tab-content active">
-     <div class="section-header">
-      <h3>Your Saved Cases</h3><button class="primary-button" onclick="showSection('assessment-console')">+ New Case</button>
-     </div>
-     <div id="user-cases-list">
-      <div class="empty-state">
-       <div class="empty-state-icon">
-        📋
-       </div>
-       <p>No saved cases yet. Start your first assessment to begin learning!</p>
-      </div>
-     </div>
-    </div>
-    <div id="bookmarked" class="tab-content">
-     <h3>Bookmarked Cases</h3>
-     <div id="bookmarked-cases-list">
-      <div class="empty-state">
-       <div class="empty-state-icon">
-        ⭐
-       </div>
-       <p>No bookmarked cases yet. Bookmark cases you want to revisit!</p>
-      </div>
-     </div>
-    </div>
-    <div id="recent-activity" class="tab-content">
-     <h3>Recent Activity</h3>
-     <div id="activity-list">
-      <div class="empty-state">
-       <div class="empty-state-icon">
-        📊
-       </div>
-       <p>Your recent activities will appear here.</p>
-      </div>
-     </div>
-    </div>
-   </div>
-  </section><!-- Features Section -->
-  <section id="features" class="main-content">
-   <div class="section-header">
-    <h2>Explore Platform Features</h2>
-   </div>
-   <div class="tabs-container">
-    <div class="tabs-header"><button class="tab-button active" onclick="switchFeatureTab('case-explorer')">Case Explorer</button> <button class="tab-button" onclick="switchFeatureTab('assessment-console')">Assessment Console</button> <button class="tab-button" onclick="switchFeatureTab('ai-diagnosis')">AI Diagnosis</button> <button class="tab-button" onclick="switchFeatureTab('multimedia')">Multimedia</button> <button class="tab-button" onclick="switchFeatureTab('adaptive-learning')">Adaptive Learning</button> <button class="tab-button" onclick="switchFeatureTab('collaboration')">Collaboration</button> <button class="tab-button" onclick="switchFeatureTab('knowledge-hub')">Knowledge Hub</button> <button class="tab-button" onclick="switchFeatureTab('progress')">Progress</button>
-    </div><!-- Case Explorer Tab -->
-    <div id="case-explorer" class="tab-content active">
-     <h3>Dynamic Case Explorer</h3>
-     <p style="color: #718096; margin-bottom: 2rem;">Browse and practice with diverse patient scenarios across specialties and difficulty levels.</p>
-     <div class="filter-controls"><input type="text" id="case-search" placeholder="🔍 Search cases..." onkeyup="filterCases()"> <select id="specialty-filter" onchange="filterCases()"> <option value="all">All Specialties</option> <option value="pediatrics">Pediatrics</option> <option value="adult-care">Adult Care</option> <option value="geriatrics">Geriatrics</option> <option value="obstetrics">Obstetrics</option> <option value="critical-care">Critical Care</option> <option value="mental-health">Mental Health</option> <option value="community">Community Health</option> </select> <select id="difficulty-filter" onchange="filterCases()"> <option value="all">All Levels</option> <option value="beginner">Beginner</option> <option value="intermediate">Intermediate</option> <option value="advanced">Advanced</option> </select>
-     </div>
-     <div class="case-library-grid" id="case-library-grid">
-      <div class="empty-state">
-       <div class="empty-state-icon">
-        📚
-       </div>
-       <p>Your saved cases will appear here. Create your first case to get started!</p>
-      </div>
-     </div>
-    </div><!-- Assessment Console Tab -->
-    <div id="assessment-console" class="tab-content">
-     <h3>Smart Assessment Console</h3>
-     <p style="color: #718096; margin-bottom: 2rem;">Create comprehensive patient assessments with our AI-powered toolkit.</p>
-     <div class="toolkit-container">
-      <form id="assessment-form">
-       <div class="form-group"><label for="case-title">Case Title</label> <input type="text" id="case-title" placeholder="e.g., Respiratory Assessment - Patient A" required>
-       </div>
-       <div class="form-grid">
-        <div class="form-group"><label for="patient-name">Patient Name (Simulated)</label> <input type="text" id="patient-name" placeholder="e.g., Patient A" required>
-        </div>
-        <div class="form-group"><label for="patient-age">Age</label> <input type="text" id="patient-age" placeholder="e.g., 45 years" required>
-        </div>
-        <div class="form-group"><label for="patient-sex">Sex</label> <select id="patient-sex" required> <option value="">Select...</option> <option value="Male">Male</option> <option value="Female">Female</option> <option value="Other">Other</option> </select>
-        </div>
-        <div class="form-group"><label for="specialty">Specialty Area</label> <select id="specialty" required> <option value="">Select...</option> <option value="pediatrics">Pediatrics</option> <option value="adult-care">Adult Care</option> <option value="geriatrics">Geriatrics</option> <option value="obstetrics">Obstetrics</option> <option value="critical-care">Critical Care</option> <option value="mental-health">Mental Health</option> <option value="community">Community Health</option> </select>
-        </div>
-        <div class="form-group"><label for="difficulty-level">Difficulty Level</label> <select id="difficulty-level" required> <option value="">Select...</option> <option value="beginner">Beginner</option> <option value="intermediate">Intermediate</option> <option value="advanced">Advanced</option> </select>
-        </div>
-        <div class="form-group"><label for="priority-level">Priority Level</label> <select id="priority-level" required> <option value="">Select...</option> <option value="high">High Priority</option> <option value="medium">Medium Priority</option> <option value="low">Low Priority</option> </select>
-        </div>
-       </div>
-       <div class="form-group"><label for="chief-complaint">Chief Complaint</label> <textarea id="chief-complaint" placeholder="Describe the primary concern or symptom..." required></textarea>
-       </div>
-       <div class="collapsible-section">
-        <div class="collapsible-header" onclick="toggleSection('vitals')"><span>Vital Signs &amp; Pain Assessment</span> <span class="arrow" id="vitals-arrow">▼</span>
-        </div>
-        <div class="collapsible-content active" id="vitals-content">
-         <div class="form-grid">
-          <div class="form-group"><label for="bp">Blood Pressure</label> <input type="text" id="bp" placeholder="e.g., 120/80 mmHg">
-          </div>
-          <div class="form-group"><label for="hr">Heart Rate</label> <input type="text" id="hr" placeholder="e.g., 72 bpm">
-          </div>
-          <div class="form-group"><label for="rr">Respiratory Rate</label> <input type="text" id="rr" placeholder="e.g., 16 breaths/min">
-          </div>
-          <div class="form-group"><label for="temp">Temperature</label> <input type="text" id="temp" placeholder="e.g., 37°C">
-          </div>
-          <div class="form-group"><label for="spo2">SpO2</label> <input type="text" id="spo2" placeholder="e.g., 98%">
-          </div>
-          <div class="form-group"><label for="pain">Pain Scale (0-10)</label> <input type="text" id="pain" placeholder="e.g., 5/10">
-          </div>
-         </div>
-        </div>
-       </div>
-       <div class="form-group"><label for="subjective">Subjective Data</label> <textarea id="subjective" placeholder="Patient's reported symptoms, feelings, concerns..." required></textarea>
-       </div>
-       <div class="form-group"><label for="objective">Objective Data</label> <textarea id="objective" placeholder="Observable findings, physical examination results..." required></textarea>
-       </div>
-       <div class="collapsible-section">
-        <div class="collapsible-header" onclick="toggleSection('systems')"><span>System-Specific Findings</span> <span class="arrow" id="systems-arrow">▼</span>
-        </div>
-        <div class="collapsible-content" id="systems-content">
-         <div class="form-group"><label for="system-cardiovascular">Cardiovascular System</label> <textarea id="system-cardiovascular" placeholder="Heart sounds, peripheral pulses, edema, capillary refill..."></textarea>
-         </div>
-         <div class="form-group"><label for="system-respiratory">Respiratory System</label> <textarea id="system-respiratory" placeholder="Breath sounds, respiratory effort, cough, sputum..."></textarea>
-         </div>
-         <div class="form-group"><label for="system-neurological">Neurological System</label> <textarea id="system-neurological" placeholder="Level of consciousness, orientation, pupil response, motor/sensory function..."></textarea>
-         </div>
-         <div class="form-group"><label for="system-gastrointestinal">Gastrointestinal System</label> <textarea id="system-gastrointestinal" placeholder="Bowel sounds, abdomen assessment, nausea, vomiting..."></textarea>
-         </div>
-         <div class="form-group"><label for="system-genitourinary">Genitourinary System</label> <textarea id="system-genitourinary" placeholder="Urinary output, color, frequency, continence..."></textarea>
-         </div>
-         <div class="form-group"><label for="system-musculoskeletal">Musculoskeletal System</label> <textarea id="system-musculoskeletal" placeholder="Range of motion, strength, gait, mobility..."></textarea>
-         </div>
-         <div class="form-group"><label for="system-integumentary">Integumentary System</label> <textarea id="system-integumentary" placeholder="Skin color, temperature, turgor, wounds, rashes..."></textarea>
-         </div>
-        </div>
-       </div>
-       <div class="collapsible-section">
-        <div class="collapsible-header" onclick="toggleSection('clinical-data')"><span>Clinical Data &amp; History</span> <span class="arrow" id="clinical-data-arrow">▼</span>
-        </div>
-        <div class="collapsible-content" id="clinical-data-content">
-         <div class="form-group"><label for="symptom-patterns">Symptom Patterns</label> <textarea id="symptom-patterns" placeholder="Onset, duration, frequency, aggravating/relieving factors..."></textarea>
-         </div>
-         <div class="form-group"><label for="previous-treatments">Previous Treatments</label> <textarea id="previous-treatments" placeholder="Medications, therapies, procedures, effectiveness..."></textarea>
-         </div>
-         <div class="form-group"><label for="lab-results">Laboratory Results</label> <textarea id="lab-results" placeholder="CBC, metabolic panel, cultures, imaging results..."></textarea>
-         </div>
-        </div>
-       </div>
-       <div class="collapsible-section" id="obstetric-section" style="display: none;">
-        <div class="collapsible-header" onclick="toggleSection('obstetric')"><span>Obstetrical History (For Obstetrics Cases)</span> <span class="arrow" id="obstetric-arrow">▼</span>
-        </div>
-        <div class="collapsible-content" id="obstetric-content">
-         <div class="form-grid">
-          <div class="form-group"><label for="obstetric-lmp">Last Menstrual Period (LMP)</label> <input type="date" id="obstetric-lmp">
-          </div>
-          <div class="form-group"><label for="obstetric-edc">Expected Date of Confinement (EDC)</label> <input type="date" id="obstetric-edc">
-          </div>
-          <div class="form-group"><label for="obstetric-gravida">Gravida</label> <input type="text" id="obstetric-gravida" placeholder="e.g., G3">
-          </div>
-          <div class="form-group"><label for="obstetric-para">Para</label> <input type="text" id="obstetric-para" placeholder="e.g., P2">
-          </div>
-         </div>
-         <div class="form-group"><label for="obstetric-history">Detailed Obstetric History</label> <textarea id="obstetric-history" placeholder="Previous pregnancies, deliveries, complications, prenatal care..."></textarea>
-         </div>
-        </div>
-       </div>
-       <div class="form-group"><label for="assessment-data">Additional Assessment Notes</label> <textarea id="assessment-data" placeholder="Any additional observations, concerns, or contextual information..."></textarea>
-       </div>
-       <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; flex-wrap: wrap;"><button type="submit" class="primary-button" id="save-assessment-btn"> <span id="save-assessment-text">🤖 Generate AI Diagnosis &amp; Care Plan</span> </button> <button type="button" class="secondary-button" onclick="resetAssessmentForm()">Clear Form</button>
-       </div>
-      </form>
-     </div>
-    </div><!-- AI Diagnosis Tab -->
-    <div id="ai-diagnosis" class="tab-content">
-     <h3>AI Diagnosis Engine</h3>
-     <p style="color: #718096; margin-bottom: 2rem;">View AI-generated nursing diagnoses, care plans, and evidence-based interventions.</p>
-     <div class="toolkit-container">
-      <div class="empty-state">
-       <div class="empty-state-icon">
-        🤖
-       </div>
-       <p>Complete an assessment to generate AI-powered nursing diagnoses and care plans with priority levels, rationale, and expected outcomes.</p><button class="primary-button" style="margin-top: 1rem;" onclick="switchFeatureTab('assessment-console')">Start Assessment</button>
-      </div>
-     </div>
-    </div><!-- Multimedia Tab -->
-    <div id="multimedia" class="tab-content">
-     <h3>Multimedia Resources</h3>
-     <p style="color: #718096; margin-bottom: 2rem;">Access interactive tutorials, 3D models, videos, and virtual skill demonstrations.</p>
-     <div class="resource-grid">
-      <div class="resource-card">
-       <div class="resource-icon">
-        🎥
-       </div>
-       <h4>Video Library</h4>
-       <p>Instructional videos for nursing procedures and clinical skills</p>
-      </div>
-      <div class="resource-card">
-       <div class="resource-icon">
-        🧬
-       </div>
-       <h4>3D Anatomical Models</h4>
-       <p>Interactive 3D models for anatomy and physiology learning</p>
-      </div>
-      <div class="resource-card">
-       <div class="resource-icon">
-        📊
-       </div>
-       <h4>Infographics</h4>
-       <p>Visual guides for complex concepts and clinical pathways</p>
-      </div>
-      <div class="resource-card">
-       <div class="resource-icon">
-        📝
-       </div>
-       <h4>Skill Demonstrations</h4>
-       <p>Virtual demonstrations of essential nursing skills</p>
-      </div>
-      <div class="resource-card">
-       <div class="resource-icon">
-        🎮
-       </div>
-       <h4>Interactive Tutorials</h4>
-       <p>Hands-on learning modules with immediate feedback</p>
-      </div>
-      <div class="resource-card">
-       <div class="resource-icon">
-        🔬
-       </div>
-       <h4>Lab Values Guide</h4>
-       <p>Reference guides for interpreting laboratory results</p>
-      </div>
-     </div>
-    </div><!-- Adaptive Learning Tab -->
-    <div id="adaptive-learning" class="tab-content">
-     <h3>Adaptive Learning Modules</h3>
-     <p style="color: #718096; margin-bottom: 2rem;">Experience personalized learning that adjusts to your performance level.</p>
-     <div class="toolkit-container">
-      <div style="margin-bottom: 2rem;">
-       <h4>🎯 AI-Guided Reasoning Exercises</h4>
-       <p style="color: #718096;">Practice critical thinking with scenarios that adapt to your skill level.</p>
-      </div>
-      <div style="margin-bottom: 2rem;">
-       <h4>💭 Reflective Practice Prompts</h4>
-       <p style="color: #718096;">Enhance your clinical reasoning through guided reflection on case scenarios.</p>
-      </div>
-      <div class="form-group"><label for="reflection-notes">Reflection Notes</label> <textarea id="reflection-notes" placeholder="Reflect on your learning experience, challenges faced, insights gained..." style="min-height: 150px;"></textarea>
-      </div>
-      <div style="margin-top: 2rem;">
-       <h4>📈 Performance-Based Complexity Adjustment</h4>
-       <p style="color: #718096;">The platform automatically adjusts case difficulty based on your performance:</p>
-       <ul style="color: #4a5568; margin-top: 1rem; line-height: 1.8;">
-        <li>High performance (&gt;80%) → Advanced cases recommended</li>
-        <li>Moderate performance (60-80%) → Intermediate cases recommended</li>
-        <li>Developing skills (&lt;60%) → Beginner cases with additional support</li>
-       </ul>
-      </div>
-     </div>
-    </div><!-- Collaboration Tab -->
-    <div id="collaboration" class="tab-content">
-     <h3>Collaborative Learning Spaces</h3>
-     <p style="color: #718096; margin-bottom: 2rem;">Engage in team-based discussions, peer review, and scenario competitions.</p>
-     <div class="toolkit-container">
-      <div class="form-group"><label for="collaboration-notes">Collaboration Notes</label> <textarea id="collaboration-notes" placeholder="Share your thoughts, questions, or insights with peers..." style="min-height: 150px;"></textarea>
-      </div><button class="primary-button">Share with Team</button>
-      <div style="margin-top: 3rem;">
-       <h4>👥 Team-Based Case Discussions</h4>
-       <p style="color: #718096; margin-bottom: 1rem;">Collaborate with peers to analyze complex cases and develop comprehensive care plans.</p>
-       <h4 style="margin-top: 2rem;">📝 Peer Review Module</h4>
-       <p style="color: #718096; margin-bottom: 1rem;">Review and provide constructive feedback on peer assessments to enhance analytical skills.</p>
-       <h4 style="margin-top: 2rem;">🏆 Scenario-Based Competitions</h4>
-       <p style="color: #718096;">Participate in friendly competitions to test your skills against other learners.</p>
-      </div>
-     </div>
-    </div><!-- Knowledge Hub Tab -->
-    <div id="knowledge-hub" class="tab-content">
-     <h3>Resource Library</h3>
-     <p style="color: #718096; margin-bottom: 2rem;">Access trusted guidelines and evidence-based resources from leading authorities.</p>
-     <div style="margin-bottom: 2rem;"><input type="text" placeholder="🔍 Search guidelines, protocols, and references..." style="width: 100%; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 1rem;">
-     </div>
-     <div class="resource-grid">
-      <div class="resource-card">
-       <div class="resource-icon">
-        📚
-       </div>
-       <h4>NANDA International</h4><a href="https://www.nanda.org/" target="_blank" rel="noopener noreferrer">Nursing Diagnoses</a>
-      </div>
-      <div class="resource-card">
-       <div class="resource-icon">
-        🌍
-       </div>
-       <h4>WHO</h4><a href="https://www.who.int/" target="_blank" rel="noopener noreferrer">Global Health Standards</a>
-      </div>
-      <div class="resource-card">
-       <div class="resource-icon">
-        🏥
-       </div>
-       <h4>DOH</h4><a href="https://www.doh.gov.ph/" target="_blank" rel="noopener noreferrer">Department of Health</a>
-      </div>
-      <div class="resource-card">
-       <div class="resource-icon">
-        📖
-       </div>
-       <h4>PubMed</h4><a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">Research Database</a>
-      </div>
-      <div class="resource-card">
-       <div class="resource-icon">
-        🔬
-       </div>
-       <h4>Evidence-Based Practice</h4>
-       <p>Clinical guidelines and protocols</p>
-      </div>
-      <div class="resource-card">
-       <div class="resource-icon">
-        📋
-       </div>
-       <h4>Clinical Pathways</h4>
-       <p>Standardized care protocols</p>
-      </div>
-      <div class="resource-card">
-       <div class="resource-icon">
-        💊
-       </div>
-       <h4>Drug References</h4>
-       <p>Medication guides and interactions</p>
-      </div>
-      <div class="resource-card">
-       <div class="resource-icon">
-        🩺
-       </div>
-       <h4>Nursing Standards</h4>
-       <p>Professional practice standards</p>
-      </div>
-     </div>
-    </div><!-- Progress Tab -->
-    <div id="progress" class="tab-content">
-     <h3>Progress Analytics Dashboard</h3>
-     <p style="color: #718096; margin-bottom: 2rem;">Track your learning journey with detailed performance insights.</p>
-     <div class="progress-section">
-      <h4>Skill Development</h4>
-      <div class="progress-bar-container">
-       <div class="progress-label"><span>Assessment Skills</span> <span>0%</span>
-       </div>
-       <div class="progress-bar">
-        <div class="progress-fill" style="width: 0%"></div>
-       </div>
-      </div>
-      <div class="progress-bar-container">
-       <div class="progress-label"><span>Care Planning</span> <span>0%</span>
-       </div>
-       <div class="progress-bar">
-        <div class="progress-fill" style="width: 0%"></div>
-       </div>
-      </div>
-      <div class="progress-bar-container">
-       <div class="progress-label"><span>Clinical Reasoning</span> <span>0%</span>
-       </div>
-       <div class="progress-bar">
-        <div class="progress-fill" style="width: 0%"></div>
-       </div>
-      </div>
-      <div class="progress-bar-container">
-       <div class="progress-label"><span>Collaboration</span> <span>0%</span>
-       </div>
-       <div class="progress-bar">
-        <div class="progress-fill" style="width: 0%"></div>
-       </div>
-      </div>
-     </div>
-     <div class="stats-grid" style="margin-top: 2rem;">
-      <div class="stat-card">
-       <p class="stat-number">0</p>
-       <p class="stat-label">Cases This Week</p>
-      </div>
-      <div class="stat-card">
-       <p class="stat-number">0</p>
-       <p class="stat-label">Study Streak (Days)</p>
-      </div>
-      <div class="stat-card">
-       <p class="stat-number">0</p>
-       <p class="stat-label">Skills Mastered</p>
-      </div>
-      <div class="stat-card">
-       <p class="stat-number">0</p>
-       <p class="stat-label">Peer Interactions</p>
-      </div>
-     </div>
-    </div>
-   </div>
-  </section><!-- Contact Section -->
-  <section id="contact" class="main-content">
-   <div class="section-header">
-    <h2>Contact &amp; Support</h2>
-   </div>
-   <div class="contact-section">
-    <h3>Get in Touch</h3>
-    <p style="text-align: center; color: #718096; margin-bottom: 2rem;">For support, inquiries, or collaboration opportunities, reach out to our team</p>
-    <div class="contact-grid">
-     <div class="contact-item">
-      <div class="contact-icon">
-       📧
-      </div>
-      <h4>Email Support</h4><a href="mailto:abdulmaliksarip566@gmail.com" id="contact-email-link">abdulmaliksarip566@gmail.com</a>
-     </div>
-     <div class="contact-item">
-      <div class="contact-icon">
-       📱
-      </div>
-      <h4>Primary Phone</h4><a href="tel:+639810420232" id="contact-phone-1-link">+639810420232</a>
-     </div>
-     <div class="contact-item">
-      <div class="contact-icon">
-       📞
-      </div>
-      <h4>Secondary Phone</h4><a href="tel:+639351286095" id="contact-phone-2-link">+639351286095</a>
-     </div>
-    </div>
-    <div style="margin-top: 3rem; padding: 2rem; background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border-radius: 15px;">
-     <h4 style="margin-top: 0; text-align: center;">Support Hours</h4>
-     <p style="text-align: center; color: #718096; margin: 0;">Monday - Friday: 8:00 AM - 6:00 PM<br>
-       Saturday: 9:00 AM - 3:00 PM<br>
-       Sunday: Closed</p>
-    </div>
-   </div>
-  </section>
-  <footer>
-   <p id="footer-text">© 2024 NurseCare+ AI Education Platform</p>
-   <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #718096;">Empowering nursing students with AI-powered comprehensive educational tools</p>
-  </footer><!-- Toast Notification -->
-  <div class="toast" id="toast"><span id="toast-message"></span>
-  </div>
-  <script>
-    const defaultConfig = {
-      site_title: "🧠 NurseCare+",
-      site_tagline: "AI-Powered Nursing Education",
-      hero_description: "NurseCare+ is a next-generation AI-powered nursing education platform that provides an immersive, interactive experience for students, combining advanced simulation, personalized learning, and comprehensive skill development. Access dynamic case scenarios, smart assessment tools, AI-generated diagnoses and care plans, multimedia resources, adaptive learning modules, collaborative spaces, and detailed progress analytics—all designed to prepare you for real-world nursing practice.",
-      contact_email: "abdulmaliksarip566@gmail.com",
-      contact_phone_1: "+639810420232",
-      contact_phone_2: "+639351286095",
-      footer_text: "© 2024 NurseCare+ AI Education Platform",
-      background_color: "#667eea",
-      accent_color: "#764ba2",
-      surface_color: "#ffffff",
-      text_color: "#2d3748",
-      button_color: "#667eea",
-      font_family: "Segoe UI",
-      font_size: 16
-    };
-
-    let currentUser = null;
-    let userName = null;
-    let userLevel = null;
-    let allCases = [];
-    let isSubmitting = false;
-
-    // Show obstetric section when obstetrics specialty is selected
-    document.getElementById('specialty').addEventListener('change', function() {
-      const obstetricSection = document.getElementById('obstetric-section');
-      if (this.value === 'obstetrics') {
-        obstetricSection.style.display = 'block';
-      } else {
-        obstetricSection.style.display = 'none';
-      }
-    });
-
-    function showSection(sectionId) {
-      if ((sectionId === 'dashboard' || sectionId === 'case-explorer' || sectionId === 'assessment-console') && !currentUser) {
-        showAuthModal();
-        return;
-      }
-
-      document.querySelectorAll('.main-content').forEach(section => {
-        section.classList.remove('active');
-      });
-      
-      const targetSection = document.getElementById(sectionId);
-      if (targetSection) {
-        targetSection.classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-
-      if (sectionId === 'dashboard' && currentUser) {
-        updateDashboard();
-      }
-
-      if (sectionId === 'case-explorer' || sectionId === 'assessment-console') {
-        showSection('features');
-        switchFeatureTab(sectionId);
-      }
-    }
-
-    function toggleSection(sectionId) {
-      const content = document.getElementById(`${sectionId}-content`);
-      const arrow = document.getElementById(`${sectionId}-arrow`);
-      
-      if (content.classList.contains('active')) {
-        content.classList.remove('active');
-        arrow.classList.remove('rotated');
-      } else {
-        content.classList.add('active');
-        arrow.classList.add('rotated');
-      }
-    }
-
-    function switchTab(tabId) {
-      document.querySelectorAll('#dashboard .tab-button').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      document.querySelectorAll('#dashboard .tab-content').forEach(content => {
-        content.classList.remove('active');
-      });
-      
-      event.target.classList.add('active');
-      document.getElementById(tabId).classList.add('active');
-
-      if (tabId === 'bookmarked') {
-        renderBookmarkedCases();
-      }
-    }
-
-    function switchFeatureTab(tabId) {
-      document.querySelectorAll('#features .tab-button').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      document.querySelectorAll('#features .tab-content').forEach(content => {
-        content.classList.remove('active');
-      });
-      
-      const buttons = document.querySelectorAll('#features .tab-button');
-      buttons.forEach(btn => {
-        if (btn.textContent.toLowerCase().includes(tabId.replace('-', ' '))) {
-          btn.classList.add('active');
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NurseCare+ AI Education Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --accent: #8b5cf6;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         }
-      });
-      
-      document.getElementById(tabId).classList.add('active');
 
-      if (tabId === 'case-explorer') {
-        filterCases();
-      }
-    }
-
-    function showAuthModal() {
-      document.getElementById('auth-modal').classList.add('active');
-    }
-
-    function closeAuthModal() {
-      document.getElementById('auth-modal').classList.remove('active');
-      document.getElementById('auth-email').value = '';
-      document.getElementById('auth-name').value = '';
-      document.getElementById('auth-level').value = '';
-    }
-
-    function showToast(message, type = 'success') {
-      const toast = document.getElementById('toast');
-      const toastMessage = document.getElementById('toast-message');
-      
-      toastMessage.textContent = message;
-      toast.className = `toast ${type} active`;
-      
-      setTimeout(() => {
-        toast.classList.remove('active');
-      }, 3000);
-    }
-
-    function updateDashboard() {
-      if (!currentUser) return;
-
-      const userCases = allCases.filter(c => c.user_email === currentUser);
-      const bookmarkedCases = userCases.filter(c => c.is_bookmarked === true);
-      
-      document.getElementById('user-name-display').textContent = userName || currentUser;
-      document.getElementById('total-cases').textContent = userCases.length;
-      document.getElementById('skill-level').textContent = userLevel || 'Beginner';
-      document.getElementById('bookmarked-cases').textContent = bookmarkedCases.length;
-
-      const badgesCount = calculateBadges(userCases.length);
-      document.getElementById('badges-earned').textContent = badgesCount;
-      document.getElementById('hours-practiced').textContent = Math.floor(userCases.reduce((sum, c) => sum + (c.time_spent || 0), 0) / 60);
-
-      const avgScore = userCases.length > 0 
-        ? Math.round(userCases.reduce((sum, c) => sum + (c.performance_score || 0), 0) / userCases.length)
-        : 0;
-      document.getElementById('avg-score').textContent = avgScore + '%';
-
-      const assessmentProgress = Math.min(userCases.length * 10, 100);
-      const planningProgress = Math.min(userCases.length * 8, 100);
-      const reasoningProgress = Math.min(userCases.length * 7, 100);
-      const masteryProgress = Math.min(avgScore, 100);
-
-      document.getElementById('assessment-progress').textContent = assessmentProgress + '%';
-      document.getElementById('assessment-bar').style.width = assessmentProgress + '%';
-      document.getElementById('planning-progress').textContent = planningProgress + '%';
-      document.getElementById('planning-bar').style.width = planningProgress + '%';
-      document.getElementById('reasoning-progress').textContent = reasoningProgress + '%';
-      document.getElementById('reasoning-bar').style.width = reasoningProgress + '%';
-      document.getElementById('mastery-progress').textContent = masteryProgress + '%';
-      document.getElementById('mastery-bar').style.width = masteryProgress + '%';
-
-      updateBadges(userCases.length);
-      renderUserCases(userCases);
-    }
-
-    function calculateBadges(caseCount) {
-      let badges = 0;
-      if (caseCount >= 1) badges++;
-      if (caseCount >= 5) badges++;
-      if (caseCount >= 10) badges++;
-      return badges;
-    }
-
-    function updateBadges(caseCount) {
-      if (caseCount >= 1) {
-        document.getElementById('badge-first-case').classList.remove('badge-locked');
-      }
-      if (caseCount >= 5) {
-        document.getElementById('badge-five-cases').classList.remove('badge-locked');
-      }
-      if (caseCount >= 10) {
-        document.getElementById('badge-ten-cases').classList.remove('badge-locked');
-      }
-    }
-
-    function renderUserCases(cases) {
-      const casesList = document.getElementById('user-cases-list');
-      
-      if (cases.length === 0) {
-        casesList.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">📋</div>
-            <p>No saved cases yet. Start your first assessment to begin learning!</p>
-          </div>
-        `;
-        return;
-      }
-
-      const sortedCases = [...cases].sort((a, b) => 
-        new Date(b.created_at) - new Date(a.created_at)
-      );
-
-      casesList.innerHTML = sortedCases.map(caseData => `
-        <div class="case-card ${caseData.is_bookmarked ? 'bookmarked' : ''}" data-case-id="${caseData.__backendId}">
-          <span class="bookmark-icon" onclick="toggleBookmark('${caseData.__backendId}')">${caseData.is_bookmarked ? '⭐' : '☆'}</span>
-          <h4>${caseData.case_title || 'Untitled Case'}</h4>
-          <p><strong>Patient:</strong> ${caseData.patient_name || 'N/A'} (${caseData.patient_age || 'N/A'})</p>
-          <p><strong>Specialty:</strong> ${formatSpecialty(caseData.specialty)}</p>
-          <p><strong>Chief Complaint:</strong> ${caseData.chief_complaint ? caseData.chief_complaint.substring(0, 80) + '...' : 'N/A'}</p>
-          <p><strong>Date:</strong> ${new Date(caseData.created_at).toLocaleDateString()}</p>
-          <span class="difficulty-badge difficulty-${caseData.difficulty_level}">${formatDifficulty(caseData.difficulty_level)}</span>
-          <span class="priority-badge priority-${caseData.priority_level}">${formatPriority(caseData.priority_level)}</span>
-          <div class="case-actions">
-            <button class="case-action-btn view" onclick="viewCase('${caseData.__backendId}')">View Details</button>
-            <button class="case-action-btn delete" onclick="confirmDeleteCase('${caseData.__backendId}')">Delete</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function renderBookmarkedCases() {
-      const bookmarkedList = document.getElementById('bookmarked-cases-list');
-      const userCases = allCases.filter(c => c.user_email === currentUser && c.is_bookmarked === true);
-      
-      if (userCases.length === 0) {
-        bookmarkedList.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">⭐</div>
-            <p>No bookmarked cases yet. Bookmark cases you want to revisit!</p>
-          </div>
-        `;
-        return;
-      }
-
-      bookmarkedList.innerHTML = userCases.map(caseData => `
-        <div class="case-card bookmarked" data-case-id="${caseData.__backendId}">
-          <span class="bookmark-icon" onclick="toggleBookmark('${caseData.__backendId}')">⭐</span>
-          <h4>${caseData.case_title || 'Untitled Case'}</h4>
-          <p><strong>Patient:</strong> ${caseData.patient_name || 'N/A'}</p>
-          <p><strong>Specialty:</strong> ${formatSpecialty(caseData.specialty)}</p>
-          <p><strong>Date:</strong> ${new Date(caseData.created_at).toLocaleDateString()}</p>
-          <span class="difficulty-badge difficulty-${caseData.difficulty_level}">${formatDifficulty(caseData.difficulty_level)}</span>
-          <div class="case-actions">
-            <button class="case-action-btn view" onclick="viewCase('${caseData.__backendId}')">View Details</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function filterCases() {
-      const searchTerm = document.getElementById('case-search').value.toLowerCase();
-      const specialtyFilter = document.getElementById('specialty-filter').value;
-      const difficultyFilter = document.getElementById('difficulty-filter').value;
-
-      const userCases = allCases.filter(c => c.user_email === currentUser);
-      
-      const filteredCases = userCases.filter(caseData => {
-        const matchesSearch = !searchTerm || 
-          (caseData.case_title && caseData.case_title.toLowerCase().includes(searchTerm)) ||
-          (caseData.patient_name && caseData.patient_name.toLowerCase().includes(searchTerm)) ||
-          (caseData.chief_complaint && caseData.chief_complaint.toLowerCase().includes(searchTerm));
-        
-        const matchesSpecialty = specialtyFilter === 'all' || caseData.specialty === specialtyFilter;
-        const matchesDifficulty = difficultyFilter === 'all' || caseData.difficulty_level === difficultyFilter;
-        
-        return matchesSearch && matchesSpecialty && matchesDifficulty;
-      });
-
-      const caseLibraryGrid = document.getElementById('case-library-grid');
-      
-      if (filteredCases.length === 0) {
-        caseLibraryGrid.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">🔍</div>
-            <p>No cases found matching your filters. Try adjusting your search criteria.</p>
-          </div>
-        `;
-        return;
-      }
-
-      caseLibraryGrid.innerHTML = filteredCases.map(caseData => `
-        <div class="case-card ${caseData.is_bookmarked ? 'bookmarked' : ''}" data-case-id="${caseData.__backendId}">
-          <span class="bookmark-icon" onclick="toggleBookmark('${caseData.__backendId}')">${caseData.is_bookmarked ? '⭐' : '☆'}</span>
-          <h4>${caseData.case_title || 'Untitled Case'}</h4>
-          <p><strong>Patient:</strong> ${caseData.patient_name || 'N/A'}</p>
-          <p><strong>Specialty:</strong> ${formatSpecialty(caseData.specialty)}</p>
-          <p><strong>Chief Complaint:</strong> ${caseData.chief_complaint ? caseData.chief_complaint.substring(0, 60) + '...' : 'N/A'}</p>
-          <span class="difficulty-badge difficulty-${caseData.difficulty_level}">${formatDifficulty(caseData.difficulty_level)}</span>
-          <span class="priority-badge priority-${caseData.priority_level}">${formatPriority(caseData.priority_level)}</span>
-          <div class="case-actions">
-            <button class="case-action-btn view" onclick="viewCase('${caseData.__backendId}')">View Details</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    async function toggleBookmark(caseId) {
-      const caseData = allCases.find(c => c.__backendId === caseId);
-      if (!caseData) return;
-
-      const updatedCase = { ...caseData, is_bookmarked: !caseData.is_bookmarked };
-      const result = await window.dataSdk.update(updatedCase);
-      
-      if (result.isOk) {
-        showToast(updatedCase.is_bookmarked ? 'Case bookmarked!' : 'Bookmark removed', 'success');
-      } else {
-        showToast('Failed to update bookmark. Please try again.', 'error');
-      }
-    }
-
-    function formatSpecialty(specialty) {
-      const specialties = {
-        'pediatrics': 'Pediatrics',
-        'adult-care': 'Adult Care',
-        'geriatrics': 'Geriatrics',
-        'obstetrics': 'Obstetrics',
-        'critical-care': 'Critical Care',
-        'mental-health': 'Mental Health',
-        'community': 'Community Health'
-      };
-      return specialties[specialty] || specialty;
-    }
-
-    function formatDifficulty(difficulty) {
-      const difficulties = {
-        'beginner': 'Beginner',
-        'intermediate': 'Intermediate',
-        'advanced': 'Advanced'
-      };
-      return difficulties[difficulty] || difficulty;
-    }
-
-    function formatPriority(priority) {
-      const priorities = {
-        'high': 'High Priority',
-        'medium': 'Medium Priority',
-        'low': 'Low Priority'
-      };
-      return priorities[priority] || priority;
-    }
-
-    function viewCase(caseId) {
-      const caseData = allCases.find(c => c.__backendId === caseId);
-      if (!caseData) return;
-
-      document.getElementById('case-title').value = caseData.case_title || '';
-      document.getElementById('patient-name').value = caseData.patient_name || '';
-      document.getElementById('patient-age').value = caseData.patient_age || '';
-      document.getElementById('patient-sex').value = caseData.patient_sex || '';
-      document.getElementById('specialty').value = caseData.specialty || '';
-      document.getElementById('difficulty-level').value = caseData.difficulty_level || '';
-      document.getElementById('priority-level').value = caseData.priority_level || '';
-      document.getElementById('chief-complaint').value = caseData.chief_complaint || '';
-      document.getElementById('subjective').value = caseData.subjective || '';
-      document.getElementById('objective').value = caseData.objective || '';
-      document.getElementById('bp').value = caseData.vitals_bp || '';
-      document.getElementById('hr').value = caseData.vitals_hr || '';
-      document.getElementById('rr').value = caseData.vitals_rr || '';
-      document.getElementById('temp').value = caseData.vitals_temp || '';
-      document.getElementById('spo2').value = caseData.vitals_spo2 || '';
-      document.getElementById('pain').value = caseData.vitals_pain || '';
-      document.getElementById('system-cardiovascular').value = caseData.system_cardiovascular || '';
-      document.getElementById('system-respiratory').value = caseData.system_respiratory || '';
-      document.getElementById('system-neurological').value = caseData.system_neurological || '';
-      document.getElementById('system-gastrointestinal').value = caseData.system_gastrointestinal || '';
-      document.getElementById('system-genitourinary').value = caseData.system_genitourinary || '';
-      document.getElementById('system-musculoskeletal').value = caseData.system_musculoskeletal || '';
-      document.getElementById('system-integumentary').value = caseData.system_integumentary || '';
-      document.getElementById('symptom-patterns').value = caseData.symptom_patterns || '';
-      document.getElementById('previous-treatments').value = caseData.previous_treatments || '';
-      document.getElementById('lab-results').value = caseData.lab_results || '';
-      document.getElementById('obstetric-lmp').value = caseData.obstetric_lmp || '';
-      document.getElementById('obstetric-edc').value = caseData.obstetric_edc || '';
-      document.getElementById('obstetric-gravida').value = caseData.obstetric_gravida || '';
-      document.getElementById('obstetric-para').value = caseData.obstetric_para || '';
-      document.getElementById('obstetric-history').value = caseData.obstetric_history || '';
-      document.getElementById('assessment-data').value = caseData.assessment_data || '';
-
-      if (caseData.specialty === 'obstetrics') {
-        document.getElementById('obstetric-section').style.display = 'block';
-      }
-
-      showSection('features');
-      switchFeatureTab('assessment-console');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    async function confirmDeleteCase(caseId) {
-      const caseCard = document.querySelector(`[data-case-id="${caseId}"]`);
-      if (!caseCard) return;
-
-      const actionsDiv = caseCard.querySelector('.case-actions');
-      actionsDiv.innerHTML = `
-        <button class="case-action-btn delete" onclick="deleteCase('${caseId}')">Confirm Delete?</button>
-        <button class="case-action-btn view" onclick="updateDashboard()">Cancel</button>
-      `;
-    }
-
-    async function deleteCase(caseId) {
-      const caseData = allCases.find(c => c.__backendId === caseId);
-      if (!caseData) return;
-
-      const result = await window.dataSdk.delete(caseData);
-      
-      if (result.isOk) {
-        showToast('Case deleted successfully', 'success');
-      } else {
-        showToast('Failed to delete case. Please try again.', 'error');
-      }
-    }
-
-    function resetAssessmentForm() {
-      document.getElementById('assessment-form').reset();
-      document.getElementById('obstetric-section').style.display = 'none';
-    }
-
-    function generateAIDiagnosis(caseData) {
-      const diagnoses = [];
-      
-      const complaint = (caseData.chief_complaint || '').toLowerCase();
-      const subjective = (caseData.subjective || '').toLowerCase();
-      const objective = (caseData.objective || '').toLowerCase();
-      
-      if (complaint.includes('pain') || complaint.includes('discomfort')) {
-        diagnoses.push({
-          title: 'Acute Pain',
-          priority: 'High',
-          rationale: 'Patient reports pain/discomfort as chief complaint. Pain management is essential for patient comfort and recovery.',
-          interventions: [
-            'Assess pain level using 0-10 scale every 2-4 hours',
-            'Administer prescribed analgesics as ordered',
-            'Implement non-pharmacological pain relief measures (positioning, relaxation)',
-            'Monitor for side effects of pain medications',
-            'Educate patient on pain management strategies'
-          ],
-          outcomes: 'Patient reports pain level reduced to 3/10 or below within 24 hours'
-        });
-      }
-
-      if (complaint.includes('breath') || complaint.includes('respiratory') || subjective.includes('shortness of breath')) {
-        diagnoses.push({
-          title: 'Impaired Gas Exchange',
-          priority: 'High',
-          rationale: 'Respiratory symptoms indicate potential compromise in oxygenation. Immediate assessment and intervention required.',
-          interventions: [
-            'Monitor oxygen saturation continuously',
-            'Assess respiratory rate, depth, and effort',
-            'Position patient in semi-Fowler\'s or high-Fowler\'s position',
-            'Administer supplemental oxygen as prescribed',
-            'Encourage deep breathing and coughing exercises',
-            'Monitor arterial blood gases if ordered'
-          ],
-          outcomes: 'Patient maintains SpO2 >95% on room air or prescribed oxygen within 48 hours'
-        });
-      }
-
-      if (caseData.specialty === 'obstetrics') {
-        diagnoses.push({
-          title: 'Risk for Maternal-Fetal Injury',
-          priority: 'High',
-          rationale: 'Obstetric patients require continuous monitoring to ensure maternal and fetal well-being.',
-          interventions: [
-            'Monitor fetal heart rate and maternal vital signs',
-            'Assess for signs of labor progression',
-            'Monitor for complications (bleeding, hypertension, decreased fetal movement)',
-            'Educate on warning signs requiring immediate attention',
-            'Ensure emergency equipment readily available'
-          ],
-          outcomes: 'Mother and fetus remain stable with normal vital signs throughout care period'
-        });
-      }
-
-      if (diagnoses.length === 0) {
-        diagnoses.push({
-          title: 'Risk for Ineffective Health Management',
-          priority: 'Medium',
-          rationale: 'Patient requires education and support to manage current health condition effectively.',
-          interventions: [
-            'Assess patient\'s understanding of current condition',
-            'Provide education on disease process and treatment plan',
-            'Identify barriers to self-care',
-            'Develop individualized care plan with patient input',
-            'Arrange follow-up care and resources'
-          ],
-          outcomes: 'Patient demonstrates understanding of condition and verbalizes ability to manage care within 72 hours'
-        });
-
-        diagnoses.push({
-          title: 'Knowledge Deficit',
-          priority: 'Medium',
-          rationale: 'Patient education is essential for optimal health outcomes and self-management.',
-          interventions: [
-            'Assess current knowledge level and learning needs',
-            'Provide written and verbal education materials',
-            'Use teach-back method to verify understanding',
-            'Include family/caregivers in education sessions',
-            'Provide resources for continued learning'
-          ],
-          outcomes: 'Patient accurately describes condition, treatment, and self-care measures before discharge'
-        });
-      }
-
-      return diagnoses;
-    }
-
-    document.getElementById('auth-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const email = document.getElementById('auth-email').value.trim();
-      const name = document.getElementById('auth-name').value.trim();
-      const level = document.getElementById('auth-level').value;
-      
-      if (!email || !name || !level) return;
-
-      currentUser = email;
-      userName = name;
-      userLevel = level.charAt(0).toUpperCase() + level.slice(1);
-      
-      document.getElementById('auth-button').textContent = 'Dashboard';
-      document.getElementById('auth-button').onclick = () => showSection('dashboard');
-      
-      closeAuthModal();
-      showToast(`Welcome, ${name}!`, 'success');
-      showSection('dashboard');
-    });
-
-    document.getElementById('assessment-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      if (isSubmitting) return;
-
-      if (!currentUser) {
-        showToast('Please sign in to save your assessment', 'error');
-        showAuthModal();
-        return;
-      }
-
-      if (allCases.filter(c => c.user_email === currentUser).length >= 999) {
-        showToast('Maximum limit of 999 cases reached. Please delete some cases first.', 'error');
-        return;
-      }
-
-      isSubmitting = true;
-      const submitBtn = document.getElementById('save-assessment-btn');
-      const submitText = document.getElementById('save-assessment-text');
-      submitBtn.disabled = true;
-      submitText.innerHTML = '<span class="loading"></span> Generating AI Diagnosis...';
-
-      const caseData = {
-        id: Date.now().toString(),
-        user_email: currentUser,
-        case_title: document.getElementById('case-title').value,
-        patient_name: document.getElementById('patient-name').value,
-        patient_age: document.getElementById('patient-age').value,
-        patient_sex: document.getElementById('patient-sex').value,
-        specialty: document.getElementById('specialty').value,
-        difficulty_level: document.getElementById('difficulty-level').value,
-        priority_level: document.getElementById('priority-level').value,
-        chief_complaint: document.getElementById('chief-complaint').value,
-        subjective: document.getElementById('subjective').value,
-        objective: document.getElementById('objective').value,
-        vitals_bp: document.getElementById('bp').value,
-        vitals_hr: document.getElementById('hr').value,
-        vitals_rr: document.getElementById('rr').value,
-        vitals_temp: document.getElementById('temp').value,
-        vitals_spo2: document.getElementById('spo2').value,
-        vitals_pain: document.getElementById('pain').value,
-        system_cardiovascular: document.getElementById('system-cardiovascular').value,
-        system_respiratory: document.getElementById('system-respiratory').value,
-        system_neurological: document.getElementById('system-neurological').value,
-        system_gastrointestinal: document.getElementById('system-gastrointestinal').value,
-        system_genitourinary: document.getElementById('system-genitourinary').value,
-        system_musculoskeletal: document.getElementById('system-musculoskeletal').value,
-        system_integumentary: document.getElementById('system-integumentary').value,
-        symptom_patterns: document.getElementById('symptom-patterns').value,
-        previous_treatments: document.getElementById('previous-treatments').value,
-        lab_results: document.getElementById('lab-results').value,
-        obstetric_lmp: document.getElementById('obstetric-lmp').value,
-        obstetric_edc: document.getElementById('obstetric-edc').value,
-        obstetric_gravida: document.getElementById('obstetric-gravida').value,
-        obstetric_para: document.getElementById('obstetric-para').value,
-        obstetric_history: document.getElementById('obstetric-history').value,
-        assessment_data: document.getElementById('assessment-data').value,
-        ai_diagnoses: '',
-        care_plan: '',
-        interventions: '',
-        rationale: '',
-        expected_outcomes: '',
-        reflection_notes: document.getElementById('reflection-notes').value,
-        collaboration_notes: document.getElementById('collaboration-notes').value,
-        progress_status: 'completed',
-        is_bookmarked: false,
-        performance_score: Math.floor(Math.random() * 30) + 70,
-        time_spent: Math.floor(Math.random() * 60) + 30,
-        created_at: new Date().toISOString(),
-        last_modified: new Date().toISOString()
-      };
-
-      const aiDiagnoses = generateAIDiagnosis(caseData);
-      caseData.ai_diagnoses = JSON.stringify(aiDiagnoses);
-
-      const result = await window.dataSdk.create(caseData);
-
-      isSubmitting = false;
-      submitBtn.disabled = false;
-      submitText.textContent = '🤖 Generate AI Diagnosis & Care Plan';
-
-      if (result.isOk) {
-        showToast('Assessment saved with AI-generated care plan!', 'success');
-        resetAssessmentForm();
-        showSection('dashboard');
-      } else {
-        showToast('Failed to save assessment. Please try again.', 'error');
-      }
-    });
-
-    const dataHandler = {
-      onDataChanged(data) {
-        allCases = data;
-        if (currentUser) {
-          updateDashboard();
+        * {
+            box-sizing: border-box;
         }
-      }
-    };
 
-    async function onConfigChange(config) {
-      const baseSize = config.font_size || defaultConfig.font_size;
-      const customFont = config.font_family || defaultConfig.font_family;
-      const baseFontStack = 'Tahoma, Geneva, Verdana, sans-serif';
-      
-      document.getElementById('nav-logo').textContent = config.site_title || defaultConfig.site_title;
-      document.getElementById('hero-title').textContent = config.site_title || defaultConfig.site_title;
-      document.getElementById('hero-tagline').textContent = config.site_tagline || defaultConfig.site_tagline;
-      document.getElementById('hero-description').textContent = config.hero_description || defaultConfig.hero_description;
-      document.getElementById('footer-text').textContent = config.footer_text || defaultConfig.footer_text;
-      
-      const email = config.contact_email || defaultConfig.contact_email;
-      const phone1 = config.contact_phone_1 || defaultConfig.contact_phone_1;
-      const phone2 = config.contact_phone_2 || defaultConfig.contact_phone_2;
-      
-      document.getElementById('contact-email-link').textContent = email;
-      document.getElementById('contact-email-link').href = `mailto:${email}`;
-      document.getElementById('contact-phone-1-link').textContent = phone1;
-      document.getElementById('contact-phone-1-link').href = `tel:${phone1}`;
-      document.getElementById('contact-phone-2-link').textContent = phone2;
-      document.getElementById('contact-phone-2-link').href = `tel:${phone2}`;
-      
-      const bgColor = config.background_color || defaultConfig.background_color;
-      const accentColor = config.accent_color || defaultConfig.accent_color;
-      
-      document.body.style.background = `linear-gradient(135deg, ${bgColor} 0%, ${accentColor} 100%)`;
-      
-      const heroSection = document.querySelector('.hero');
-      if (heroSection) {
-        heroSection.style.background = `linear-gradient(135deg, ${bgColor} 0%, ${accentColor} 100%)`;
-      }
-      
-      document.querySelectorAll('.nav-button, .cta-button, .primary-button, .collapsible-header').forEach(el => {
-        el.style.background = `linear-gradient(135deg, ${bgColor} 0%, ${accentColor} 100%)`;
-      });
-      
-      document.querySelectorAll('.modal-button.primary, .case-action-btn.view').forEach(el => {
-        el.style.background = `linear-gradient(135deg, ${bgColor} 0%, ${accentColor} 100%)`;
-      });
+        html {
+            scroll-behavior: smooth;
+        }
 
-      document.querySelectorAll('.progress-fill').forEach(el => {
-        el.style.background = `linear-gradient(135deg, ${bgColor} 0%, ${accentColor} 100%)`;
-      });
-      
-      document.body.style.fontSize = `${baseSize}px`;
-      document.body.style.fontFamily = `${customFont}, ${baseFontStack}`;
-      
-      const heroTitle = document.querySelector('.hero h1');
-      if (heroTitle) {
-        heroTitle.style.fontFamily = `${customFont}, ${baseFontStack}`;
-        heroTitle.style.fontSize = `${baseSize * 2.2}px`;
-      }
-      
-      const heroTagline = document.querySelector('.hero .tagline');
-      if (heroTagline) {
-        heroTagline.style.fontFamily = `${customFont}, ${baseFontStack}`;
-        heroTagline.style.fontSize = `${baseSize * 1.5}px`;
-      }
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+        }
 
-    if (window.dataSdk) {
-      window.dataSdk.init(dataHandler);
-    }
+        /* Animated Background */
+        .bg-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
 
-    if (window.elementSdk) {
-      window.elementSdk.init({
-        defaultConfig: defaultConfig,
-        onConfigChange: onConfigChange,
-        mapToCapabilities: (config) => ({
-          recolorables: [
-            {
-              get: () => config.background_color || defaultConfig.background_color,
-              set: (value) => {
-                config.background_color = value;
-                window.elementSdk.setConfig({ background_color: value });
-              }
-            },
-            {
-              get: () => config.accent_color || defaultConfig.accent_color,
-              set: (value) => {
-                config.accent_color = value;
-                window.elementSdk.setConfig({ accent_color: value });
-              }
-            },
-            {
-              get: () => config.surface_color || defaultConfig.surface_color,
-              set: (value) => {
-                config.surface_color = value;
-                window.elementSdk.setConfig({ surface_color: value });
-              }
-            },
-            {
-              get: () => config.text_color || defaultConfig.text_color,
-              set: (value) => {
-                config.text_color = value;
-                window.elementSdk.setConfig({ text_color: value });
-              }
-            },
-            {
-              get: () => config.button_color || defaultConfig.button_color,
-              set: (value) => {
-                config.button_color = value;
-                window.elementSdk.setConfig({ button_color: value });
-              }
+        .bg-mesh::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(236, 72, 153, 0.2) 0%, transparent 40%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-mesh::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+            opacity: 0.4;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(1deg); }
+            66% { transform: translate(-20px, 20px) rotate(-1deg); }
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link {
+            position: relative;
+            color: rgba(255, 255, 255, 0.7);
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: white;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 6rem 2rem;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 900px;
+            z-index: 1;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
             }
-          ],
-          borderables: [],
-          fontEditable: {
-            get: () => config.font_family || defaultConfig.font_family,
-            set: (value) => {
-              config.font_family = value;
-              window.elementSdk.setConfig({ font_family: value });
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
-          },
-          fontSizeable: {
-            get: () => config.font_size || defaultConfig.font_size,
-            set: (value) => {
-              config.font_size = value;
-              window.elementSdk.setConfig({ font_size: value });
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, #c7d2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+        }
+
+        .hero-tagline {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        /* Floating Elements Animation */
+        .float-element {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.5;
+            animation: float-element 15s ease-in-out infinite;
+        }
+
+        @keyframes float-element {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(20px, -20px) scale(1.1); }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 480px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Form Elements */
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Section Transitions */
+        .section {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            padding: 6rem 2rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        .section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Dashboard Stats */
+        .stat-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        /* Progress Bars */
+        .progress-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 999px;
+            height: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 999px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Case Cards */
+        .case-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .case-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .case-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .case-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .case-card.bookmarked {
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.05);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .badge-difficulty-beginner {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .badge-difficulty-intermediate {
+            background: rgba(234, 179, 8, 0.2);
+            color: #facc15;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+
+        .badge-difficulty-advanced {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Tabs */
+        .tabs-header {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .tabs-header::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-button {
+            padding: 0.875rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-button::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .tab-button.active {
+            color: white;
+        }
+
+        .tab-button.active::after {
+            transform: scaleX(1);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Collapsible Sections */
+        .collapsible {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .collapsible-header {
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .collapsible-header:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+        }
+
+        .collapsible-content.open {
+            max-height: 2000px;
+            padding: 1.5rem;
+        }
+
+        .collapsible-arrow {
+            transition: transform 0.3s;
+        }
+
+        .collapsible.open .collapsible-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* AI Diagnosis Section */
+        .ai-diagnosis-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-diagnosis-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateX(400px);
+            opacity: 0;
+            animation: slideInToast 0.4s ease forwards;
+            min-width: 300px;
+        }
+
+        @keyframes slideInToast {
+            to {
+                transform: translateX(0);
+                opacity: 1;
             }
-          }
-        }),
-        mapToEditPanelValues: (config) => new Map([
-          ["site_title", config.site_title || defaultConfig.site_title],
-          ["site_tagline", config.site_tagline || defaultConfig.site_tagline],
-          ["hero_description", config.hero_description || defaultConfig.hero_description],
-          ["contact_email", config.contact_email || defaultConfig.contact_email],
-          ["contact_phone_1", config.contact_phone_1 || defaultConfig.contact_phone_1],
-          ["contact_phone_2", config.contact_phone_2 || defaultConfig.contact_phone_2],
-          ["footer_text", config.footer_text || defaultConfig.footer_text]
-        ])
-      });
-    }
-  </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99cacbada63ddb1e',t:'MTc2MjgzMjcxNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+        }
+
+        .toast.success {
+            border-left: 4px solid #22c55e;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .toast.info {
+            border-left: 4px solid #6366f1;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .empty-state-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-icon-wrapper {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .glass-card:hover .feature-icon-wrapper {
+            transform: scale(1.1) rotate(5deg);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .section {
+                padding: 5rem 1rem 1rem;
+            }
+            
+            .modal {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            nav, .btn-primary, .btn-secondary {
+                display: none;
+            }
+            
+            .section {
+                display: block !important;
+                opacity: 1 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="bg-mesh"></div>
+    <div class="float-element" style="width: 300px; height: 300px; background: #6366f1; top: 10%; left: -5%;"></div>
+    <div class="float-element" style="width: 400px; height: 400px; background: #8b5cf6; bottom: 10%; right: -10%; animation-delay: -5s;"></div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="showSection('home')">
+                <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+                    <i data-lucide="brain" class="w-6 h-6 text-white"></i>
+                </div>
+                <span class="text-xl font-bold bg-gradient-to-r from-white to-indigo-200 bg-clip-text text-transparent">NurseCare+</span>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8">
+                <a class="nav-link" onclick="showSection('home')">Home</a>
+                <a class="nav-link" onclick="showSection('dashboard')" id="nav-dashboard" style="display: none;">Dashboard</a>
+                <a class="nav-link" onclick="showSection('features')">Features</a>
+                <a class="nav-link" onclick="showSection('contact')">Contact</a>
+            </div>
+            
+            <button class="btn-primary" id="auth-btn" onclick="openAuthModal()">
+                <span id="auth-btn-text">Sign In</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="auth-modal" onclick="closeAuthModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="user" class="w-8 h-8 text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">Welcome to NurseCare+</h2>
+                <p class="text-gray-400">Create your account to start learning</p>
+            </div>
+            
+            <form id="auth-form" onsubmit="handleAuth(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                        <input type="email" id="auth-email" class="form-input" placeholder="you@example.com" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                        <input type="text" id="auth-name" class="form-input" placeholder="Your Name" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Experience Level</label>
+                        <select id="auth-level" class="form-input" required>
+                            <option value="">Select your level...</option>
+                            <option value="beginner">Beginner - First Year Student</option>
+                            <option value="intermediate">Intermediate - 2nd-3rd Year</option>
+                            <option value="advanced">Advanced - Final Year/Graduate</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button type="button" class="btn-secondary flex-1" onclick="closeAuthModal()">Cancel</button>
+                    <button type="submit" class="btn-primary flex-1" id="auth-submit">
+                        <span id="auth-submit-text">Get Started</span>
+                    </button>
+                </div>
+            </form>
+            
+            <p class="text-center text-sm text-gray-500 mt-6">
+                Your data is stored locally on your device for privacy
+            </p>
+        </div>
+    </div>
+
+    <!-- Home Section -->
+    <section id="home" class="section active">
+        <div class="hero">
+            <div class="hero-content">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-6">
+                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                    <span class="text-sm font-medium text-gray-300">AI-Powered Learning Platform</span>
+                </div>
+                
+                <h1>Master Nursing<br>with AI Intelligence</h1>
+                <p class="hero-tagline">Next-generation education platform for nursing students</p>
+                <p class="text-lg text-gray-400 mb-8 max-w-2xl mx-auto leading-relaxed">
+                    Experience immersive clinical simulations, AI-generated diagnoses, and personalized learning paths. 
+                    Practice with realistic patient scenarios across all specialties.
+                </p>
+                
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button class="btn-primary text-lg px-8 py-4" onclick="openAuthModal()">
+                        Start Learning Free
+                        <i data-lucide="arrow-right" class="inline w-5 h-5 ml-2"></i>
+                    </button>
+                    <button class="btn-secondary text-lg px-8 py-4" onclick="showSection('features')">
+                        Explore Features
+                    </button>
+                </div>
+
+                <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="text-3xl font-bold text-indigo-400 mb-1">50+</div>
+                        <div class="text-gray-400">Clinical Scenarios</div>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="text-3xl font-bold text-purple-400 mb-1">AI</div>
+                        <div class="text-gray-400">Powered Diagnosis</div>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="text-3xl font-bold text-pink-400 mb-1">100%</div>
+                        <div class="text-gray-400">Offline Capable</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Preview -->
+        <div class="max-w-7xl mx-auto mt-20">
+            <h2 class="text-3xl font-bold text-center mb-12">Platform Features</h2>
+            <div class="feature-grid">
+                <div class="glass-card p-6 rounded-2xl cursor-pointer" onclick="showSection('features'); switchFeatureTab('case-explorer')">
+                    <div class="feature-icon-wrapper">
+                        <i data-lucide="search" class="w-7 h-7 text-indigo-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Dynamic Case Explorer</h3>
+                    <p class="text-gray-400">Browse diverse patient scenarios across pediatrics, adult care, geriatrics, and more.</p>
+                </div>
+                
+                <div class="glass-card p-6 rounded-2xl cursor-pointer" onclick="showSection('features'); switchFeatureTab('assessment-console')">
+                    <div class="feature-icon-wrapper">
+                        <i data-lucide="clipboard-list" class="w-7 h-7 text-purple-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Smart Assessment</h3>
+                    <p class="text-gray-400">Comprehensive patient documentation with system-specific findings and vital signs.</p>
+                </div>
+                
+                <div class="glass-card p-6 rounded-2xl cursor-pointer" onclick="showSection('features'); switchFeatureTab('ai-diagnosis')">
+                    <div class="feature-icon-wrapper">
+                        <i data-lucide="brain-circuit" class="w-7 h-7 text-pink-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">AI Diagnosis Engine</h3>
+                    <p class="text-gray-400">Generate evidence-based nursing diagnoses and personalized care plans instantly.</p>
+                </div>
+                
+                <div class="glass-card p-6 rounded-2xl cursor-pointer" onclick="showSection('features'); switchFeatureTab('progress')">
+                    <div class="feature-icon-wrapper">
+                        <i data-lucide="trending-up" class="w-7 h-7 text-green-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Progress Analytics</h3>
+                    <p class="text-gray-400">Track your skill development with detailed insights and achievement badges.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="section">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2">Welcome back, <span id="dashboard-user-name" class="text-indigo-400">Student</span>! 👋</h1>
+            <p class="text-gray-400">Track your progress and continue your learning journey</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="stat-card">
+                <p class="stat-number" id="stat-cases">0</p>
+                <p class="text-gray-400 text-sm mt-1">Cases Completed</p>
+            </div>
+            <div class="stat-card">
+                <p class="stat-number" id="stat-badges">0</p>
+                <p class="text-gray-400 text-sm mt-1">Badges Earned</p>
+            </div>
+            <div class="stat-card">
+                <p class="stat-number" id="stat-score">0%</p>
+                <p class="text-gray-400 text-sm mt-1">Avg Score</p>
+            </div>
+            <div class="stat-card">
+                <p class="stat-number" id="stat-hours">0</p>
+                <p class="text-gray-400 text-sm mt-1">Hours Practiced</p>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="glass-card rounded-2xl p-6 mb-8">
+            <h3 class="text-xl font-semibold mb-6">Skill Development</h3>
+            <div class="space-y-6">
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-300">Assessment Skills</span>
+                        <span class="text-indigo-400 font-semibold" id="progress-assessment-text">0%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progress-assessment" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-300">Care Planning</span>
+                        <span class="text-indigo-400 font-semibold" id="progress-planning-text">0%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progress-planning" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-300">Clinical Reasoning</span>
+                        <span class="text-indigo-400 font-semibold" id="progress-reasoning-text">0%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progress-reasoning" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="glass-card rounded-2xl p-6">
+            <div class="tabs-header">
+                <button class="tab-button active" onclick="switchTab('tab-my-cases', this)">My Cases</button>
+                <button class="tab-button" onclick="switchTab('tab-bookmarked', this)">Bookmarked</button>
+                <button class="tab-button" onclick="switchTab('tab-achievements', this)">Achievements</button>
+            </div>
+
+            <div id="tab-my-cases" class="tab-content active">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">Your Saved Cases</h3>
+                    <button class="btn-primary text-sm" onclick="showSection('features'); switchFeatureTab('assessment-console')">
+                        <i data-lucide="plus" class="inline w-4 h-4 mr-1"></i> New Case
+                    </button>
+                </div>
+                <div id="my-cases-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="empty-state col-span-full">
+                        <div class="empty-state-icon">
+                            <i data-lucide="clipboard-list" class="w-10 h-10 text-gray-500"></i>
+                        </div>
+                        <p>No saved cases yet. Start your first assessment!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-bookmarked" class="tab-content">
+                <h3 class="text-lg font-semibold mb-4">Bookmarked Cases</h3>
+                <div id="bookmarked-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="empty-state col-span-full">
+                        <div class="empty-state-icon">
+                            <i data-lucide="star" class="w-10 h-10 text-gray-500"></i>
+                        </div>
+                        <p>No bookmarked cases yet.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-achievements" class="tab-content">
+                <h3 class="text-lg font-semibold mb-4">Your Achievements</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="achievements-grid">
+                    <!-- Badges injected here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2">Platform Features</h1>
+            <p class="text-gray-400">Explore all tools available for your nursing education</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-2 mb-6 overflow-x-auto">
+            <div class="tabs-header border-0 mb-0">
+                <button class="tab-button active" onclick="switchFeatureTab('case-explorer', this)">Case Explorer</button>
+                <button class="tab-button" onclick="switchFeatureTab('assessment-console', this)">Assessment</button>
+                <button class="tab-button" onclick="switchFeatureTab('ai-diagnosis', this)">AI Diagnosis</button>
+                <button class="tab-button" onclick="switchFeatureTab('resources', this)">Resources</button>
+            </div>
+        </div>
+
+        <!-- Case Explorer -->
+        <div id="case-explorer" class="tab-content active">
+            <div class="flex flex-wrap gap-4 mb-6">
+                <input type="text" id="case-search" class="form-input flex-1 min-w-[200px]" placeholder="Search cases..." onkeyup="filterCases()">
+                <select id="filter-specialty" class="form-input w-full md:w-48" onchange="filterCases()">
+                    <option value="">All Specialties</option>
+                    <option value="pediatrics">Pediatrics</option>
+                    <option value="adult-care">Adult Care</option>
+                    <option value="geriatrics">Geriatrics</option>
+                    <option value="obstetrics">Obstetrics</option>
+                    <option value="critical-care">Critical Care</option>
+                </select>
+                <select id="filter-difficulty" class="form-input w-full md:w-48" onchange="filterCases()">
+                    <option value="">All Levels</option>
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                </select>
+            </div>
+            <div id="case-library" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Cases injected here -->
+            </div>
+        </div>
+
+        <!-- Assessment Console -->
+        <div id="assessment-console" class="tab-content">
+            <div class="glass-card rounded-2xl p-6 md:p-8">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                    <i data-lucide="clipboard-list" class="text-indigo-400"></i>
+                    New Patient Assessment
+                </h2>
+                
+                <form id="assessment-form" onsubmit="saveAssessment(event)">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Case Title</label>
+                            <input type="text" id="case-title" class="form-input" placeholder="e.g., Respiratory Distress Assessment" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Patient Name</label>
+                            <input type="text" id="patient-name" class="form-input" placeholder="Patient identifier" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Age</label>
+                            <input type="text" id="patient-age" class="form-input" placeholder="e.g., 45 years" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Sex</label>
+                            <select id="patient-sex" class="form-input" required>
+                                <option value="">Select...</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Specialty</label>
+                            <select id="specialty" class="form-input" required onchange="toggleObstetricFields()">
+                                <option value="">Select...</option>
+                                <option value="pediatrics">Pediatrics</option>
+                                <option value="adult-care">Adult Care</option>
+                                <option value="geriatrics">Geriatrics</option>
+                                <option value="obstetrics">Obstetrics</option>
+                                <option value="critical-care">Critical Care</option>
+                                <option value="mental-health">Mental Health</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Difficulty</label>
+                            <select id="difficulty-level" class="form-input" required>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Chief Complaint</label>
+                        <textarea id="chief-complaint" class="form-input" rows="3" placeholder="Primary reason for visit..." required></textarea>
+                    </div>
+
+                    <!-- Vital Signs -->
+                    <div class="collapsible open mb-4" id="vitals-section">
+                        <div class="collapsible-header" onclick="toggleCollapsible('vitals-section')">
+                            <span class="font-semibold flex items-center gap-2">
+                                <i data-lucide="activity" class="w-5 h-5"></i> Vital Signs
+                            </span>
+                            <i data-lucide="chevron-down" class="collapsible-arrow w-5 h-5"></i>
+                        </div>
+                        <div class="collapsible-content open">
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Blood Pressure</label>
+                                    <input type="text" id="vitals-bp" class="form-input" placeholder="120/80">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Heart Rate</label>
+                                    <input type="text" id="vitals-hr" class="form-input" placeholder="72 bpm">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Respiratory Rate</label>
+                                    <input type="text" id="vitals-rr" class="form-input" placeholder="16/min">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Temperature</label>
+                                    <input type="text" id="vitals-temp" class="form-input" placeholder="37°C">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">SpO2</label>
+                                    <input type="text" id="vitals-spo2" class="form-input" placeholder="98%">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Pain (0-10)</label>
+                                    <input type="text" id="vitals-pain" class="form-input" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Assessment -->
+                    <div class="collapsible mb-4" id="systems-section">
+                        <div class="collapsible-header" onclick="toggleCollapsible('systems-section')">
+                            <span class="font-semibold flex items-center gap-2">
+                                <i data-lucide="stethoscope" class="w-5 h-5"></i> System Assessment
+                            </span>
+                            <i data-lucide="chevron-down" class="collapsible-arrow w-5 h-5"></i>
+                        </div>
+                        <div class="collapsible-content">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Cardiovascular</label>
+                                    <textarea id="system-cardiovascular" class="form-input" rows="2" placeholder="Heart sounds, pulses, edema..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Respiratory</label>
+                                    <textarea id="system-respiratory" class="form-input" rows="2" placeholder="Breath sounds, effort, cough..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Neurological</label>
+                                    <textarea id="system-neurological" class="form-input" rows="2" placeholder="LOC, orientation, pupils..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Gastrointestinal</label>
+                                    <textarea id="system-gastrointestinal" class="form-input" rows="2" placeholder="Bowel sounds, abdomen..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Obstetric Section (Conditional) -->
+                    <div class="collapsible mb-4 hidden" id="obstetric-section">
+                        <div class="collapsible-header" onclick="toggleCollapsible('obstetric-section')">
+                            <span class="font-semibold flex items-center gap-2">
+                                <i data-lucide="baby" class="w-5 h-5"></i> Obstetric History
+                            </span>
+                            <i data-lucide="chevron-down" class="collapsible-arrow w-5 h-5"></i>
+                        </div>
+                        <div class="collapsible-content">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">LMP</label>
+                                    <input type="date" id="ob-lmp" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">EDC</label>
+                                    <input type="date" id="ob-edc" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Gravida</label>
+                                    <input type="text" id="ob-gravida" class="form-input" placeholder="G3">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Para</label>
+                                    <input type="text" id="ob-para" class="form-input" placeholder="P2">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4 mt-8">
+                        <button type="submit" class="btn-primary flex-1" id="save-btn">
+                            <span id="save-btn-text">Generate AI Diagnosis</span>
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="resetAssessmentForm()">Clear</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- AI Diagnosis -->
+        <div id="ai-diagnosis" class="tab-content">
+            <div id="diagnosis-empty" class="glass-card rounded-2xl p-12 text-center">
+                <div class="w-20 h-20 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="brain-circuit" class="w-10 h-10 text-indigo-400"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">AI Diagnosis Engine</h3>
+                <p class="text-gray-400 mb-6 max-w-md mx-auto">Complete a patient assessment to generate evidence-based nursing diagnoses and care plans.</p>
+                <button class="btn-primary" onclick="switchFeatureTab('assessment-console', document.querySelector('[onclick*=\'assessment-console\']'))">
+                    Start Assessment
+                </button>
+            </div>
+            
+            <div id="diagnosis-results" class="hidden space-y-6">
+                <!-- AI results injected here -->
+            </div>
+        </div>
+
+        <!-- Resources -->
+        <div id="resources" class="tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="https://www.nanda.org/" target="_blank" class="glass-card p-6 rounded-2xl hover:no-underline block">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4">
+                        <i data-lucide="book-open" class="w-6 h-6 text-blue-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">NANDA International</h3>
+                    <p class="text-gray-400 text-sm">Nursing diagnoses definitions and classifications</p>
+                </a>
+                
+                <a href="https://www.who.int/" target="_blank" class="glass-card p-6 rounded-2xl hover:no-underline block">
+                    <div class="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center mb-4">
+                        <i data-lucide="globe" class="w-6 h-6 text-cyan-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">WHO Guidelines</h3>
+                    <p class="text-gray-400 text-sm">Global health standards and protocols</p>
+                </a>
+                
+                <a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" class="glass-card p-6 rounded-2xl hover:no-underline block">
+                    <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-4">
+                        <i data-lucide="microscope" class="w-6 h-6 text-green-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">PubMed</h3>
+                    <p class="text-gray-400 text-sm">Medical research and evidence-based practice</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold mb-4">Get in Touch</h1>
+                <p class="text-gray-400">Have questions or feedback? We'd love to hear from you.</p>
+            </div>
+            
+            <div class="glass-card rounded-2xl p-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div class="w-14 h-14 bg-indigo-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="mail" class="w-7 h-7 text-indigo-400"></i>
+                        </div>
+                        <h3 class="font-semibold mb-1">Email</h3>
+                        <a href="mailto:support@nursecare.ai" class="text-gray-400 hover:text-white transition">support@nursecare.ai</a>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-14 h-14 bg-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="phone" class="w-7 h-7 text-purple-400"></i>
+                        </div>
+                        <h3 class="font-semibold mb-1">Phone</h3>
+                        <p class="text-gray-400">+1 (555) 123-4567</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-14 h-14 bg-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="map-pin" class="w-7 h-7 text-pink-400"></i>
+                        </div>
+                        <h3 class="font-semibold mb-1">Location</h3>
+                        <p class="text-gray-400">San Francisco, CA</p>
+                    </div>
+                </div>
+                
+                <div class="mt-8 pt-8 border-t border-white/10 text-center">
+                    <p class="text-gray-500 text-sm">Available Monday - Friday, 9:00 AM - 6:00 PM PST</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Data Store using IndexedDB for persistence
+        const DB_NAME = 'NurseCareDB';
+        const DB_VERSION = 1;
+        let db;
+        let currentUser = null;
+        let currentCase = null;
+
+        // Initialize IndexedDB
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const database = event.target.result;
+                    
+                    if (!database.objectStoreNames.contains('users')) {
+                        database.createObjectStore('users', { keyPath: 'email' });
+                    }
+                    if (!database.objectStoreNames.contains('cases')) {
+                        const caseStore = database.createObjectStore('cases', { keyPath: 'id', autoIncrement: true });
+                        caseStore.createIndex('user_email', 'user_email', { unique: false });
+                        caseStore.createIndex('is_bookmarked', 'is_bookmarked', { unique: false });
+                    }
+                };
+            });
+        }
+
+        // Data Operations
+        async function saveUser(userData) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['users'], 'readwrite');
+                const store = transaction.objectStore('users');
+                const request = store.put(userData);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function getUser(email) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['users'], 'readonly');
+                const store = transaction.objectStore('users');
+                const request = store.get(email);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function saveCase(caseData) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['cases'], 'readwrite');
+                const store = transaction.objectStore('cases');
+                const request = store.add(caseData);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function updateCase(caseData) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['cases'], 'readwrite');
+                const store = transaction.objectStore('cases');
+                const request = store.put(caseData);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function deleteCase(id) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['cases'], 'readwrite');
+                const store = transaction.objectStore('cases');
+                const request = store.delete(id);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function getUserCases(email) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['cases'], 'readonly');
+                const store = transaction.objectStore('cases');
+                const index = store.index('user_email');
+                const request = index.getAll(email);
+                request.onsuccess = () => resolve(request.result || []);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // UI Functions
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info';
+            toast.innerHTML = `
+                <i data-lucide="${icon}" class="w-5 h-5 ${type === 'success' ? 'text-green-400' : type === 'error' ? 'text-red-400' : 'text-indigo-400'}"></i>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function showSection(sectionId) {
+            // Check auth for protected sections
+            if ((sectionId === 'dashboard') && !currentUser) {
+                openAuthModal();
+                return;
+            }
+
+            // Update nav
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            if (sectionId !== 'home') {
+                const activeLink = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+                if (activeLink) activeLink.classList.add('active');
+            }
+
+            // Switch sections with animation
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            const target = document.getElementById(sectionId);
+            if (target) {
+                target.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Load data if needed
+            if (sectionId === 'dashboard' && currentUser) {
+                loadDashboard();
+            } else if (sectionId === 'features') {
+                loadCaseLibrary();
+            }
+        }
+
+        function openAuthModal() {
+            document.getElementById('auth-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAuthModal(event) {
+            if (event && event.target !== document.getElementById('auth-modal') && event.target.closest('.modal')) return;
+            document.getElementById('auth-modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        async function handleAuth(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('auth-email').value;
+            const name = document.getElementById('auth-name').value;
+            const level = document.getElementById('auth-level').value;
+            
+            const submitBtn = document.getElementById('auth-submit');
+            const submitText = document.getElementById('auth-submit-text');
+            
+            submitBtn.disabled = true;
+            submitText.innerHTML = '<div class="spinner mx-auto"></div>';
+            
+            try {
+                // Check existing user or create new
+                let user = await getUser(email);
+                if (!user) {
+                    user = {
+                        email,
+                        name,
+                        level,
+                        created_at: new Date().toISOString(),
+                        last_login: new Date().toISOString()
+                    };
+                    await saveUser(user);
+                    showToast('Account created successfully!', 'success');
+                } else {
+                    user.last_login = new Date().toISOString();
+                    await saveUser(user);
+                    showToast(`Welcome back, ${user.name}!`, 'success');
+                }
+                
+                currentUser = user;
+                updateUIForUser();
+                closeAuthModal();
+                showSection('dashboard');
+            } catch (error) {
+                console.error('Auth error:', error);
+                showToast('Authentication failed. Please try again.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitText.textContent = 'Get Started';
+            }
+        }
+
+        function updateUIForUser() {
+            if (!currentUser) return;
+            
+            document.getElementById('auth-btn').onclick = () => showSection('dashboard');
+            document.getElementById('auth-btn-text').textContent = 'Dashboard';
+            document.getElementById('nav-dashboard').style.display = 'block';
+            document.getElementById('dashboard-user-name').textContent = currentUser.name;
+        }
+
+        async function loadDashboard() {
+            if (!currentUser) return;
+            
+            try {
+                const cases = await getUserCases(currentUser.email);
+                const bookmarked = cases.filter(c => c.is_bookmarked);
+                
+                // Update stats
+                document.getElementById('stat-cases').textContent = cases.length;
+                document.getElementById('stat-badges').textContent = calculateBadges(cases.length);
+                document.getElementById('stat-score').textContent = cases.length > 0 ? 
+                    Math.round(cases.reduce((sum, c) => sum + (c.score || 0), 0) / cases.length) + '%' : '0%';
+                document.getElementById('stat-hours').textContent = Math.floor(cases.length * 0.5);
+                
+                // Update progress bars
+                const progress = Math.min(cases.length * 10, 100);
+                updateProgress('progress-assessment', progress);
+                updateProgress('progress-planning', Math.min(progress * 0.8, 100));
+                updateProgress('progress-reasoning', Math.min(progress * 0.9, 100));
+                
+                // Render cases
+                renderMyCases(cases);
+                renderBookmarkedCases(bookmarked);
+                renderAchievements(cases.length);
+                
+            } catch (error) {
+                console.error('Dashboard load error:', error);
+            }
+        }
+
+        function updateProgress(id, value) {
+            const bar = document.getElementById(id);
+            const text = document.getElementById(id + '-text');
+            if (bar && text) {
+                bar.style.width = value + '%';
+                text.textContent = Math.round(value) + '%';
+            }
+        }
+
+        function calculateBadges(caseCount) {
+            let badges = 0;
+            if (caseCount >= 1) badges++;
+            if (caseCount >= 5) badges++;
+            if (caseCount >= 10) badges++;
+            if (caseCount >= 25) badges++;
+            return badges;
+        }
+
+        function renderMyCases(cases) {
+            const container = document.getElementById('my-cases-container');
+            
+            if (cases.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state col-span-full">
+                        <div class="empty-state-icon">
+                            <i data-lucide="clipboard-list" class="w-10 h-10 text-gray-500"></i>
+                        </div>
+                        <p>No saved cases yet. Start your first assessment!</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+            
+            container.innerHTML = cases.map(c => createCaseCard(c)).join('');
+            lucide.createIcons();
+        }
+
+        function renderBookmarkedCases(cases) {
+            const container = document.getElementById('bookmarked-container');
+            
+            if (cases.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state col-span-full">
+                        <div class="empty-state-icon">
+                            <i data-lucide="star" class="w-10 h-10 text-gray-500"></i>
+                        </div>
+                        <p>No bookmarked cases yet.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+            
+            container.innerHTML = cases.map(c => createCaseCard(c)).join('');
+            lucide.createIcons();
+        }
+
+        function createCaseCard(c) {
+            const date = new Date(c.created_at).toLocaleDateString();
+            return `
+                <div class="case-card ${c.is_bookmarked ? 'bookmarked' : ''}">
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="font-semibold text-lg pr-8">${c.case_title}</h4>
+                        <button onclick="toggleBookmark(${c.id})" class="absolute top-4 right-4 text-yellow-400 hover:scale-110 transition">
+                            <i data-lucide="${c.is_bookmarked ? 'star' : 'star-off'}" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-2">${c.patient_name} • ${c.patient_age}</p>
+                    <p class="text-gray-500 text-sm mb-4 line-clamp-2">${c.chief_complaint}</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="badge badge-difficulty-${c.difficulty_level}">${c.difficulty_level}</span>
+                        <span class="px-2 py-1 rounded-full text-xs bg-white/10 text-gray-300">${c.specialty}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="viewCase(${c.id})" class="btn-primary text-sm py-2 px-4 flex-1">View</button>
+                        <button onclick="deleteCaseHandler(${c.id})" class="btn-secondary text-sm py-2 px-4">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-3">${date}</p>
+                </div>
+            `;
+        }
+
+        function renderAchievements(caseCount) {
+            const achievements = [
+                { id: 'first-case', name: 'First Steps', icon: 'footprints', unlocked: caseCount >= 1 },
+                { id: 'five-cases', name: 'Quick Learner', icon: 'zap', unlocked: caseCount >= 5 },
+                { id: 'ten-cases', name: 'Dedicated', icon: 'award', unlocked: caseCount >= 10 },
+                { id: 'expert', name: 'Expert Nurse', icon: 'crown', unlocked: caseCount >= 25 }
+            ];
+            
+            const grid = document.getElementById('achievements-grid');
+            grid.innerHTML = achievements.map(a => `
+                <div class="glass-card p-4 rounded-xl text-center ${a.unlocked ? '' : 'opacity-40 grayscale'}">
+                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="${a.icon}" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <p class="font-semibold text-sm">${a.name}</p>
+                    ${a.unlocked ? '<span class="text-xs text-green-400 mt-1 block">Unlocked!</span>' : '<span class="text-xs text-gray-500 mt-1 block">Locked</span>'}
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        async function toggleBookmark(id) {
+            try {
+                const transaction = db.transaction(['cases'], 'readwrite');
+                const store = transaction.objectStore('cases');
+                const request = store.get(id);
+                
+                request.onsuccess = async () => {
+                    const caseData = request.result;
+                    if (caseData && caseData.user_email === currentUser.email) {
+                        caseData.is_bookmarked = !caseData.is_bookmarked;
+                        await updateCase(caseData);
+                        showToast(caseData.is_bookmarked ? 'Case bookmarked!' : 'Bookmark removed', 'success');
+                        loadDashboard();
+                        loadCaseLibrary();
+                    }
+                };
+            } catch (error) {
+                showToast('Failed to update bookmark', 'error');
+            }
+        }
+
+        async function deleteCaseHandler(id) {
+            if (!confirm('Are you sure you want to delete this case?')) return;
+            
+            try {
+                await deleteCase(id);
+                showToast('Case deleted', 'success');
+                loadDashboard();
+                loadCaseLibrary();
+            } catch (error) {
+                showToast('Failed to delete case', 'error');
+            }
+        }
+
+        function viewCase(id) {
+            // Implementation for viewing case details
+            showToast('Case details view coming soon', 'info');
+        }
+
+        // Tab Functions
+        function switchTab(tabId, btn) {
+            // Update buttons
+            btn.parentElement.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function switchFeatureTab(tabId, btn) {
+            if (!btn) {
+                btn = document.querySelector(`[onclick="switchFeatureTab('${tabId}', this)"]`);
+            }
+            if (btn) {
+                btn.parentElement.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            
+            document.querySelectorAll('#features .tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            if (tabId === 'case-explorer') {
+                loadCaseLibrary();
+            }
+        }
+
+        // Assessment Form Functions
+        function toggleObstetricFields() {
+            const specialty = document.getElementById('specialty').value;
+            const section = document.getElementById('obstetric-section');
+            if (specialty === 'obstetrics') {
+                section.classList.remove('hidden');
+            } else {
+                section.classList.add('hidden');
+            }
+        }
+
+        function toggleCollapsible(id) {
+            const el = document.getElementById(id);
+            const content = el.querySelector('.collapsible-content');
+            const arrow = el.querySelector('.collapsible-arrow');
+            
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                content.style.maxHeight = '0';
+                content.style.padding = '0 1.5rem';
+                arrow.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('open');
+                content.style.maxHeight = content.scrollHeight + 'px';
+                content.style.padding = '1.5rem';
+                arrow.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        async function saveAssessment(event) {
+            event.preventDefault();
+            
+            if (!currentUser) {
+                showToast('Please sign in first', 'error');
+                openAuthModal();
+                return;
+            }
+            
+            const btn = document.getElementById('save-btn');
+            const btnText = document.getElementById('save-btn-text');
+            
+            btn.disabled = true;
+            btnText.innerHTML = '<div class="spinner inline-block mr-2"></div> Generating AI Diagnosis...';
+            
+            try {
+                const caseData = {
+                    user_email: currentUser.email,
+                    case_title: document.getElementById('case-title').value,
+                    patient_name: document.getElementById('patient-name').value,
+                    patient_age: document.getElementById('patient-age').value,
+                    patient_sex: document.getElementById('patient-sex').value,
+                    specialty: document.getElementById('specialty').value,
+                    difficulty_level: document.getElementById('difficulty-level').value,
+                    chief_complaint: document.getElementById('chief-complaint').value,
+                    vitals: {
+                        bp: document.getElementById('vitals-bp').value,
+                        hr: document.getElementById('vitals-hr').value,
+                        rr: document.getElementById('vitals-rr').value,
+                        temp: document.getElementById('vitals-temp').value,
+                        spo2: document.getElementById('vitals-spo2').value,
+                        pain: document.getElementById('vitals-pain').value
+                    },
+                    systems: {
+                        cardiovascular: document.getElementById('system-cardiovascular').value,
+                        respiratory: document.getElementById('system-respiratory').value,
+                        neurological: document.getElementById('system-neurological').value,
+                        gastrointestinal: document.getElementById('system-gastrointestinal').value
+                    },
+                    is_bookmarked: false,
+                    score: Math.floor(Math.random() * 30) + 70,
+                    created_at: new Date().toISOString()
+                };
+                
+                // Add obstetric data if applicable
+                if (caseData.specialty === 'obstetrics') {
+                    caseData.obstetric = {
+                        lmp: document.getElementById('ob-lmp').value,
+                        edc: document.getElementById('ob-edc').value,
+                        gravida: document.getElementById('ob-gravida').value,
+                        para: document.getElementById('ob-para').value
+                    };
+                }
+                
+                // Generate AI Diagnosis
+                const diagnoses = generateAIDiagnosis(caseData);
+                caseData.ai_diagnoses = diagnoses;
+                
+                await saveCase(caseData);
+                
+                showToast('Assessment saved with AI diagnosis!', 'success');
+                resetAssessmentForm();
+                
+                // Show diagnosis results
+                showDiagnosisResults(diagnoses);
+                switchFeatureTab('ai-diagnosis', null);
+                
+            } catch (error) {
+                console.error('Save error:', error);
+                showToast('Failed to save assessment', 'error');
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = 'Generate AI Diagnosis';
+            }
+        }
+
+        function generateAIDiagnosis(caseData) {
+            const diagnoses = [];
+            const complaint = (caseData.chief_complaint || '').toLowerCase();
+            
+            if (complaint.includes('pain') || complaint.includes('chest')) {
+                diagnoses.push({
+                    title: 'Acute Pain',
+                    priority: 'High',
+                    rationale: 'Patient reports pain as primary complaint requiring immediate intervention.',
+                    interventions: [
+                        'Assess pain level q2h using standardized scale',
+                        'Administer prescribed analgesics',
+                        'Implement non-pharmacological measures',
+                        'Monitor for adverse effects'
+                    ],
+                    outcomes: 'Patient reports pain ≤3/10 within 24 hours'
+                });
+            }
+            
+            if (complaint.includes('breath') || complaint.includes('respiratory') || complaint.includes('cough')) {
+                diagnoses.push({
+                    title: 'Impaired Gas Exchange',
+                    priority: 'High',
+                    rationale: 'Respiratory symptoms indicate potential oxygenation compromise.',
+                    interventions: [
+                        'Monitor SpO2 continuously',
+                        'Assess respiratory rate and effort',
+                        'Position for optimal ventilation',
+                        'Administer O2 as prescribed'
+                    ],
+                    outcomes: 'SpO2 maintained >95% on room air'
+                });
+            }
+            
+            if (caseData.specialty === 'obstetrics') {
+                diagnoses.push({
+                    title: 'Risk for Maternal-Fetal Injury',
+                    priority: 'High',
+                    rationale: 'Obstetric patient requires continuous monitoring.',
+                    interventions: [
+                        'Monitor fetal heart rate',
+                        'Assess maternal vital signs',
+                        'Monitor for complications',
+                        'Educate on warning signs'
+                    ],
+                    outcomes: 'Normal maternal and fetal status maintained'
+                });
+            }
+            
+            if (diagnoses.length === 0) {
+                diagnoses.push({
+                    title: 'Health Management Deficit',
+                    priority: 'Medium',
+                    rationale: 'Patient requires education and support for condition management.',
+                    interventions: [
+                        'Assess current knowledge',
+                        'Provide disease-specific education',
+                        'Develop self-care plan',
+                        'Arrange follow-up care'
+                    ],
+                    outcomes: 'Patient verbalizes understanding of condition'
+                });
+            }
+            
+            return diagnoses;
+        }
+
+        function showDiagnosisResults(diagnoses) {
+            document.getElementById('diagnosis-empty').classList.add('hidden');
+            const container = document.getElementById('diagnosis-results');
+            container.classList.remove('hidden');
+            
+            container.innerHTML = diagnoses.map((d, i) => `
+                <div class="ai-diagnosis-card" style="animation: fadeInUp 0.5s ease ${i * 0.1}s both;">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center">
+                            <i data-lucide="activity" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">${d.title}</h3>
+                            <span class="text-sm ${d.priority === 'High' ? 'text-red-400' : 'text-yellow-400'}">${d.priority} Priority</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-semibold text-indigo-300 mb-1">Rationale</h4>
+                            <p class="text-gray-300">${d.rationale}</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold text-indigo-300 mb-2">Nursing Interventions</h4>
+                            <ul class="space-y-2">
+                                ${d.interventions.map(i => `
+                                    <li class="flex items-start gap-2 text-gray-300">
+                                        <i data-lucide="check" class="w-4 h-4 text-green-400 mt-1 flex-shrink-0"></i>
+                                        <span>${i}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-white/5 rounded-lg p-4 mt-4">
+                            <h4 class="font-semibold text-green-300 mb-1">Expected Outcomes</h4>
+                            <p class="text-gray-300">${d.outcomes}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            lucide.createIcons();
+        }
+
+        function resetAssessmentForm() {
+            document.getElementById('assessment-form').reset();
+            document.getElementById('obstetric-section').classList.add('hidden');
+        }
+
+        async function loadCaseLibrary() {
+            if (!currentUser) {
+                document.getElementById('case-library').innerHTML = `
+                    <div class="empty-state col-span-full">
+                        <div class="empty-state-icon">
+                            <i data-lucide="lock" class="w-10 h-10 text-gray-500"></i>
+                        </div>
+                        <p>Please sign in to view your cases</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+            
+            filterCases();
+        }
+
+        async function filterCases() {
+            if (!currentUser) return;
+            
+            const search = document.getElementById('case-search').value.toLowerCase();
+            const specialty = document.getElementById('filter-specialty').value;
+            const difficulty = document.getElementById('filter-difficulty').value;
+            
+            try {
+                let cases = await getUserCases(currentUser.email);
+                
+                if (search) {
+                    cases = cases.filter(c => 
+                        (c.case_title && c.case_title.toLowerCase().includes(search)) ||
+                        (c.patient_name && c.patient_name.toLowerCase().includes(search)) ||
+                        (c.chief_complaint && c.chief_complaint.toLowerCase().includes(search))
+                    );
+                }
+                
+                if (specialty) {
+                    cases = cases.filter(c => c.specialty === specialty);
+                }
+                
+                if (difficulty) {
+                    cases = cases.filter(c => c.difficulty_level === difficulty);
+                }
+                
+                const container = document.getElementById('case-library');
+                
+                if (cases.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state col-span-full">
+                            <div class="empty-state-icon">
+                                <i data-lucide="search-x" class="w-10 h-10 text-gray-500"></i>
+                            </div>
+                            <p>No cases found matching your filters</p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = cases.map(c => createCaseCard(c)).join('');
+                }
+                
+                lucide.createIcons();
+            } catch (error) {
+                console.error('Filter error:', error);
+            }
+        }
+
+        // Navigation scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await initDB();
+                console.log('Database initialized');
+                
+                // Check for existing session
+                // Note: In a real app, you'd check for a session token here
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showToast('Failed to initialize app', 'error');
+            }
+        });
+    </script>
+</body>
 </html>
