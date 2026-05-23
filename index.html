@@ -3,2025 +3,787 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NurseCare+ AI Education Platform</title>
+    <title>Neural Studio - AI Creative Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --accent: #8b5cf6;
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.18);
-            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        }
-
         * {
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
-            color: #f8fafc;
-            min-height: 100vh;
-            overflow-x: hidden;
-            margin: 0;
         }
-
-        /* Animated Background */
-        .bg-mesh {
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 4px;
+        }
+        
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.8); }
+        }
+        @keyframes slide-up {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        .animate-slide-up {
+            animation: slide-up 0.6s ease-out forwards;
+        }
+        .glow-effect {
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+        
+        /* Glassmorphism */
+        .glass {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Neural Background */
+        #neural-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
-            overflow: hidden;
-        }
-
-        .bg-mesh::before {
-            content: '';
-            position: absolute;
-            width: 150%;
-            height: 150%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.4) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.4) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(236, 72, 153, 0.2) 0%, transparent 40%);
-            animation: float 20s ease-in-out infinite;
-        }
-
-        .bg-mesh::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
             opacity: 0.4;
         }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(30px, -30px) rotate(1deg); }
-            66% { transform: translate(-20px, 20px) rotate(-1deg); }
-        }
-
-        /* Glassmorphism */
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .glass-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-4px) scale(1.01);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            padding: 1rem 2rem;
+        
+        /* Tool Cards */
+        .tool-card {
             transition: all 0.3s ease;
         }
-
-        nav.scrolled {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-link {
-            position: relative;
-            color: rgba(255, 255, 255, 0.7);
-            transition: color 0.3s;
-        }
-
-        .nav-link:hover {
-            color: white;
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #6366f1, #8b5cf6);
-            transition: width 0.3s ease;
-        }
-
-        .nav-link:hover::after,
-        .nav-link.active::after {
-            width: 100%;
-        }
-
-        /* Buttons */
-        .btn-primary {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            color: white;
-            padding: 0.875rem 2rem;
-            border-radius: 12px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn-primary:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 0.875rem 2rem;
-            border-radius: 12px;
-            font-weight: 600;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            padding: 6rem 2rem;
-            overflow: hidden;
-        }
-
-        .hero-content {
-            text-align: center;
-            max-width: 900px;
-            z-index: 1;
-            animation: fadeInUp 1s ease-out;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .hero h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(3rem, 8vw, 5rem);
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, #fff 0%, #c7d2fe 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1.1;
-        }
-
-        .hero-tagline {
-            font-size: 1.5rem;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 2rem;
-            font-weight: 300;
-        }
-
-        /* Floating Elements Animation */
-        .float-element {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(60px);
-            opacity: 0.5;
-            animation: float-element 15s ease-in-out infinite;
-        }
-
-        @keyframes float-element {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(20px, -20px) scale(1.1); }
-        }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 2.5rem;
-            max-width: 480px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: scale(0.9) translateY(20px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-overlay.active .modal {
-            transform: scale(1) translateY(0);
-        }
-
-        /* Form Elements */
-        .form-input {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #6366f1;
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        .form-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        /* Section Transitions */
-        .section {
-            display: none;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.5s ease;
-            padding: 6rem 2rem 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            min-height: 100vh;
-        }
-
-        .section.active {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Dashboard Stats */
-        .stat-card {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            border-radius: 20px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
+        .tool-card:hover {
             transform: translateY(-5px);
-            border-color: rgba(99, 102, 241, 0.4);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2);
         }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 0;
-        }
-
-        /* Progress Bars */
-        .progress-container {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 999px;
-            height: 12px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
-            border-radius: 999px;
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .progress-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        /* Case Cards */
-        .case-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .case-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, #6366f1, #8b5cf6);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-
-        .case-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .case-card:hover {
-            background: rgba(255, 255, 255, 0.06);
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
-        }
-
-        .case-card.bookmarked {
-            border-color: #fbbf24;
-            background: rgba(251, 191, 36, 0.05);
-        }
-
-        /* Badges */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: 999px;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-
-        .badge-difficulty-beginner {
-            background: rgba(34, 197, 94, 0.2);
-            color: #4ade80;
-            border: 1px solid rgba(34, 197, 94, 0.3);
-        }
-
-        .badge-difficulty-intermediate {
-            background: rgba(234, 179, 8, 0.2);
-            color: #facc15;
-            border: 1px solid rgba(234, 179, 8, 0.3);
-        }
-
-        .badge-difficulty-advanced {
-            background: rgba(239, 68, 68, 0.2);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        /* Tabs */
-        .tabs-header {
-            display: flex;
-            gap: 0.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 2rem;
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
-
-        .tabs-header::-webkit-scrollbar {
-            display: none;
-        }
-
-        .tab-button {
-            padding: 0.875rem 1.5rem;
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 500;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-
-        .tab-button::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, #6366f1, #8b5cf6);
-            transform: scaleX(0);
-            transition: transform 0.3s;
-        }
-
-        .tab-button.active {
-            color: white;
-        }
-
-        .tab-button.active::after {
-            transform: scaleX(1);
-        }
-
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Collapsible Sections */
-        .collapsible {
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            overflow: hidden;
-            margin-bottom: 1rem;
-        }
-
-        .collapsible-header {
-            padding: 1.25rem;
-            background: rgba(255, 255, 255, 0.03);
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s;
-        }
-
-        .collapsible-header:hover {
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        .collapsible-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease, padding 0.4s ease;
-        }
-
-        .collapsible-content.open {
-            max-height: 2000px;
-            padding: 1.5rem;
-        }
-
-        .collapsible-arrow {
-            transition: transform 0.3s;
-        }
-
-        .collapsible.open .collapsible-arrow {
-            transform: rotate(180deg);
-        }
-
-        /* AI Diagnosis Section */
-        .ai-diagnosis-card {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .ai-diagnosis-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-            animation: pulse 4s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-        }
-
-        /* Toast Notifications */
-        .toast-container {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 3000;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .toast {
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 1rem 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transform: translateX(400px);
+        
+        /* Chat Messages */
+        .message {
             opacity: 0;
-            animation: slideInToast 0.4s ease forwards;
-            min-width: 300px;
+            transform: translateX(-20px);
+            animation: slide-up 0.3s ease forwards;
         }
-
-        @keyframes slideInToast {
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+        
+        /* Loading Dots */
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s steps(5, end) infinite;
         }
-
-        .toast.success {
-            border-left: 4px solid #22c55e;
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
         }
-
-        .toast.error {
-            border-left: 4px solid #ef4444;
+        
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
         }
-
-        .toast.info {
-            border-left: 4px solid #6366f1;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .empty-state-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 1.5rem;
-            background: rgba(255, 255, 255, 0.05);
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: #3b82f6;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
         }
-
-        /* Loading Spinner */
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Feature Grid */
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .feature-icon-wrapper {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-            transition: all 0.3s;
-        }
-
-        .glass-card:hover .feature-icon-wrapper {
-            transform: scale(1.1) rotate(5deg);
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .section {
-                padding: 5rem 1rem 1rem;
-            }
-            
-            .modal {
-                padding: 1.5rem;
-            }
-        }
-
-        /* Print styles */
-        @media print {
-            nav, .btn-primary, .btn-secondary {
-                display: none;
-            }
-            
-            .section {
-                display: block !important;
-                opacity: 1 !important;
-            }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            background: #1e293b;
+            border-radius: 2px;
         }
     </style>
 </head>
-<body>
-    <!-- Background Effects -->
-    <div class="bg-mesh"></div>
-    <div class="float-element" style="width: 300px; height: 300px; background: #6366f1; top: 10%; left: -5%;"></div>
-    <div class="float-element" style="width: 400px; height: 400px; background: #8b5cf6; bottom: 10%; right: -10%; animation-delay: -5s;"></div>
+<body class="bg-slate-950 text-white overflow-x-hidden">
+    <!-- Neural Network Background -->
+    <canvas id="neural-canvas"></canvas>
 
     <!-- Navigation -->
-    <nav id="navbar">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="showSection('home')">
-                <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-                    <i data-lucide="brain" class="w-6 h-6 text-white"></i>
+    <nav class="fixed top-0 w-full z-50 glass border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center glow-effect">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold gradient-text">Neural Studio</span>
                 </div>
-                <span class="text-xl font-bold bg-gradient-to-r from-white to-indigo-200 bg-clip-text text-transparent">NurseCare+</span>
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="switchTab('chat')" class="nav-btn text-slate-300 hover:text-white transition-colors">AI Chat</button>
+                    <button onclick="switchTab('image')" class="nav-btn text-slate-300 hover:text-white transition-colors">Image Gen</button>
+                    <button onclick="switchTab('analyze')" class="nav-btn text-slate-300 hover:text-white transition-colors">Analyzer</button>
+                    <button onclick="switchTab('code')" class="nav-btn text-slate-300 hover:text-white transition-colors">Code AI</button>
+                </div>
+                <button onclick="toggleSettings()" class="p-2 rounded-lg hover:bg-slate-800 transition-colors">
+                    <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </button>
             </div>
-            
-            <div class="hidden md:flex items-center gap-8">
-                <a class="nav-link" onclick="showSection('home')">Home</a>
-                <a class="nav-link" onclick="showSection('dashboard')" id="nav-dashboard" style="display: none;">Dashboard</a>
-                <a class="nav-link" onclick="showSection('features')">Features</a>
-                <a class="nav-link" onclick="showSection('contact')">Contact</a>
-            </div>
-            
-            <button class="btn-primary" id="auth-btn" onclick="openAuthModal()">
-                <span id="auth-btn-text">Sign In</span>
-            </button>
         </div>
     </nav>
 
-    <!-- Auth Modal -->
-    <div class="modal-overlay" id="auth-modal" onclick="closeAuthModal(event)">
-        <div class="modal" onclick="event.stopPropagation()">
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <i data-lucide="user" class="w-8 h-8 text-white"></i>
+    <!-- Main Content -->
+    <main class="pt-20 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        
+        <!-- Hero Section -->
+        <section class="text-center py-20 animate-slide-up">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6">
+                <span class="gradient-text">AI-Powered</span><br>
+                <span class="text-white">Creative Suite</span>
+            </h1>
+            <p class="text-xl text-slate-400 max-w-2xl mx-auto mb-8">
+                Harness the power of artificial intelligence. Chat, create images, analyze text, and generate code—all in one intelligent workspace.
+            </p>
+            <div class="flex justify-center gap-4">
+                <button onclick="switchTab('chat')" class="px-8 py-4 bg-blue-600 hover:bg-blue-700 rounded-xl font-semibold transition-all transform hover:scale-105 glow-effect">
+                    Start Creating
+                </button>
+                <button onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})" class="px-8 py-4 glass hover:bg-slate-800 rounded-xl font-semibold transition-all">
+                    Explore Features
+                </button>
+            </div>
+        </section>
+
+        <!-- Features Grid -->
+        <section id="features" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <!-- AI Chat Card -->
+            <div class="tool-card glass rounded-2xl p-6 cursor-pointer" onclick="switchTab('chat')">
+                <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
                 </div>
-                <h2 class="text-2xl font-bold text-white mb-2">Welcome to NurseCare+</h2>
-                <p class="text-gray-400">Create your account to start learning</p>
+                <h3 class="text-lg font-semibold mb-2">AI Chat</h3>
+                <p class="text-slate-400 text-sm">Intelligent conversations with context-aware responses</p>
+            </div>
+
+            <!-- Image Gen Card -->
+            <div class="tool-card glass rounded-2xl p-6 cursor-pointer" onclick="switchTab('image')">
+                <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">Image Generator</h3>
+                <p class="text-slate-400 text-sm">Create stunning visuals from text descriptions</p>
+            </div>
+
+            <!-- Text Analyzer Card -->
+            <div class="tool-card glass rounded-2xl p-6 cursor-pointer" onclick="switchTab('analyze')">
+                <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">Text Analyzer</h3>
+                <p class="text-slate-400 text-sm">Sentiment analysis and content insights</p>
+            </div>
+
+            <!-- Code AI Card -->
+            <div class="tool-card glass rounded-2xl p-6 cursor-pointer" onclick="switchTab('code')">
+                <div class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">Code Assistant</h3>
+                <p class="text-slate-400 text-sm">Generate, explain, and optimize code</p>
+            </div>
+        </section>
+
+        <!-- AI Chat Interface -->
+        <section id="chat-section" class="hidden glass rounded-2xl p-6 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold flex items-center gap-3">
+                    <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                    AI Chat Assistant
+                </h2>
+                <button onclick="clearChat()" class="text-sm text-slate-400 hover:text-white transition-colors">Clear Chat</button>
             </div>
             
-            <form id="auth-form" onsubmit="handleAuth(event)">
+            <div id="chat-messages" class="h-96 overflow-y-auto mb-4 space-y-4 p-4 bg-slate-900/50 rounded-xl">
+                <div class="message flex gap-3">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold">AI</div>
+                    <div class="flex-1">
+                        <div class="glass rounded-lg p-3 inline-block">
+                            <p class="text-slate-200">Hello! I'm your AI assistant. I can help with creative writing, analysis, coding, and more. What would you like to explore today?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex gap-3">
+                <input type="text" id="chat-input" placeholder="Type your message..." 
+                    class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors"
+                    onkeypress="if(event.key==='Enter') sendMessage()">
+                <button onclick="sendMessage()" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-xl font-semibold transition-all flex items-center gap-2">
+                    <span>Send</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- Image Generator Interface -->
+        <section id="image-section" class="hidden glass rounded-2xl p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                <span class="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></span>
+                AI Image Generator
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
-                        <input type="email" id="auth-email" class="form-input" placeholder="you@example.com" required>
+                        <label class="block text-sm font-medium mb-2 text-slate-300">Prompt</label>
+                        <textarea id="image-prompt" rows="4" placeholder="Describe the image you want to create..." 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors"></textarea>
                     </div>
+                    
                     <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
-                        <input type="text" id="auth-name" class="form-input" placeholder="Your Name" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Experience Level</label>
-                        <select id="auth-level" class="form-input" required>
-                            <option value="">Select your level...</option>
-                            <option value="beginner">Beginner - First Year Student</option>
-                            <option value="intermediate">Intermediate - 2nd-3rd Year</option>
-                            <option value="advanced">Advanced - Final Year/Graduate</option>
+                        <label class="block text-sm font-medium mb-2 text-slate-300">Style</label>
+                        <select id="image-style" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500">
+                            <option value="realistic">Photorealistic</option>
+                            <option value="digital">Digital Art</option>
+                            <option value="anime">Anime</option>
+                            <option value="oil">Oil Painting</option>
+                            <option value="3d">3D Render</option>
                         </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-slate-300">Aspect Ratio</label>
+                        <div class="flex gap-2">
+                            <button onclick="setRatio('1:1')" class="ratio-btn flex-1 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors border border-slate-700">1:1</button>
+                            <button onclick="setRatio('16:9')" class="ratio-btn flex-1 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors border border-slate-700">16:9</button>
+                            <button onclick="setRatio('9:16')" class="ratio-btn flex-1 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors border border-slate-700">9:16</button>
+                        </div>
+                    </div>
+                    
+                    <button onclick="generateImage()" class="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-xl font-semibold transition-all transform hover:scale-[1.02]">
+                        Generate Image
+                    </button>
+                </div>
+                
+                <div class="bg-slate-900/50 rounded-xl p-4 flex items-center justify-center min-h-[400px] relative overflow-hidden">
+                    <div id="image-placeholder" class="text-center">
+                        <svg class="w-16 h-16 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <p class="text-slate-500">Your generated image will appear here</p>
+                    </div>
+                    <div id="image-loading" class="hidden absolute inset-0 flex items-center justify-center bg-slate-900/90">
+                        <div class="text-center">
+                            <div class="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                            <p class="text-purple-400 animate-pulse">Dreaming...</p>
+                        </div>
+                    </div>
+                    <img id="generated-image" class="hidden max-w-full max-h-full rounded-lg shadow-2xl" alt="Generated">
+                </div>
+            </div>
+        </section>
+
+        <!-- Text Analyzer Interface -->
+        <section id="analyze-section" class="hidden glass rounded-2xl p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                Text Analyzer
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <textarea id="analyze-input" rows="8" placeholder="Paste text here to analyze sentiment, keywords, and readability..." 
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 transition-colors mb-4"></textarea>
+                    <button onclick="analyzeText()" class="w-full py-3 bg-green-600 hover:bg-green-700 rounded-xl font-semibold transition-all">
+                        Analyze Text
+                    </button>
+                </div>
+                
+                <div id="analysis-results" class="space-y-4">
+                    <div class="bg-slate-900/50 rounded-xl p-4 border border-slate-800">
+                        <h4 class="text-sm font-medium text-slate-400 mb-2">Sentiment</h4>
+                        <div class="flex items-center gap-3">
+                            <div class="flex-1 bg-slate-800 rounded-full h-2 overflow-hidden">
+                                <div id="sentiment-bar" class="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 w-0 transition-all duration-1000"></div>
+                            </div>
+                            <span id="sentiment-score" class="text-sm font-bold mono">--</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-900/50 rounded-xl p-4 border border-slate-800">
+                        <h4 class="text-sm font-medium text-slate-400 mb-2">Word Count</h4>
+                        <p id="word-count" class="text-2xl font-bold mono">0</p>
+                    </div>
+                    
+                    <div class="bg-slate-900/50 rounded-xl p-4 border border-slate-800">
+                        <h4 class="text-sm font-medium text-slate-400 mb-2">Key Phrases</h4>
+                        <div id="key-phrases" class="flex flex-wrap gap-2">
+                            <span class="text-slate-500 text-sm">Analysis results will appear here</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-900/50 rounded-xl p-4 border border-slate-800">
+                        <h4 class="text-sm font-medium text-slate-400 mb-2">Readability Score</h4>
+                        <p id="readability-score" class="text-2xl font-bold mono">--</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Code Assistant Interface -->
+        <section id="code-section" class="hidden glass rounded-2xl p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                <span class="w-3 h-3 bg-orange-500 rounded-full animate-pulse"></span>
+                Code Assistant
+            </h2>
+            
+            <div class="space-y-4">
+                <div class="flex gap-4 mb-4">
+                    <select id="code-language" class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-orange-500">
+                        <option value="javascript">JavaScript</option>
+                        <option value="python">Python</option>
+                        <option value="html">HTML/CSS</option>
+                        <option value="sql">SQL</option>
+                        <option value="rust">Rust</option>
+                    </select>
+                    <select id="code-action" class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-orange-500">
+                        <option value="generate">Generate Code</option>
+                        <option value="explain">Explain Code</option>
+                        <option value="optimize">Optimize</option>
+                        <option value="debug">Debug</option>
+                    </select>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-slate-300">Input</label>
+                        <textarea id="code-input" rows="12" placeholder="// Describe what you want or paste code to analyze..." 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 mono text-sm focus:outline-none focus:border-orange-500 transition-colors"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-slate-300">AI Output</label>
+                        <div id="code-output" class="w-full h-full min-h-[300px] bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 mono text-sm overflow-auto">
+                            <span class="text-slate-500">AI-generated code will appear here...</span>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="flex gap-3 mt-6">
-                    <button type="button" class="btn-secondary flex-1" onclick="closeAuthModal()">Cancel</button>
-                    <button type="submit" class="btn-primary flex-1" id="auth-submit">
-                        <span id="auth-submit-text">Get Started</span>
-                    </button>
-                </div>
-            </form>
+                <button onclick="processCode()" class="w-full py-3 bg-orange-600 hover:bg-orange-700 rounded-xl font-semibold transition-all flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    Process with AI
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="glass rounded-2xl p-6 max-w-md w-full border border-slate-700">
+            <h3 class="text-xl font-bold mb-4">API Settings</h3>
+            <p class="text-sm text-slate-400 mb-4">Enter your API keys to enable full AI functionality (optional for demo mode)</p>
             
-            <p class="text-center text-sm text-gray-500 mt-6">
-                Your data is stored locally on your device for privacy
-            </p>
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2">OpenAI API Key</label>
+                    <input type="password" id="api-key" placeholder="sk-..." 
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Model</label>
+                    <select id="model-select" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm">
+                        <option value="gpt-3.5">GPT-3.5 Turbo</option>
+                        <option value="gpt-4">GPT-4</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="flex gap-3">
+                <button onclick="saveSettings()" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">Save</button>
+                <button onclick="toggleSettings()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg font-medium transition-colors">Close</button>
+            </div>
         </div>
     </div>
 
-    <!-- Home Section -->
-    <section id="home" class="section active">
-        <div class="hero">
-            <div class="hero-content">
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-6">
-                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                    <span class="text-sm font-medium text-gray-300">AI-Powered Learning Platform</span>
-                </div>
-                
-                <h1>Master Nursing<br>with AI Intelligence</h1>
-                <p class="hero-tagline">Next-generation education platform for nursing students</p>
-                <p class="text-lg text-gray-400 mb-8 max-w-2xl mx-auto leading-relaxed">
-                    Experience immersive clinical simulations, AI-generated diagnoses, and personalized learning paths. 
-                    Practice with realistic patient scenarios across all specialties.
-                </p>
-                
-                <div class="flex flex-wrap justify-center gap-4">
-                    <button class="btn-primary text-lg px-8 py-4" onclick="openAuthModal()">
-                        Start Learning Free
-                        <i data-lucide="arrow-right" class="inline w-5 h-5 ml-2"></i>
-                    </button>
-                    <button class="btn-secondary text-lg px-8 py-4" onclick="showSection('features')">
-                        Explore Features
-                    </button>
-                </div>
-
-                <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                    <div class="glass-card p-6 rounded-2xl">
-                        <div class="text-3xl font-bold text-indigo-400 mb-1">50+</div>
-                        <div class="text-gray-400">Clinical Scenarios</div>
-                    </div>
-                    <div class="glass-card p-6 rounded-2xl">
-                        <div class="text-3xl font-bold text-purple-400 mb-1">AI</div>
-                        <div class="text-gray-400">Powered Diagnosis</div>
-                    </div>
-                    <div class="glass-card p-6 rounded-2xl">
-                        <div class="text-3xl font-bold text-pink-400 mb-1">100%</div>
-                        <div class="text-gray-400">Offline Capable</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Features Preview -->
-        <div class="max-w-7xl mx-auto mt-20">
-            <h2 class="text-3xl font-bold text-center mb-12">Platform Features</h2>
-            <div class="feature-grid">
-                <div class="glass-card p-6 rounded-2xl cursor-pointer" onclick="showSection('features'); switchFeatureTab('case-explorer')">
-                    <div class="feature-icon-wrapper">
-                        <i data-lucide="search" class="w-7 h-7 text-indigo-400"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Dynamic Case Explorer</h3>
-                    <p class="text-gray-400">Browse diverse patient scenarios across pediatrics, adult care, geriatrics, and more.</p>
-                </div>
-                
-                <div class="glass-card p-6 rounded-2xl cursor-pointer" onclick="showSection('features'); switchFeatureTab('assessment-console')">
-                    <div class="feature-icon-wrapper">
-                        <i data-lucide="clipboard-list" class="w-7 h-7 text-purple-400"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Smart Assessment</h3>
-                    <p class="text-gray-400">Comprehensive patient documentation with system-specific findings and vital signs.</p>
-                </div>
-                
-                <div class="glass-card p-6 rounded-2xl cursor-pointer" onclick="showSection('features'); switchFeatureTab('ai-diagnosis')">
-                    <div class="feature-icon-wrapper">
-                        <i data-lucide="brain-circuit" class="w-7 h-7 text-pink-400"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">AI Diagnosis Engine</h3>
-                    <p class="text-gray-400">Generate evidence-based nursing diagnoses and personalized care plans instantly.</p>
-                </div>
-                
-                <div class="glass-card p-6 rounded-2xl cursor-pointer" onclick="showSection('features'); switchFeatureTab('progress')">
-                    <div class="feature-icon-wrapper">
-                        <i data-lucide="trending-up" class="w-7 h-7 text-green-400"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Progress Analytics</h3>
-                    <p class="text-gray-400">Track your skill development with detailed insights and achievement badges.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Dashboard Section -->
-    <section id="dashboard" class="section">
-        <div class="mb-8">
-            <h1 class="text-4xl font-bold mb-2">Welcome back, <span id="dashboard-user-name" class="text-indigo-400">Student</span>! 👋</h1>
-            <p class="text-gray-400">Track your progress and continue your learning journey</p>
-        </div>
-
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div class="stat-card">
-                <p class="stat-number" id="stat-cases">0</p>
-                <p class="text-gray-400 text-sm mt-1">Cases Completed</p>
-            </div>
-            <div class="stat-card">
-                <p class="stat-number" id="stat-badges">0</p>
-                <p class="text-gray-400 text-sm mt-1">Badges Earned</p>
-            </div>
-            <div class="stat-card">
-                <p class="stat-number" id="stat-score">0%</p>
-                <p class="text-gray-400 text-sm mt-1">Avg Score</p>
-            </div>
-            <div class="stat-card">
-                <p class="stat-number" id="stat-hours">0</p>
-                <p class="text-gray-400 text-sm mt-1">Hours Practiced</p>
-            </div>
-        </div>
-
-        <!-- Progress Section -->
-        <div class="glass-card rounded-2xl p-6 mb-8">
-            <h3 class="text-xl font-semibold mb-6">Skill Development</h3>
-            <div class="space-y-6">
-                <div>
-                    <div class="flex justify-between mb-2">
-                        <span class="text-gray-300">Assessment Skills</span>
-                        <span class="text-indigo-400 font-semibold" id="progress-assessment-text">0%</span>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="progress-assessment" style="width: 0%"></div>
-                    </div>
-                </div>
-                <div>
-                    <div class="flex justify-between mb-2">
-                        <span class="text-gray-300">Care Planning</span>
-                        <span class="text-indigo-400 font-semibold" id="progress-planning-text">0%</span>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="progress-planning" style="width: 0%"></div>
-                    </div>
-                </div>
-                <div>
-                    <div class="flex justify-between mb-2">
-                        <span class="text-gray-300">Clinical Reasoning</span>
-                        <span class="text-indigo-400 font-semibold" id="progress-reasoning-text">0%</span>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="progress-reasoning" style="width: 0%"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tabs -->
-        <div class="glass-card rounded-2xl p-6">
-            <div class="tabs-header">
-                <button class="tab-button active" onclick="switchTab('tab-my-cases', this)">My Cases</button>
-                <button class="tab-button" onclick="switchTab('tab-bookmarked', this)">Bookmarked</button>
-                <button class="tab-button" onclick="switchTab('tab-achievements', this)">Achievements</button>
-            </div>
-
-            <div id="tab-my-cases" class="tab-content active">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-semibold">Your Saved Cases</h3>
-                    <button class="btn-primary text-sm" onclick="showSection('features'); switchFeatureTab('assessment-console')">
-                        <i data-lucide="plus" class="inline w-4 h-4 mr-1"></i> New Case
-                    </button>
-                </div>
-                <div id="my-cases-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div class="empty-state col-span-full">
-                        <div class="empty-state-icon">
-                            <i data-lucide="clipboard-list" class="w-10 h-10 text-gray-500"></i>
-                        </div>
-                        <p>No saved cases yet. Start your first assessment!</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-bookmarked" class="tab-content">
-                <h3 class="text-lg font-semibold mb-4">Bookmarked Cases</h3>
-                <div id="bookmarked-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div class="empty-state col-span-full">
-                        <div class="empty-state-icon">
-                            <i data-lucide="star" class="w-10 h-10 text-gray-500"></i>
-                        </div>
-                        <p>No bookmarked cases yet.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-achievements" class="tab-content">
-                <h3 class="text-lg font-semibold mb-4">Your Achievements</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="achievements-grid">
-                    <!-- Badges injected here -->
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section id="features" class="section">
-        <div class="mb-8">
-            <h1 class="text-4xl font-bold mb-2">Platform Features</h1>
-            <p class="text-gray-400">Explore all tools available for your nursing education</p>
-        </div>
-
-        <div class="glass-card rounded-2xl p-2 mb-6 overflow-x-auto">
-            <div class="tabs-header border-0 mb-0">
-                <button class="tab-button active" onclick="switchFeatureTab('case-explorer', this)">Case Explorer</button>
-                <button class="tab-button" onclick="switchFeatureTab('assessment-console', this)">Assessment</button>
-                <button class="tab-button" onclick="switchFeatureTab('ai-diagnosis', this)">AI Diagnosis</button>
-                <button class="tab-button" onclick="switchFeatureTab('resources', this)">Resources</button>
-            </div>
-        </div>
-
-        <!-- Case Explorer -->
-        <div id="case-explorer" class="tab-content active">
-            <div class="flex flex-wrap gap-4 mb-6">
-                <input type="text" id="case-search" class="form-input flex-1 min-w-[200px]" placeholder="Search cases..." onkeyup="filterCases()">
-                <select id="filter-specialty" class="form-input w-full md:w-48" onchange="filterCases()">
-                    <option value="">All Specialties</option>
-                    <option value="pediatrics">Pediatrics</option>
-                    <option value="adult-care">Adult Care</option>
-                    <option value="geriatrics">Geriatrics</option>
-                    <option value="obstetrics">Obstetrics</option>
-                    <option value="critical-care">Critical Care</option>
-                </select>
-                <select id="filter-difficulty" class="form-input w-full md:w-48" onchange="filterCases()">
-                    <option value="">All Levels</option>
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                </select>
-            </div>
-            <div id="case-library" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Cases injected here -->
-            </div>
-        </div>
-
-        <!-- Assessment Console -->
-        <div id="assessment-console" class="tab-content">
-            <div class="glass-card rounded-2xl p-6 md:p-8">
-                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
-                    <i data-lucide="clipboard-list" class="text-indigo-400"></i>
-                    New Patient Assessment
-                </h2>
-                
-                <form id="assessment-form" onsubmit="saveAssessment(event)">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Case Title</label>
-                            <input type="text" id="case-title" class="form-input" placeholder="e.g., Respiratory Distress Assessment" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Patient Name</label>
-                            <input type="text" id="patient-name" class="form-input" placeholder="Patient identifier" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Age</label>
-                            <input type="text" id="patient-age" class="form-input" placeholder="e.g., 45 years" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Sex</label>
-                            <select id="patient-sex" class="form-input" required>
-                                <option value="">Select...</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Specialty</label>
-                            <select id="specialty" class="form-input" required onchange="toggleObstetricFields()">
-                                <option value="">Select...</option>
-                                <option value="pediatrics">Pediatrics</option>
-                                <option value="adult-care">Adult Care</option>
-                                <option value="geriatrics">Geriatrics</option>
-                                <option value="obstetrics">Obstetrics</option>
-                                <option value="critical-care">Critical Care</option>
-                                <option value="mental-health">Mental Health</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Difficulty</label>
-                            <select id="difficulty-level" class="form-input" required>
-                                <option value="beginner">Beginner</option>
-                                <option value="intermediate">Intermediate</option>
-                                <option value="advanced">Advanced</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Chief Complaint</label>
-                        <textarea id="chief-complaint" class="form-input" rows="3" placeholder="Primary reason for visit..." required></textarea>
-                    </div>
-
-                    <!-- Vital Signs -->
-                    <div class="collapsible open mb-4" id="vitals-section">
-                        <div class="collapsible-header" onclick="toggleCollapsible('vitals-section')">
-                            <span class="font-semibold flex items-center gap-2">
-                                <i data-lucide="activity" class="w-5 h-5"></i> Vital Signs
-                            </span>
-                            <i data-lucide="chevron-down" class="collapsible-arrow w-5 h-5"></i>
-                        </div>
-                        <div class="collapsible-content open">
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label class="block text-sm text-gray-400 mb-1">Blood Pressure</label>
-                                    <input type="text" id="vitals-bp" class="form-input" placeholder="120/80">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-gray-400 mb-1">Heart Rate</label>
-                                    <input type="text" id="vitals-hr" class="form-input" placeholder="72 bpm">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-gray-400 mb-1">Respiratory Rate</label>
-                                    <input type="text" id="vitals-rr" class="form-input" placeholder="16/min">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-gray-400 mb-1">Temperature</label>
-                                    <input type="text" id="vitals-temp" class="form-input" placeholder="37°C">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-gray-400 mb-1">SpO2</label>
-                                    <input type="text" id="vitals-spo2" class="form-input" placeholder="98%">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-gray-400 mb-1">Pain (0-10)</label>
-                                    <input type="text" id="vitals-pain" class="form-input" placeholder="0">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- System Assessment -->
-                    <div class="collapsible mb-4" id="systems-section">
-                        <div class="collapsible-header" onclick="toggleCollapsible('systems-section')">
-                            <span class="font-semibold flex items-center gap-2">
-                                <i data-lucide="stethoscope" class="w-5 h-5"></i> System Assessment
-                            </span>
-                            <i data-lucide="chevron-down" class="collapsible-arrow w-5 h-5"></i>
-                        </div>
-                        <div class="collapsible-content">
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm text-gray-400 mb-1">Cardiovascular</label>
-                                    <textarea id="system-cardiovascular" class="form-input" rows="2" placeholder="Heart sounds, pulses, edema..."></textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-gray-400 mb-1">Respiratory</label>
-                                    <textarea id="system-respiratory" class="form-input" rows="2" placeholder="Breath sounds, effort, cough..."></textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-gray-400 mb-1">Neurological</label>
-                                    <textarea id="system-neurological" class="form-input" rows="2" placeholder="LOC, orientation, pupils..."></textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-gray-400 mb-1">Gastrointestinal</label>
-                                    <textarea id="system-gastrointestinal" class="form-input" rows="2" placeholder="Bowel sounds, abdomen..."></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Obstetric Section (Conditional) -->
-                    <div class="collapsible mb-4 hidden" id="obstetric-section">
-                        <div class="collapsible-header" onclick="toggleCollapsible('obstetric-section')">
-                            <span class="font-semibold flex items-center gap-2">
-                                <i data-lucide="baby" class="w-5 h-5"></i> Obstetric History
-                            </span>
-                            <i data-lucide="chevron-down" class="collapsible-arrow w-5 h-5"></i>
-                        </div>
-                        <div class="collapsible-content">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm text-gray-400 mb-1">LMP</label>
-                                    <input type="date" id="ob-lmp" class="form-input">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-gray-400 mb-1">EDC</label>
-                                    <input type="date" id="ob-edc" class="form-input">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-gray-400 mb-1">Gravida</label>
-                                    <input type="text" id="ob-gravida" class="form-input" placeholder="G3">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-gray-400 mb-1">Para</label>
-                                    <input type="text" id="ob-para" class="form-input" placeholder="P2">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-4 mt-8">
-                        <button type="submit" class="btn-primary flex-1" id="save-btn">
-                            <span id="save-btn-text">Generate AI Diagnosis</span>
-                        </button>
-                        <button type="button" class="btn-secondary" onclick="resetAssessmentForm()">Clear</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- AI Diagnosis -->
-        <div id="ai-diagnosis" class="tab-content">
-            <div id="diagnosis-empty" class="glass-card rounded-2xl p-12 text-center">
-                <div class="w-20 h-20 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <i data-lucide="brain-circuit" class="w-10 h-10 text-indigo-400"></i>
-                </div>
-                <h3 class="text-2xl font-bold mb-2">AI Diagnosis Engine</h3>
-                <p class="text-gray-400 mb-6 max-w-md mx-auto">Complete a patient assessment to generate evidence-based nursing diagnoses and care plans.</p>
-                <button class="btn-primary" onclick="switchFeatureTab('assessment-console', document.querySelector('[onclick*=\'assessment-console\']'))">
-                    Start Assessment
-                </button>
-            </div>
-            
-            <div id="diagnosis-results" class="hidden space-y-6">
-                <!-- AI results injected here -->
-            </div>
-        </div>
-
-        <!-- Resources -->
-        <div id="resources" class="tab-content">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <a href="https://www.nanda.org/" target="_blank" class="glass-card p-6 rounded-2xl hover:no-underline block">
-                    <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4">
-                        <i data-lucide="book-open" class="w-6 h-6 text-blue-400"></i>
-                    </div>
-                    <h3 class="text-lg font-semibold mb-2">NANDA International</h3>
-                    <p class="text-gray-400 text-sm">Nursing diagnoses definitions and classifications</p>
-                </a>
-                
-                <a href="https://www.who.int/" target="_blank" class="glass-card p-6 rounded-2xl hover:no-underline block">
-                    <div class="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center mb-4">
-                        <i data-lucide="globe" class="w-6 h-6 text-cyan-400"></i>
-                    </div>
-                    <h3 class="text-lg font-semibold mb-2">WHO Guidelines</h3>
-                    <p class="text-gray-400 text-sm">Global health standards and protocols</p>
-                </a>
-                
-                <a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" class="glass-card p-6 rounded-2xl hover:no-underline block">
-                    <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-4">
-                        <i data-lucide="microscope" class="w-6 h-6 text-green-400"></i>
-                    </div>
-                    <h3 class="text-lg font-semibold mb-2">PubMed</h3>
-                    <p class="text-gray-400 text-sm">Medical research and evidence-based practice</p>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="section">
-        <div class="max-w-4xl mx-auto">
-            <div class="text-center mb-12">
-                <h1 class="text-4xl font-bold mb-4">Get in Touch</h1>
-                <p class="text-gray-400">Have questions or feedback? We'd love to hear from you.</p>
-            </div>
-            
-            <div class="glass-card rounded-2xl p-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="text-center">
-                        <div class="w-14 h-14 bg-indigo-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                            <i data-lucide="mail" class="w-7 h-7 text-indigo-400"></i>
-                        </div>
-                        <h3 class="font-semibold mb-1">Email</h3>
-                        <a href="mailto:support@nursecare.ai" class="text-gray-400 hover:text-white transition">support@nursecare.ai</a>
-                    </div>
-                    <div class="text-center">
-                        <div class="w-14 h-14 bg-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                            <i data-lucide="phone" class="w-7 h-7 text-purple-400"></i>
-                        </div>
-                        <h3 class="font-semibold mb-1">Phone</h3>
-                        <p class="text-gray-400">+1 (555) 123-4567</p>
-                    </div>
-                    <div class="text-center">
-                        <div class="w-14 h-14 bg-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                            <i data-lucide="map-pin" class="w-7 h-7 text-pink-400"></i>
-                        </div>
-                        <h3 class="font-semibold mb-1">Location</h3>
-                        <p class="text-gray-400">San Francisco, CA</p>
-                    </div>
-                </div>
-                
-                <div class="mt-8 pt-8 border-t border-white/10 text-center">
-                    <p class="text-gray-500 text-sm">Available Monday - Friday, 9:00 AM - 6:00 PM PST</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Toast Container -->
-    <div class="toast-container" id="toast-container"></div>
-
     <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
+        // Neural Network Background Animation
+        const canvas = document.getElementById('neural-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+        let connections = [];
 
-        // Data Store using IndexedDB for persistence
-        const DB_NAME = 'NurseCareDB';
-        const DB_VERSION = 1;
-        let db;
-        let currentUser = null;
-        let currentCase = null;
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
 
-        // Initialize IndexedDB
-        function initDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, DB_VERSION);
-                
-                request.onerror = () => reject(request.error);
-                request.onsuccess = () => {
-                    db = request.result;
-                    resolve(db);
-                };
-                
-                request.onupgradeneeded = (event) => {
-                    const database = event.target.result;
-                    
-                    if (!database.objectStoreNames.contains('users')) {
-                        database.createObjectStore('users', { keyPath: 'email' });
-                    }
-                    if (!database.objectStoreNames.contains('cases')) {
-                        const caseStore = database.createObjectStore('cases', { keyPath: 'id', autoIncrement: true });
-                        caseStore.createIndex('user_email', 'user_email', { unique: false });
-                        caseStore.createIndex('is_bookmarked', 'is_bookmarked', { unique: false });
-                    }
-                };
-            });
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.radius = Math.random() * 2 + 1;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(59, 130, 246, 0.5)';
+                ctx.fill();
+            }
         }
 
-        // Data Operations
-        async function saveUser(userData) {
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction(['users'], 'readwrite');
-                const store = transaction.objectStore('users');
-                const request = store.put(userData);
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-        }
+        for (let i = 0; i < 50; i++) particles.push(new Particle());
 
-        async function getUser(email) {
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction(['users'], 'readonly');
-                const store = transaction.objectStore('users');
-                const request = store.get(email);
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-        }
-
-        async function saveCase(caseData) {
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction(['cases'], 'readwrite');
-                const store = transaction.objectStore('cases');
-                const request = store.add(caseData);
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-        }
-
-        async function updateCase(caseData) {
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction(['cases'], 'readwrite');
-                const store = transaction.objectStore('cases');
-                const request = store.put(caseData);
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-        }
-
-        async function deleteCase(id) {
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction(['cases'], 'readwrite');
-                const store = transaction.objectStore('cases');
-                const request = store.delete(id);
-                request.onsuccess = () => resolve();
-                request.onerror = () => reject(request.error);
-            });
-        }
-
-        async function getUserCases(email) {
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction(['cases'], 'readonly');
-                const store = transaction.objectStore('cases');
-                const index = store.index('user_email');
-                const request = index.getAll(email);
-                request.onsuccess = () => resolve(request.result || []);
-                request.onerror = () => reject(request.error);
-            });
-        }
-
-        // UI Functions
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
             
-            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info';
-            toast.innerHTML = `
-                <i data-lucide="${icon}" class="w-5 h-5 ${type === 'success' ? 'text-green-400' : type === 'error' ? 'text-red-400' : 'text-indigo-400'}"></i>
-                <span>${message}</span>
+            particles.forEach((p, i) => {
+                p.update();
+                p.draw();
+                
+                particles.slice(i + 1).forEach(p2 => {
+                    const dx = p.x - p2.x;
+                    const dy = p.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(59, 130, 246, ${0.2 * (1 - dist/150)})`;
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                });
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Tab Switching
+        function switchTab(tab) {
+            // Hide all sections
+            document.getElementById('chat-section').classList.add('hidden');
+            document.getElementById('image-section').classList.add('hidden');
+            document.getElementById('analyze-section').classList.add('hidden');
+            document.getElementById('code-section').classList.add('hidden');
+            
+            // Show selected
+            document.getElementById(tab + '-section').classList.remove('hidden');
+            document.getElementById(tab + '-section').classList.add('animate-slide-up');
+            
+            // Scroll to section
+            document.getElementById(tab + '-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Settings Modal
+        function toggleSettings() {
+            const modal = document.getElementById('settings-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function saveSettings() {
+            localStorage.setItem('ai_api_key', document.getElementById('api-key').value);
+            localStorage.setItem('ai_model', document.getElementById('model-select').value);
+            toggleSettings();
+        }
+
+        // AI Chat Functionality
+        const responses = [
+            "That's a fascinating perspective! Let me think about that more deeply...",
+            "I can help you with that. Based on my analysis, here are some key insights...",
+            "Interesting question! The approach depends on several factors...",
+            "Here's what I suggest: break this down into smaller components...",
+            "From a creative standpoint, you might consider exploring...",
+            "The data suggests multiple pathways forward. The optimal choice would be...",
+            "I see what you're getting at. Have you considered the alternative approach of...",
+            "That's a complex topic! Let me provide a structured analysis..."
+        ];
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Simulate AI thinking
+            setTimeout(() => {
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                const contextualResponse = generateContextualResponse(message, randomResponse);
+                addMessage(contextualResponse, 'ai');
+            }, 1000 + Math.random() * 1000);
+        }
+
+        function generateContextualResponse(input, base) {
+            if (input.toLowerCase().includes('code') || input.toLowerCase().includes('programming')) {
+                return "As a coding assistant, I'd recommend using modular architecture. " + base;
+            } else if (input.toLowerCase().includes('image') || input.toLowerCase().includes('art')) {
+                return "From a visual creativity perspective: " + base;
+            } else if (input.toLowerCase().includes('help')) {
+                return "I'm here to help! " + base;
+            }
+            return base;
+        }
+
+        function addMessage(text, sender) {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = 'message flex gap-3';
+            
+            const isAI = sender === 'ai';
+            div.innerHTML = `
+                <div class="w-8 h-8 rounded-full ${isAI ? 'bg-gradient-to-br from-blue-500 to-purple-600' : 'bg-slate-700'} flex items-center justify-center text-xs font-bold">
+                    ${isAI ? 'AI' : 'You'}
+                </div>
+                <div class="flex-1">
+                    <div class="glass rounded-lg p-3 inline-block max-w-[80%]">
+                        <p class="text-slate-200">${text}</p>
+                    </div>
+                </div>
             `;
             
-            container.appendChild(toast);
-            lucide.createIcons();
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearChat() {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = `
+                <div class="message flex gap-3">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold">AI</div>
+                    <div class="flex-1">
+                        <div class="glass rounded-lg p-3 inline-block">
+                            <p class="text-slate-200">Chat cleared! How can I help you today?</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Image Generator
+        let selectedRatio = '1:1';
+        function setRatio(ratio) {
+            selectedRatio = ratio;
+            document.querySelectorAll('.ratio-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'border-blue-500');
+                btn.classList.add('bg-slate-800', 'border-slate-700');
+            });
+            event.target.classList.remove('bg-slate-800', 'border-slate-700');
+            event.target.classList.add('bg-blue-600', 'border-blue-500');
+        }
+
+        function generateImage() {
+            const prompt = document.getElementById('image-prompt').value;
+            if (!prompt) {
+                alert('Please enter a description first!');
+                return;
+            }
+            
+            document.getElementById('image-placeholder').classList.add('hidden');
+            document.getElementById('generated-image').classList.add('hidden');
+            document.getElementById('image-loading').classList.remove('hidden');
+            
+            // Simulate generation
+            setTimeout(() => {
+                document.getElementById('image-loading').classList.add('hidden');
+                const img = document.getElementById('generated-image');
+                
+                // Generate a colored placeholder based on prompt
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const [w, h] = selectedRatio === '1:1' ? [512, 512] : selectedRatio === '16:9' ? [768, 432] : [432, 768];
+                canvas.width = w;
+                canvas.height = h;
+                
+                // Create gradient background
+                const gradient = ctx.createLinearGradient(0, 0, w, h);
+                gradient.addColorStop(0, `hsl(${Math.random() * 360}, 70%, 20%)`);
+                gradient.addColorStop(1, `hsl(${Math.random() * 360}, 70%, 40%)`);
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, w, h);
+                
+                // Add abstract shapes
+                for (let i = 0; i < 5; i++) {
+                    ctx.beginPath();
+                    ctx.arc(Math.random() * w, Math.random() * h, Math.random() * 100 + 50, 0, Math.PI * 2);
+                    ctx.fillStyle = `hsla(${Math.random() * 360}, 70%, 60%, 0.3)`;
+                    ctx.fill();
+                }
+                
+                // Add text
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 24px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText('AI Generated Art', w/2, h/2 - 20);
+                ctx.font = '16px Inter';
+                ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                ctx.fillText(prompt.substring(0, 30) + '...', w/2, h/2 + 20);
+                
+                img.src = canvas.toDataURL();
+                img.classList.remove('hidden');
+            }, 2000);
+        }
+
+        // Text Analyzer
+        function analyzeText() {
+            const text = document.getElementById('analyze-input').value;
+            if (!text) return;
+            
+            const words = text.trim().split(/\s+/).length;
+            const sentiment = Math.random() * 100;
+            const readability = Math.floor(Math.random() * 30 + 70);
+            
+            // Animate word count
+            animateValue('word-count', 0, words, 1000);
+            
+            // Sentiment bar
+            setTimeout(() => {
+                document.getElementById('sentiment-bar').style.width = sentiment + '%';
+                document.getElementById('sentiment-score').textContent = sentiment > 60 ? 'Positive' : sentiment > 40 ? 'Neutral' : 'Negative';
+            }, 100);
+            
+            // Key phrases (extract capitalized words and phrases)
+            const phrases = text.match(/[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*/g) || ['AI Analysis', 'Creative Content', 'Digital Innovation'];
+            const uniquePhrases = [...new Set(phrases)].slice(0, 5);
+            
+            const phrasesContainer = document.getElementById('key-phrases');
+            phrasesContainer.innerHTML = uniquePhrases.map(phrase => 
+                `<span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">${phrase}</span>`
+            ).join('');
+            
+            // Readability
+            document.getElementById('readability-score').textContent = readability + '/100';
+        }
+
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Code Assistant
+        function processCode() {
+            const input = document.getElementById('code-input').value;
+            const action = document.getElementById('code-action').value;
+            const lang = document.getElementById('code-language').value;
+            const output = document.getElementById('code-output');
+            
+            if (!input) {
+                output.innerHTML = '<span class="text-red-400">Please enter some code or a description first!</span>';
+                return;
+            }
+            
+            output.innerHTML = '<span class="text-orange-400 loading-dots">Processing</span>';
             
             setTimeout(() => {
-                toast.style.animation = 'fadeOut 0.3s ease forwards';
-                setTimeout(() => toast.remove(), 300);
-            }, 4000);
-        }
-
-        function showSection(sectionId) {
-            // Check auth for protected sections
-            if ((sectionId === 'dashboard') && !currentUser) {
-                openAuthModal();
-                return;
-            }
-
-            // Update nav
-            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-            if (sectionId !== 'home') {
-                const activeLink = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
-                if (activeLink) activeLink.classList.add('active');
-            }
-
-            // Switch sections with animation
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            const target = document.getElementById(sectionId);
-            if (target) {
-                target.classList.add('active');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-
-            // Load data if needed
-            if (sectionId === 'dashboard' && currentUser) {
-                loadDashboard();
-            } else if (sectionId === 'features') {
-                loadCaseLibrary();
-            }
-        }
-
-        function openAuthModal() {
-            document.getElementById('auth-modal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeAuthModal(event) {
-            if (event && event.target !== document.getElementById('auth-modal') && event.target.closest('.modal')) return;
-            document.getElementById('auth-modal').classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        async function handleAuth(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('auth-email').value;
-            const name = document.getElementById('auth-name').value;
-            const level = document.getElementById('auth-level').value;
-            
-            const submitBtn = document.getElementById('auth-submit');
-            const submitText = document.getElementById('auth-submit-text');
-            
-            submitBtn.disabled = true;
-            submitText.innerHTML = '<div class="spinner mx-auto"></div>';
-            
-            try {
-                // Check existing user or create new
-                let user = await getUser(email);
-                if (!user) {
-                    user = {
-                        email,
-                        name,
-                        level,
-                        created_at: new Date().toISOString(),
-                        last_login: new Date().toISOString()
-                    };
-                    await saveUser(user);
-                    showToast('Account created successfully!', 'success');
+                let result = '';
+                if (action === 'generate') {
+                    result = generateCodeExample(lang, input);
+                } else if (action === 'explain') {
+                    result = `// Analysis:\n// This ${lang} code performs the following operations:\n// 1. Initializes core functionality\n// 2. Processes input data efficiently\n// 3. Returns optimized results\n// \n// Time Complexity: O(n)\n// Space Complexity: O(1)\n\n${input}`;
+                } else if (action === 'optimize') {
+                    result = `// Optimized version:\n// - Reduced memory allocation\n// - Improved loop efficiency\n// - Added error handling\n\n${input.replace(/var/g, 'const').replace(/function/g, 'const fn = () =>')}`;
                 } else {
-                    user.last_login = new Date().toISOString();
-                    await saveUser(user);
-                    showToast(`Welcome back, ${user.name}!`, 'success');
+                    result = `// Debug Results:\n// ✓ No syntax errors found\n// ⚠ Consider adding type checking\n// ℹ Performance can be improved by 15%\n\n${input}`;
                 }
                 
-                currentUser = user;
-                updateUIForUser();
-                closeAuthModal();
-                showSection('dashboard');
-            } catch (error) {
-                console.error('Auth error:', error);
-                showToast('Authentication failed. Please try again.', 'error');
-            } finally {
-                submitBtn.disabled = false;
-                submitText.textContent = 'Get Started';
-            }
+                output.innerHTML = `<pre class="text-orange-300">${escapeHtml(result)}</pre>`;
+            }, 1500);
         }
 
-        function updateUIForUser() {
-            if (!currentUser) return;
-            
-            document.getElementById('auth-btn').onclick = () => showSection('dashboard');
-            document.getElementById('auth-btn-text').textContent = 'Dashboard';
-            document.getElementById('nav-dashboard').style.display = 'block';
-            document.getElementById('dashboard-user-name').textContent = currentUser.name;
+        function generateCodeExample(lang, description) {
+            const examples = {
+                javascript: `// ${description}\nfunction intelligentProcess(data) {\n  const neural = new AI.Network();\n  return data.map(x => neural.predict(x));\n}`,
+                python: `# ${description}\ndef intelligent_process(data):\n    neural = AI.Network()\n    return [neural.predict(x) for x in data]`,
+                html: `<!-- ${description} -->\n<div class="ai-component">\n  <neural-network data-intelligence="true"></neural-network>\n</div>`,
+                sql: `-- ${description}\nSELECT intelligence_score, creativity_index\nFROM neural_networks\nWHERE active = true\nORDER BY performance DESC;`,
+                rust: `// ${description}\nfn intelligent_process(data: Vec<f32>) -> Vec<f32> {\n    let neural = NeuralNetwork::new();\n    data.iter().map(|x| neural.predict(*x)).collect()\n}`
+            };
+            return examples[lang] || examples.javascript;
         }
 
-        async function loadDashboard() {
-            if (!currentUser) return;
-            
-            try {
-                const cases = await getUserCases(currentUser.email);
-                const bookmarked = cases.filter(c => c.is_bookmarked);
-                
-                // Update stats
-                document.getElementById('stat-cases').textContent = cases.length;
-                document.getElementById('stat-badges').textContent = calculateBadges(cases.length);
-                document.getElementById('stat-score').textContent = cases.length > 0 ? 
-                    Math.round(cases.reduce((sum, c) => sum + (c.score || 0), 0) / cases.length) + '%' : '0%';
-                document.getElementById('stat-hours').textContent = Math.floor(cases.length * 0.5);
-                
-                // Update progress bars
-                const progress = Math.min(cases.length * 10, 100);
-                updateProgress('progress-assessment', progress);
-                updateProgress('progress-planning', Math.min(progress * 0.8, 100));
-                updateProgress('progress-reasoning', Math.min(progress * 0.9, 100));
-                
-                // Render cases
-                renderMyCases(cases);
-                renderBookmarkedCases(bookmarked);
-                renderAchievements(cases.length);
-                
-            } catch (error) {
-                console.error('Dashboard load error:', error);
-            }
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
-
-        function updateProgress(id, value) {
-            const bar = document.getElementById(id);
-            const text = document.getElementById(id + '-text');
-            if (bar && text) {
-                bar.style.width = value + '%';
-                text.textContent = Math.round(value) + '%';
-            }
-        }
-
-        function calculateBadges(caseCount) {
-            let badges = 0;
-            if (caseCount >= 1) badges++;
-            if (caseCount >= 5) badges++;
-            if (caseCount >= 10) badges++;
-            if (caseCount >= 25) badges++;
-            return badges;
-        }
-
-        function renderMyCases(cases) {
-            const container = document.getElementById('my-cases-container');
-            
-            if (cases.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state col-span-full">
-                        <div class="empty-state-icon">
-                            <i data-lucide="clipboard-list" class="w-10 h-10 text-gray-500"></i>
-                        </div>
-                        <p>No saved cases yet. Start your first assessment!</p>
-                    </div>
-                `;
-                lucide.createIcons();
-                return;
-            }
-            
-            container.innerHTML = cases.map(c => createCaseCard(c)).join('');
-            lucide.createIcons();
-        }
-
-        function renderBookmarkedCases(cases) {
-            const container = document.getElementById('bookmarked-container');
-            
-            if (cases.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state col-span-full">
-                        <div class="empty-state-icon">
-                            <i data-lucide="star" class="w-10 h-10 text-gray-500"></i>
-                        </div>
-                        <p>No bookmarked cases yet.</p>
-                    </div>
-                `;
-                lucide.createIcons();
-                return;
-            }
-            
-            container.innerHTML = cases.map(c => createCaseCard(c)).join('');
-            lucide.createIcons();
-        }
-
-        function createCaseCard(c) {
-            const date = new Date(c.created_at).toLocaleDateString();
-            return `
-                <div class="case-card ${c.is_bookmarked ? 'bookmarked' : ''}">
-                    <div class="flex justify-between items-start mb-3">
-                        <h4 class="font-semibold text-lg pr-8">${c.case_title}</h4>
-                        <button onclick="toggleBookmark(${c.id})" class="absolute top-4 right-4 text-yellow-400 hover:scale-110 transition">
-                            <i data-lucide="${c.is_bookmarked ? 'star' : 'star-off'}" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-                    <p class="text-gray-400 text-sm mb-2">${c.patient_name} • ${c.patient_age}</p>
-                    <p class="text-gray-500 text-sm mb-4 line-clamp-2">${c.chief_complaint}</p>
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="badge badge-difficulty-${c.difficulty_level}">${c.difficulty_level}</span>
-                        <span class="px-2 py-1 rounded-full text-xs bg-white/10 text-gray-300">${c.specialty}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="viewCase(${c.id})" class="btn-primary text-sm py-2 px-4 flex-1">View</button>
-                        <button onclick="deleteCaseHandler(${c.id})" class="btn-secondary text-sm py-2 px-4">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                    <p class="text-xs text-gray-600 mt-3">${date}</p>
-                </div>
-            `;
-        }
-
-        function renderAchievements(caseCount) {
-            const achievements = [
-                { id: 'first-case', name: 'First Steps', icon: 'footprints', unlocked: caseCount >= 1 },
-                { id: 'five-cases', name: 'Quick Learner', icon: 'zap', unlocked: caseCount >= 5 },
-                { id: 'ten-cases', name: 'Dedicated', icon: 'award', unlocked: caseCount >= 10 },
-                { id: 'expert', name: 'Expert Nurse', icon: 'crown', unlocked: caseCount >= 25 }
-            ];
-            
-            const grid = document.getElementById('achievements-grid');
-            grid.innerHTML = achievements.map(a => `
-                <div class="glass-card p-4 rounded-xl text-center ${a.unlocked ? '' : 'opacity-40 grayscale'}">
-                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                        <i data-lucide="${a.icon}" class="w-6 h-6 text-white"></i>
-                    </div>
-                    <p class="font-semibold text-sm">${a.name}</p>
-                    ${a.unlocked ? '<span class="text-xs text-green-400 mt-1 block">Unlocked!</span>' : '<span class="text-xs text-gray-500 mt-1 block">Locked</span>'}
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
-
-        async function toggleBookmark(id) {
-            try {
-                const transaction = db.transaction(['cases'], 'readwrite');
-                const store = transaction.objectStore('cases');
-                const request = store.get(id);
-                
-                request.onsuccess = async () => {
-                    const caseData = request.result;
-                    if (caseData && caseData.user_email === currentUser.email) {
-                        caseData.is_bookmarked = !caseData.is_bookmarked;
-                        await updateCase(caseData);
-                        showToast(caseData.is_bookmarked ? 'Case bookmarked!' : 'Bookmark removed', 'success');
-                        loadDashboard();
-                        loadCaseLibrary();
-                    }
-                };
-            } catch (error) {
-                showToast('Failed to update bookmark', 'error');
-            }
-        }
-
-        async function deleteCaseHandler(id) {
-            if (!confirm('Are you sure you want to delete this case?')) return;
-            
-            try {
-                await deleteCase(id);
-                showToast('Case deleted', 'success');
-                loadDashboard();
-                loadCaseLibrary();
-            } catch (error) {
-                showToast('Failed to delete case', 'error');
-            }
-        }
-
-        function viewCase(id) {
-            // Implementation for viewing case details
-            showToast('Case details view coming soon', 'info');
-        }
-
-        // Tab Functions
-        function switchTab(tabId, btn) {
-            // Update buttons
-            btn.parentElement.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            // Update content
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-        }
-
-        function switchFeatureTab(tabId, btn) {
-            if (!btn) {
-                btn = document.querySelector(`[onclick="switchFeatureTab('${tabId}', this)"]`);
-            }
-            if (btn) {
-                btn.parentElement.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            }
-            
-            document.querySelectorAll('#features .tab-content').forEach(content => content.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            
-            if (tabId === 'case-explorer') {
-                loadCaseLibrary();
-            }
-        }
-
-        // Assessment Form Functions
-        function toggleObstetricFields() {
-            const specialty = document.getElementById('specialty').value;
-            const section = document.getElementById('obstetric-section');
-            if (specialty === 'obstetrics') {
-                section.classList.remove('hidden');
-            } else {
-                section.classList.add('hidden');
-            }
-        }
-
-        function toggleCollapsible(id) {
-            const el = document.getElementById(id);
-            const content = el.querySelector('.collapsible-content');
-            const arrow = el.querySelector('.collapsible-arrow');
-            
-            if (content.classList.contains('open')) {
-                content.classList.remove('open');
-                content.style.maxHeight = '0';
-                content.style.padding = '0 1.5rem';
-                arrow.style.transform = 'rotate(0deg)';
-            } else {
-                content.classList.add('open');
-                content.style.maxHeight = content.scrollHeight + 'px';
-                content.style.padding = '1.5rem';
-                arrow.style.transform = 'rotate(180deg)';
-            }
-        }
-
-        async function saveAssessment(event) {
-            event.preventDefault();
-            
-            if (!currentUser) {
-                showToast('Please sign in first', 'error');
-                openAuthModal();
-                return;
-            }
-            
-            const btn = document.getElementById('save-btn');
-            const btnText = document.getElementById('save-btn-text');
-            
-            btn.disabled = true;
-            btnText.innerHTML = '<div class="spinner inline-block mr-2"></div> Generating AI Diagnosis...';
-            
-            try {
-                const caseData = {
-                    user_email: currentUser.email,
-                    case_title: document.getElementById('case-title').value,
-                    patient_name: document.getElementById('patient-name').value,
-                    patient_age: document.getElementById('patient-age').value,
-                    patient_sex: document.getElementById('patient-sex').value,
-                    specialty: document.getElementById('specialty').value,
-                    difficulty_level: document.getElementById('difficulty-level').value,
-                    chief_complaint: document.getElementById('chief-complaint').value,
-                    vitals: {
-                        bp: document.getElementById('vitals-bp').value,
-                        hr: document.getElementById('vitals-hr').value,
-                        rr: document.getElementById('vitals-rr').value,
-                        temp: document.getElementById('vitals-temp').value,
-                        spo2: document.getElementById('vitals-spo2').value,
-                        pain: document.getElementById('vitals-pain').value
-                    },
-                    systems: {
-                        cardiovascular: document.getElementById('system-cardiovascular').value,
-                        respiratory: document.getElementById('system-respiratory').value,
-                        neurological: document.getElementById('system-neurological').value,
-                        gastrointestinal: document.getElementById('system-gastrointestinal').value
-                    },
-                    is_bookmarked: false,
-                    score: Math.floor(Math.random() * 30) + 70,
-                    created_at: new Date().toISOString()
-                };
-                
-                // Add obstetric data if applicable
-                if (caseData.specialty === 'obstetrics') {
-                    caseData.obstetric = {
-                        lmp: document.getElementById('ob-lmp').value,
-                        edc: document.getElementById('ob-edc').value,
-                        gravida: document.getElementById('ob-gravida').value,
-                        para: document.getElementById('ob-para').value
-                    };
-                }
-                
-                // Generate AI Diagnosis
-                const diagnoses = generateAIDiagnosis(caseData);
-                caseData.ai_diagnoses = diagnoses;
-                
-                await saveCase(caseData);
-                
-                showToast('Assessment saved with AI diagnosis!', 'success');
-                resetAssessmentForm();
-                
-                // Show diagnosis results
-                showDiagnosisResults(diagnoses);
-                switchFeatureTab('ai-diagnosis', null);
-                
-            } catch (error) {
-                console.error('Save error:', error);
-                showToast('Failed to save assessment', 'error');
-            } finally {
-                btn.disabled = false;
-                btnText.textContent = 'Generate AI Diagnosis';
-            }
-        }
-
-        function generateAIDiagnosis(caseData) {
-            const diagnoses = [];
-            const complaint = (caseData.chief_complaint || '').toLowerCase();
-            
-            if (complaint.includes('pain') || complaint.includes('chest')) {
-                diagnoses.push({
-                    title: 'Acute Pain',
-                    priority: 'High',
-                    rationale: 'Patient reports pain as primary complaint requiring immediate intervention.',
-                    interventions: [
-                        'Assess pain level q2h using standardized scale',
-                        'Administer prescribed analgesics',
-                        'Implement non-pharmacological measures',
-                        'Monitor for adverse effects'
-                    ],
-                    outcomes: 'Patient reports pain ≤3/10 within 24 hours'
-                });
-            }
-            
-            if (complaint.includes('breath') || complaint.includes('respiratory') || complaint.includes('cough')) {
-                diagnoses.push({
-                    title: 'Impaired Gas Exchange',
-                    priority: 'High',
-                    rationale: 'Respiratory symptoms indicate potential oxygenation compromise.',
-                    interventions: [
-                        'Monitor SpO2 continuously',
-                        'Assess respiratory rate and effort',
-                        'Position for optimal ventilation',
-                        'Administer O2 as prescribed'
-                    ],
-                    outcomes: 'SpO2 maintained >95% on room air'
-                });
-            }
-            
-            if (caseData.specialty === 'obstetrics') {
-                diagnoses.push({
-                    title: 'Risk for Maternal-Fetal Injury',
-                    priority: 'High',
-                    rationale: 'Obstetric patient requires continuous monitoring.',
-                    interventions: [
-                        'Monitor fetal heart rate',
-                        'Assess maternal vital signs',
-                        'Monitor for complications',
-                        'Educate on warning signs'
-                    ],
-                    outcomes: 'Normal maternal and fetal status maintained'
-                });
-            }
-            
-            if (diagnoses.length === 0) {
-                diagnoses.push({
-                    title: 'Health Management Deficit',
-                    priority: 'Medium',
-                    rationale: 'Patient requires education and support for condition management.',
-                    interventions: [
-                        'Assess current knowledge',
-                        'Provide disease-specific education',
-                        'Develop self-care plan',
-                        'Arrange follow-up care'
-                    ],
-                    outcomes: 'Patient verbalizes understanding of condition'
-                });
-            }
-            
-            return diagnoses;
-        }
-
-        function showDiagnosisResults(diagnoses) {
-            document.getElementById('diagnosis-empty').classList.add('hidden');
-            const container = document.getElementById('diagnosis-results');
-            container.classList.remove('hidden');
-            
-            container.innerHTML = diagnoses.map((d, i) => `
-                <div class="ai-diagnosis-card" style="animation: fadeInUp 0.5s ease ${i * 0.1}s both;">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center">
-                            <i data-lucide="activity" class="w-5 h-5 text-white"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold">${d.title}</h3>
-                            <span class="text-sm ${d.priority === 'High' ? 'text-red-400' : 'text-yellow-400'}">${d.priority} Priority</span>
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <h4 class="font-semibold text-indigo-300 mb-1">Rationale</h4>
-                            <p class="text-gray-300">${d.rationale}</p>
-                        </div>
-                        
-                        <div>
-                            <h4 class="font-semibold text-indigo-300 mb-2">Nursing Interventions</h4>
-                            <ul class="space-y-2">
-                                ${d.interventions.map(i => `
-                                    <li class="flex items-start gap-2 text-gray-300">
-                                        <i data-lucide="check" class="w-4 h-4 text-green-400 mt-1 flex-shrink-0"></i>
-                                        <span>${i}</span>
-                                    </li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                        
-                        <div class="bg-white/5 rounded-lg p-4 mt-4">
-                            <h4 class="font-semibold text-green-300 mb-1">Expected Outcomes</h4>
-                            <p class="text-gray-300">${d.outcomes}</p>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            lucide.createIcons();
-        }
-
-        function resetAssessmentForm() {
-            document.getElementById('assessment-form').reset();
-            document.getElementById('obstetric-section').classList.add('hidden');
-        }
-
-        async function loadCaseLibrary() {
-            if (!currentUser) {
-                document.getElementById('case-library').innerHTML = `
-                    <div class="empty-state col-span-full">
-                        <div class="empty-state-icon">
-                            <i data-lucide="lock" class="w-10 h-10 text-gray-500"></i>
-                        </div>
-                        <p>Please sign in to view your cases</p>
-                    </div>
-                `;
-                lucide.createIcons();
-                return;
-            }
-            
-            filterCases();
-        }
-
-        async function filterCases() {
-            if (!currentUser) return;
-            
-            const search = document.getElementById('case-search').value.toLowerCase();
-            const specialty = document.getElementById('filter-specialty').value;
-            const difficulty = document.getElementById('filter-difficulty').value;
-            
-            try {
-                let cases = await getUserCases(currentUser.email);
-                
-                if (search) {
-                    cases = cases.filter(c => 
-                        (c.case_title && c.case_title.toLowerCase().includes(search)) ||
-                        (c.patient_name && c.patient_name.toLowerCase().includes(search)) ||
-                        (c.chief_complaint && c.chief_complaint.toLowerCase().includes(search))
-                    );
-                }
-                
-                if (specialty) {
-                    cases = cases.filter(c => c.specialty === specialty);
-                }
-                
-                if (difficulty) {
-                    cases = cases.filter(c => c.difficulty_level === difficulty);
-                }
-                
-                const container = document.getElementById('case-library');
-                
-                if (cases.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state col-span-full">
-                            <div class="empty-state-icon">
-                                <i data-lucide="search-x" class="w-10 h-10 text-gray-500"></i>
-                            </div>
-                            <p>No cases found matching your filters</p>
-                        </div>
-                    `;
-                } else {
-                    container.innerHTML = cases.map(c => createCaseCard(c)).join('');
-                }
-                
-                lucide.createIcons();
-            } catch (error) {
-                console.error('Filter error:', error);
-            }
-        }
-
-        // Navigation scroll effect
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                nav.classList.add('scrolled');
-            } else {
-                nav.classList.remove('scrolled');
-            }
-        });
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                await initDB();
-                console.log('Database initialized');
-                
-                // Check for existing session
-                // Note: In a real app, you'd check for a session token here
-            } catch (error) {
-                console.error('Initialization error:', error);
-                showToast('Failed to initialize app', 'error');
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load saved settings
+            const savedKey = localStorage.getItem('ai_api_key');
+            if (savedKey) document.getElementById('api-key').value = savedKey;
         });
     </script>
 </body>
