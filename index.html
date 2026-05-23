@@ -1,2056 +1,2028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NurseCare+ AI Education Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --accent: #8b5cf6;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
 
-# I'll create a comprehensive React application for the Endoscopy educational website
-# This will be a single, well-structured file with all components
+        * {
+            box-sizing: border-box;
+        }
 
-code = '''import React, { useState, useEffect, useRef, useContext, createContext } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
-import { 
-  Stethoscope, ChevronDown, Play, Pause, Moon, Sun, ArrowRight, 
-  Activity, Heart, Shield, AlertTriangle, CheckCircle, XCircle,
-  Clock, User, FileText, Video, BookOpen, HelpCircle, Sparkles,
-  Microscope, Scissors, Monitor, Lightbulb, Camera, Droplets,
-  Thermometer, Pill, Syringe, Bandage, Search, Menu, X,
-  Brain, Eye, Zap, Globe, Award, Phone, Mail, MapPin, Facebook,
-  Twitter, Linkedin, Instagram, ChevronRight, Star, Info,
-  FlaskConical, Layers, Scan, Radio, Fingerprint, Dna,
-  ArrowUpRight, Minimize2, Maximize2, RotateCcw, Volume2
-} from 'lucide-react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Autoplay, EffectCards, EffectCoverflow } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/effect-cards';
-import 'swiper/css/effect-coverflow';
+        html {
+            scroll-behavior: smooth;
+        }
 
-// ==========================================
-// TYPES & INTERFACES
-// ==========================================
-interface SectionProps {
-  isActive?: boolean;
-}
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+        }
 
-interface ProcedureCard {
-  id: string;
-  name: string;
-  fullName: string;
-  icon: React.ReactNode;
-  purpose: string;
-  overview: string;
-  duration: string;
-  risks: string[];
-  recovery: string;
-  preparation: string[];
-  color: string;
-}
+        /* Animated Background */
+        .bg-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
 
-interface DiseaseCard {
-  name: string;
-  description: string;
-  icon: React.ReactNode;
-  color: string;
-}
+        .bg-mesh::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(236, 72, 153, 0.2) 0%, transparent 40%);
+            animation: float 20s ease-in-out infinite;
+        }
 
-interface AnesthesiaType {
-  name: string;
-  definition: string;
-  purpose: string;
-  whenUsed: string;
-  advantages: string[];
-  risks: string[];
-  icon: React.ReactNode;
-  color: string;
-}
+        .bg-mesh::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+            opacity: 0.4;
+        }
 
-interface Instrument {
-  name: string;
-  description: string;
-  icon: React.ReactNode;
-}
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(1deg); }
+            66% { transform: translate(-20px, 20px) rotate(-1deg); }
+        }
 
-interface FAQItem {
-  question: string;
-  answer: string;
-}
+        /* Glassmorphism */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
 
-interface FunFact {
-  title: string;
-  content: string;
-  icon: React.ReactNode;
-}
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-interface VideoItem {
-  title: string;
-  embedId: string;
-  category: string;
-}
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
 
-// ==========================================
-// THEME CONTEXT
-// ==========================================
-interface ThemeContextType {
-  darkMode: boolean;
-  toggleDarkMode: () => void;
-}
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            transition: all 0.3s ease;
+        }
 
-const ThemeContext = createContext<ThemeContextType>({ darkMode: false, toggleDarkMode: () => {} });
+        nav.scrolled {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [darkMode, setDarkMode] = useState(false);
-  
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-  
-  const toggleDarkMode = () => setDarkMode(!darkMode);
-  
-  return (
-    <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-};
+        .nav-link {
+            position: relative;
+            color: rgba(255, 255, 255, 0.7);
+            transition: color 0.3s;
+        }
 
-// ==========================================
-// DATA
-// ==========================================
-const procedures: ProcedureCard[] = [
-  {
-    id: 'egd',
-    name: 'EGD',
-    fullName: 'Upper GI Endoscopy (Esophagogastroduodenoscopy)',
-    icon: <Scan className="w-8 h-8" />,
-    purpose: 'Visual examination of the esophagus, stomach, and duodenum to diagnose and treat upper GI conditions.',
-    overview: 'A flexible endoscope is inserted through the mouth, down the esophagus, into the stomach and duodenum. The camera transmits images to a monitor, allowing the physician to examine the lining, take biopsies, and perform therapeutic procedures.',
-    duration: '15-30 minutes',
-    risks: ['Bleeding', 'Perforation', 'Infection', 'Reaction to sedation'],
-    recovery: '30-60 minutes in recovery area. Patient must have escort. NPO until gag reflex returns.',
-    preparation: ['NPO 6-8 hours before', 'Remove dentures/jewelry', 'Inform of allergies', 'Arrange transportation'],
-    color: 'from-blue-500 to-cyan-400'
-  },
-  {
-    id: 'colonoscopy',
-    name: 'Colonoscopy',
-    fullName: 'Lower GI Endoscopy (Colonoscopy)',
-    icon: <Layers className="w-8 h-8" />,
-    purpose: 'Examination of the entire colon and rectum for screening, diagnosis, and treatment of lower GI diseases.',
-    overview: 'A colonoscope is inserted through the rectum and advanced through the entire colon. Carbon dioxide or air insufflation expands the colon for better visualization. Polyps can be removed, biopsies taken, and bleeding sources treated.',
-    duration: '30-60 minutes',
-    risks: ['Bleeding (especially post-polypectomy)', 'Perforation', 'Infection', 'Sedation complications'],
-    recovery: '1-2 hours observation. Bloating and cramping common. Clear liquid diet initially.',
-    preparation: ['Clear liquid diet 24h prior', 'Bowel prep with laxatives', 'NPO 2-4 hours before', 'Arrange transportation'],
-    color: 'from-teal-500 to-emerald-400'
-  },
-  {
-    id: 'sigmoidoscopy',
-    name: 'Sigmoidoscopy',
-    fullName: 'Flexible Sigmoidoscopy',
-    icon: <Activity className="w-8 h-8" />,
-    purpose: 'Examination of the rectum and sigmoid colon for diagnostic and screening purposes.',
-    overview: 'A sigmoidoscope is inserted through the rectum and advanced to the sigmoid colon (about 60cm). Less invasive than colonoscopy. Often performed without sedation. Air insufflation provides visualization.',
-    duration: '10-20 minutes',
-    risks: ['Bleeding', 'Perforation (rare)', 'Discomfort/cramping'],
-    recovery: 'Immediate. May resume normal activities. Mild bloating resolves quickly.',
-    preparation: ['Enema or limited bowel prep', 'Light meal 2 hours before', 'No sedation usually needed'],
-    color: 'from-indigo-500 to-purple-400'
-  },
-  {
-    id: 'capsule',
-    name: 'Capsule Endoscopy',
-    fullName: 'Wireless Capsule Endoscopy',
-    icon: <Camera className="w-8 h-8" />,
-    purpose: 'Examination of the small intestine using a swallowable camera capsule for obscure GI bleeding and Crohn\'s disease.',
-    overview: 'Patient swallows a vitamin-sized capsule containing a camera, light source, and transmitter. The capsule captures thousands of images as it travels through the digestive tract over 8-12 hours. Images are downloaded to a recorder.',
-    duration: '8-12 hours (capsule transit time)',
-    risks: ['Capsule retention', 'Incomplete examination', 'Rare obstruction'],
-    recovery: 'Normal activities during procedure. Capsule passes naturally in stool.',
-    preparation: ['NPO 10-12 hours before', 'Clear liquid diet day prior', 'No MRI until capsule passes'],
-    color: 'from-amber-500 to-orange-400'
-  },
-  {
-    id: 'ercp',
-    name: 'ERCP',
-    fullName: 'Endoscopic Retrograde Cholangiopancreatography',
-    icon: <Radio className="w-8 h-8" />,
-    purpose: 'Diagnostic and therapeutic procedure for bile duct and pancreatic duct disorders.',
-    overview: 'A side-viewing duodenoscope is advanced to the duodenum. Contrast dye is injected into the bile and pancreatic ducts via the ampulla of Vater. X-ray fluoroscopy visualizes the ducts. Stones can be removed, strictures dilated, and stents placed.',
-    duration: '30-90 minutes',
-    risks: ['Pancreatitis (most common)', 'Bleeding', 'Perforation', 'Infection (cholangitis)'],
-    recovery: '2-4 hours observation. Monitor for pancreatitis (abdominal pain, elevated amylase). NPO until cleared.',
-    preparation: ['NPO 6-8 hours', 'Coagulation studies', 'IV antibiotics if indicated', 'Arrange transportation'],
-    color: 'from-rose-500 to-pink-400'
-  }
-];
+        .nav-link:hover {
+            color: white;
+        }
 
-const diseases: DiseaseCard[] = [
-  { name: 'GERD', description: 'Gastroesophageal reflux disease causing heartburn and esophageal damage', icon: <Flame className="w-6 h-6" />, color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' },
-  { name: 'Gastritis', description: 'Inflammation of the stomach lining causing pain and nausea', icon: <Thermometer className="w-6 h-6" />, color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' },
-  { name: 'Peptic Ulcer', description: 'Open sores in the stomach or duodenum lining', icon: <AlertTriangle className="w-6 h-6" />, color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' },
-  { name: 'GI Bleeding', description: 'Blood loss from any part of the gastrointestinal tract', icon: <Droplets className="w-6 h-6" />, color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' },
-  { name: 'Colon Polyps', description: 'Abnormal growths in the colon that may become cancerous', icon: <Layers className="w-6 h-6" />, color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' },
-  { name: 'Colorectal Cancer', description: 'Cancer of the colon or rectum, often preventable with screening', icon: <Shield className="w-6 h-6" />, color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300' },
-  { name: "Crohn's Disease", description: 'Chronic inflammatory bowel disease affecting any GI segment', icon: <Zap className="w-6 h-6" />, color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' },
-  { name: 'Ulcerative Colitis', description: 'Chronic inflammation of the colon and rectum lining', icon: <Activity className="w-6 h-6" />, color: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300' },
-  { name: 'Esophageal Varices', description: 'Enlarged veins in the esophagus from portal hypertension', icon: <Heart className="w-6 h-6" />, color: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300' }
-];
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transition: width 0.3s ease;
+        }
 
-const anesthesiaTypes: AnesthesiaType[] = [
-  {
-    name: 'General Anesthesia',
-    definition: 'Reversible loss of consciousness and sensation throughout the entire body.',
-    purpose: 'To ensure patient is completely unconscious and pain-free during complex procedures.',
-    whenUsed: 'Rarely for standard endoscopy; used for complex ERCP, emergency procedures, or uncooperative patients.',
-    advantages: ['Complete unconsciousness', 'No memory of procedure', 'Muscle relaxation', 'Airway control'],
-    risks: ['Respiratory depression', 'Hypotension', 'Malignant hyperthermia', 'Prolonged recovery'],
-    icon: <Brain className="w-8 h-8" />,
-    color: 'from-violet-500 to-purple-500'
-  },
-  {
-    name: 'Regional Anesthesia',
-    definition: 'Loss of sensation in a specific region of the body without loss of consciousness.',
-    purpose: 'To block pain signals from a specific area while patient remains awake.',
-    whenUsed: 'Occasionally for complex endoscopic procedures requiring deep sedation alternatives.',
-    advantages: ['Reduced systemic effects', 'Faster recovery than general', 'Lower respiratory risk', 'Patient can communicate'],
-    risks: ['Local anesthetic toxicity', 'Nerve injury', 'Incomplete block', 'Hypotension'],
-    icon: <Target className="w-8 h-8" />,
-    color: 'from-blue-500 to-indigo-500'
-  },
-  {
-    name: 'Local Anesthesia',
-    definition: 'Reversible loss of sensation in a confined body area without affecting consciousness.',
-    purpose: 'To numb the throat or rectal area for minimal discomfort during scope insertion.',
-    whenUsed: 'Flexible sigmoidoscopy, minor procedures, or as adjunct to sedation.',
-    advantages: ['Minimal systemic effects', 'Rapid onset', 'Short duration', 'Patient cooperation maintained'],
-    risks: ['Allergic reactions', 'Local tissue irritation', 'Inadequate analgesia', 'Systemic absorption'],
-    icon: <Pin className="w-8 h-8" />,
-    color: 'from-green-500 to-emerald-500'
-  },
-  {
-    name: 'Conscious Sedation',
-    definition: 'Drug-induced depression of consciousness during which patients respond purposefully to verbal commands.',
-    purpose: 'To relieve anxiety, discomfort, and pain while maintaining patient safety and cooperation.',
-    whenUsed: 'Standard for most EGD and colonoscopy procedures. Most common anesthesia type for endoscopy.',
-    advantages: ['Amnesia effect', 'Anxiolysis', 'Rapid onset and recovery', 'Patient maintains airway reflexes'],
-    risks: ['Respiratory depression', 'Hypotension', 'Oversedation', 'Paradoxical agitation'],
-    icon: <Moon className="w-8 h-8" />,
-    color: 'from-teal-500 to-cyan-500'
-  }
-];
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
 
-const instruments: Instrument[] = [
-  { name: 'Endoscope', description: 'Flexible tube with camera, light, and channels for instruments and suction', icon: <Scan className="w-10 h-10" /> },
-  { name: 'Biopsy Forceps', description: 'Small pincers passed through the endoscope channel to obtain tissue samples', icon: <Scissors className="w-10 h-10" /> },
-  { name: 'Camera System', description: 'High-definition digital processor that captures and displays real-time images', icon: <Camera className="w-10 h-10" /> },
-  { name: 'Light Source', description: 'LED or xenon light transmitted via fiberoptics to illuminate the GI tract', icon: <Lightbulb className="w-10 h-10" /> },
-  { name: 'Suction Device', description: 'Removes secretions, blood, and debris to maintain clear visualization', icon: <Droplets className="w-10 h-10" /> },
-  { name: 'Monitor Display', description: 'High-resolution screens showing the endoscopic image for the medical team', icon: <Monitor className="w-10 h-10" /> },
-  { name: 'Polypectomy Snare', description: 'Wire loop that encircles and removes polyps via electrocautery', icon: <Circle className="w-10 h-10" /> },
-  { name: 'Injection Needle', description: 'Fine needle for submucosal injections of saline, dye, or medications', icon: <Syringe className="w-10 h-10" /> }
-];
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
 
-const faqs: FAQItem[] = [
-  { question: 'Is endoscopy painful?', answer: 'Most patients experience minimal discomfort due to conscious sedation. You may feel pressure or bloating, but pain is rare. The sedation causes drowsiness and often amnesia, so many patients do not remember the procedure.' },
-  { question: 'How long does the procedure take?', answer: 'Upper endoscopy (EGD) typically takes 15-30 minutes. Colonoscopy takes 30-60 minutes. Capsule endoscopy requires 8-12 hours for the capsule to pass through, but you can resume normal activities. Recovery time adds 30-60 minutes.' },
-  { question: 'Is anesthesia always necessary?', answer: 'Conscious sedation is standard for EGD and colonoscopy to ensure comfort and cooperation. Flexible sigmoidoscopy may be performed without sedation. General anesthesia is rarely needed and reserved for complex cases or uncooperative patients.' },
-  { question: 'What are the main risks?', answer: 'Major complications are rare (occurring in <1% of procedures). Risks include bleeding (especially after biopsy or polypectomy), perforation (tear in the GI wall), infection, and adverse reactions to sedation. Your healthcare team is trained to manage these emergencies.' },
-  { question: 'How should I prepare for endoscopy?', answer: 'Preparation varies by procedure: Upper endoscopy requires fasting 6-8 hours. Colonoscopy requires a clear liquid diet and bowel preparation the day before. You must arrange transportation if receiving sedation. Inform your doctor of all medications, allergies, and medical conditions.' }
-];
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
 
-const funFacts: FunFact[] = [
-  { title: 'First Flexible Endoscope', content: 'The first flexible fiberoptic endoscope was developed in 1957 by Basil Hirschowitz, allowing physicians to see around bends in the digestive tract for the first time.', icon: <History className="w-6 h-6" /> },
-  { title: 'Capsule Camera Size', content: 'The capsule endoscopy camera is only 11mm x 26mm (about the size of a large vitamin pill) yet contains a camera, light source, battery, and radio transmitter.', icon: <Camera className="w-6 h-6" /> },
-  { title: 'GI Tract Length', content: 'The entire gastrointestinal tract is approximately 9 meters (30 feet) long in adults. The small intestine alone is about 6 meters and has a surface area roughly the size of a tennis court due to villi.', icon: <Ruler className="w-6 h-6" /> },
-  { title: 'Polyp to Cancer Timeline', content: 'It typically takes 10-15 years for a small adenomatous polyp to develop into colorectal cancer, which is why regular screening colonoscopy is so effective at prevention.', icon: <Clock className="w-6 h-6" /> },
-  { title: 'Endoscopic Milestones', content: 'Modern endoscopes can perform incredible procedures: remove early cancers, close perforations, place feeding tubes, drain pancreatic pseudocysts, and even perform weight loss procedures.', icon: <Award className="w-6 h-6" /> }
-];
+        .btn-primary:hover::before {
+            left: 100%;
+        }
 
-const videos: VideoItem[] = [
-  { title: 'Upper GI Endoscopy Procedure', embedId: 'dQw4w9WgXcQ', category: 'Procedure' },
-  { title: 'Colonoscopy Explained', embedId: 'dQw4w9WgXcQ', category: 'Procedure' },
-  { title: 'Nursing Care in Endoscopy', embedId: 'dQw4w9WgXcQ', category: 'Nursing' },
-  { title: 'Patient Preparation Guide', embedId: 'dQw4w9WgXcQ', category: 'Education' },
-  { title: 'Endoscopy Equipment Tour', embedId: 'dQw4w9WgXcQ', category: 'Equipment' },
-  { title: 'Capsule Endoscopy Technology', embedId: 'dQw4w9WgXcQ', category: 'Technology' }
-];
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
 
-// ==========================================
-// UTILITY COMPONENTS
-// ==========================================
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
 
-const ScrollProgress = () => {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
-  
-  return (
-    <motion.div
-      className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-teal-400 to-cyan-400 z-[60] origin-left"
-      style={{ scaleX }}
-    />
-  );
-};
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
 
-const FloatingIcon = ({ icon, delay, x, y }: { icon: React.ReactNode; delay: number; x: string; y: string }) => (
-  <motion.div
-    className="absolute opacity-10 dark:opacity-5 pointer-events-none"
-    style={{ left: x, top: y }}
-    animate={{ y: [0, -20, 0], rotate: [0, 10, -10, 0] }}
-    transition={{ duration: 6, delay, repeat: Infinity, ease: "easeInOut" }}
-  >
-    {icon}
-  </motion.div>
-);
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 6rem 2rem;
+            overflow: hidden;
+        }
 
-const SectionTitle = ({ title, subtitle, align = 'center' }: { title: string; subtitle?: string; align?: 'left' | 'center' | 'right' }) => (
-  <motion.div 
-    className={`mb-12 ${align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'}`}
-    initial={{ opacity: 0, y: 30 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    transition={{ duration: 0.6 }}
-  >
-    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 via-teal-500 to-cyan-500 bg-clip-text text-transparent mb-4">
-      {title}
-    </h2>
-    {subtitle && <p className="text-slate-600 dark:text-slate-300 text-lg max-w-2xl mx-auto">{subtitle}</p>}
-    <div className={`h-1 w-24 bg-gradient-to-r from-blue-500 to-teal-400 rounded-full mt-4 ${align === 'center' ? 'mx-auto' : align === 'right' ? 'ml-auto' : ''}`} />
-  </motion.div>
-);
+        .hero-content {
+            text-align: center;
+            max-width: 900px;
+            z-index: 1;
+            animation: fadeInUp 1s ease-out;
+        }
 
-const GlassCard = ({ children, className = '', hover = true }: { children: React.ReactNode; className?: string; hover?: boolean }) => (
-  <motion.div
-    className={`bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 rounded-2xl shadow-xl ${className}`}
-    whileHover={hover ? { y: -5, boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' } : {}}
-    transition={{ duration: 0.3 }}
-  >
-    {children}
-  </motion.div>
-);
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-// ==========================================
-// SECTION COMPONENTS
-// ==========================================
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, #c7d2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+        }
 
-const HeroSection = ({ onNavigate }: { onNavigate: (section: string) => void }) => {
-  const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 500], [0, 200]);
-  const y2 = useTransform(scrollY, [0, 500], [0, -100]);
-  
-  return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-teal-900">
-      {/* Animated Background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div 
-          className="absolute -top-40 -right-40 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl"
-          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 8, repeat: Infinity }}
-        />
-        <motion.div 
-          className="absolute -bottom-40 -left-40 w-96 h-96 bg-teal-400/20 rounded-full blur-3xl"
-          animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 8, repeat: Infinity, delay: 2 }}
-        />
-        <motion.div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-400/10 rounded-full blur-3xl"
-          animate={{ scale: [1, 1.1, 1], rotate: [0, 90, 0] }}
-          transition={{ duration: 15, repeat: Infinity }}
-        />
-      </div>
-      
-      {/* Floating Icons */}
-      <FloatingIcon icon={<Stethoscope className="w-16 h-16 text-blue-400" />} delay={0} x="10%" y="20%" />
-      <FloatingIcon icon={<Heart className="w-12 h-12 text-teal-400" />} delay={1} x="80%" y="30%" />
-      <FloatingIcon icon={<Activity className="w-14 h-14 text-cyan-400" />} delay={2} x="15%" y="70%" />
-      <FloatingIcon icon={<Microscope className="w-10 h-10 text-indigo-400" />} delay={3} x="85%" y="75%" />
-      
-      {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        >
-          <motion.div 
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-sm font-medium mb-6"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.3, type: "spring" }}
-          >
-            <Sparkles className="w-4 h-4" />
-            Medical Education Series
-          </motion.div>
-          
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-slate-800 dark:text-white mb-6 leading-tight">
-            <span className="bg-gradient-to-r from-blue-600 via-teal-500 to-cyan-500 bg-clip-text text-transparent">
-              ENDOSCOPY
-            </span>
-            <br />
-            <span className="text-2xl md:text-4xl lg:text-5xl text-slate-600 dark:text-slate-300">
-              Upper & Lower GI Procedures
-            </span>
-          </h1>
-          
-          <motion.p 
-            className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto mb-10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            A minimally invasive diagnostic and therapeutic approach using advanced endoscopic 
-            technology to visualize, diagnose, and treat conditions of the gastrointestinal tract.
-          </motion.p>
-          
-          <motion.div 
-            className="flex flex-wrap gap-4 justify-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-          >
-            <motion.button
-              onClick={() => onNavigate('introduction')}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Learn More <ArrowRight className="w-5 h-5" />
-            </motion.button>
-            <motion.button
-              onClick={() => onNavigate('procedures')}
-              className="px-8 py-4 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 border-2 border-blue-200 dark:border-slate-600 rounded-full font-semibold hover:bg-blue-50 dark:hover:bg-slate-700 transition-all flex items-center gap-2"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Explore Procedures <Scan className="w-5 h-5" />
-            </motion.button>
-            <motion.button
-              onClick={() => onNavigate('videos')}
-              className="px-8 py-4 bg-white dark:bg-slate-800 text-teal-600 dark:text-teal-400 border-2 border-teal-200 dark:border-slate-600 rounded-full font-semibold hover:bg-teal-50 dark:hover:bg-slate-700 transition-all flex items-center gap-2"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Watch Videos <Play className="w-5 h-5" />
-            </motion.button>
-          </motion.div>
-        </motion.div>
-        
-        {/* Stats */}
-        <motion.div 
-          className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1 }}
-        >
-          {[
-            { value: '15M+', label: 'Procedures Yearly' },
-            { value: '95%', label: 'Detection Rate' },
-            { value: '<1%', label: 'Complication Rate' },
-            { value: '30min', label: 'Average Duration' }
-          ].map((stat, i) => (
-            <GlassCard key={i} className="p-4 text-center">
-              <div className="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">{stat.value}</div>
-              <div className="text-sm text-slate-600 dark:text-slate-400 mt-1">{stat.label}</div>
-            </GlassCard>
-          ))}
-        </motion.div>
-      </div>
-      
-      {/* Scroll Indicator */}
-      <motion.div 
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
-        <ChevronDown className="w-8 h-8 text-slate-400 dark:text-slate-500" />
-      </motion.div>
-    </section>
-  );
-};
+        .hero-tagline {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
 
-const IntroductionSection = () => {
-  const cards = [
-    { title: 'What is Endoscopy?', content: 'Endoscopy is a minimally invasive procedure using a flexible tube with a camera to examine the interior of hollow organs and cavities in the body.', icon: <Search className="w-8 h-8" /> },
-    { title: 'Purpose', content: 'To diagnose, monitor, and treat diseases of the digestive tract including ulcers, polyps, cancer, inflammation, and bleeding sources.', icon: <Target className="w-8 h-8" /> },
-    { title: 'Importance', content: 'Endoscopy enables early detection of GI cancers, reduces need for open surgery, allows immediate therapeutic intervention, and saves lives through screening.', icon: <Heart className="w-8 h-8" /> },
-    { title: 'History', content: 'From rigid tubes in 1800s to fiberoptics in 1957, to modern HD and 4K digital endoscopes with AI-enhanced detection and therapeutic capabilities.', icon: <History className="w-8 h-8" /> }
-  ];
-  
-  return (
-    <section className="py-20 px-4 bg-white dark:bg-slate-900">
-      <div className="max-w-6xl mx-auto">
-        <SectionTitle 
-          title="Introduction to Endoscopy" 
-          subtitle="Understanding the fundamentals of gastrointestinal endoscopic procedures and their critical role in modern healthcare"
-        />
-        
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {cards.map((card, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <GlassCard className="p-6 h-full">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center text-white mb-4">
-                  {card.icon}
-                </div>
-                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-3">{card.title}</h3>
-                <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">{card.content}</p>
-              </GlassCard>
-            </motion.div>
-          ))}
-        </div>
-        
-        {/* Interactive Infographic */}
-        <motion.div 
-          className="mt-16 p-8 rounded-3xl bg-gradient-to-br from-blue-50 to-teal-50 dark:from-slate-800 dark:to-slate-700"
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-        >
-          <h3 className="text-2xl font-bold text-center text-slate-800 dark:text-white mb-8">The Endoscopy Process Flow</h3>
-          <div className="flex flex-wrap justify-center items-center gap-4">
-            {['Patient Assessment', 'Preparation', 'Sedation', 'Insertion', 'Examination', 'Intervention', 'Recovery', 'Follow-up'].map((step, i) => (
-              <React.Fragment key={i}>
-                <motion.div
-                  className="px-6 py-3 bg-white dark:bg-slate-700 rounded-xl shadow-md text-sm font-semibold text-slate-700 dark:text-slate-200"
-                  whileHover={{ scale: 1.1, backgroundColor: '#3b82f6', color: '#fff' }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {step}
-                </motion.div>
-                {i < 7 && <ArrowRight className="w-5 h-5 text-slate-400 hidden md:block" />}
-              </React.Fragment>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-};
+        /* Floating Elements Animation */
+        .float-element {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.5;
+            animation: float-element 15s ease-in-out infinite;
+        }
 
-const ProceduresSection = () => {
-  const [activeProcedure, setActiveProcedure] = useState<string | null>(null);
-  
-  return (
-    <section className="py-20 px-4 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
-      <div className="max-w-6xl mx-auto">
-        <SectionTitle 
-          title="Endoscopic Procedures" 
-          subtitle="Comprehensive overview of upper and lower gastrointestinal endoscopic procedures"
-        />
-        
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {procedures.map((proc, i) => (
-            <motion.div
-              key={proc.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <GlassCard 
-                className={`p-6 cursor-pointer h-full ${activeProcedure === proc.id ? 'ring-2 ring-blue-500' : ''}`}
-                onClick={() => setActiveProcedure(activeProcedure === proc.id ? null : proc.id)}
-              >
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${proc.color} flex items-center justify-center text-white mb-4 shadow-lg`}>
-                  {proc.icon}
-                </div>
-                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-1">{proc.name}</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">{proc.fullName}</p>
-                <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">{proc.purpose}</p>
-                
-                <AnimatePresence>
-                  {activeProcedure === proc.id && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="pt-4 border-t border-slate-200 dark:border-slate-600 space-y-3">
-                        <div>
-                          <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase">Overview</span>
-                          <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{proc.overview}</p>
-                        </div>
-                        <div className="flex gap-4">
-                          <div className="flex-1">
-                            <span className="text-xs font-bold text-teal-600 dark:text-teal-400 uppercase">Duration</span>
-                            <p className="text-sm text-slate-600 dark:text-slate-300">{proc.duration}</p>
-                          </div>
-                          <div className="flex-1">
-                            <span className="text-xs font-bold text-teal-600 dark:text-teal-400 uppercase">Recovery</span>
-                            <p className="text-sm text-slate-600 dark:text-slate-300">{proc.recovery}</p>
-                          </div>
-                        </div>
-                        <div>
-                          <span className="text-xs font-bold text-red-600 dark:text-red-400 uppercase">Risks</span>
-                          <div className="flex flex-wrap gap-2 mt-1">
-                            {proc.risks.map((risk, r) => (
-                              <span key={r} className="px-2 py-1 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-xs rounded-full">{risk}</span>
-                            ))}
-                          </div>
-                        </div>
-                        <div>
-                          <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase">Preparation</span>
-                          <ul className="mt-1 space-y-1">
-                            {proc.preparation.map((prep, p) => (
-                              <li key={p} className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2">
-                                <CheckCircle className="w-3 h-3 text-green-500" /> {prep}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                
-                <div className="mt-4 flex items-center text-blue-600 dark:text-blue-400 text-sm font-medium">
-                  {activeProcedure === proc.id ? 'Show Less' : 'Learn More'}
-                  <motion.div animate={{ rotate: activeProcedure === proc.id ? 180 : 0 }}>
-                    <ChevronDown className="w-4 h-4 ml-1" />
-                  </motion.div>
-                </div>
-              </GlassCard>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
+        @keyframes float-element {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(20px, -20px) scale(1.1); }
+        }
 
-const ConditionsSection = () => {
-  const [hoveredDisease, setHoveredDisease] = useState<number | null>(null);
-  
-  return (
-    <section className="py-20 px-4 bg-white dark:bg-slate-900">
-      <div className="max-w-6xl mx-auto">
-        <SectionTitle 
-          title="Conditions Requiring Endoscopy" 
-          subtitle="Common gastrointestinal diseases and conditions diagnosed and managed through endoscopic procedures"
-        />
-        
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {diseases.map((disease, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              onHoverStart={() => setHoveredDisease(i)}
-              onHoverEnd={() => setHoveredDisease(null)}
-            >
-              <GlassCard className="p-6 h-full relative overflow-hidden">
-                <motion.div
-                  className={`absolute inset-0 ${disease.color} opacity-0`}
-                  animate={{ opacity: hoveredDisease === i ? 0.1 : 0 }}
-                />
-                <div className="relative z-10">
-                  <div className={`w-12 h-12 rounded-xl ${disease.color} flex items-center justify-center mb-4`}>
-                    {disease.icon}
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">{disease.name}</h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-300">{disease.description}</p>
-                  
-                  <motion.div
-                    className="mt-4 flex items-center text-sm font-medium text-blue-600 dark:text-blue-400"
-                    animate={{ x: hoveredDisease === i ? 5 : 0 }}
-                  >
-                    View Details <ArrowRight className="w-4 h-4 ml-1" />
-                  </motion.div>
-                </div>
-              </GlassCard>
-            </motion.div>
-          ))}
-        </div>
-        
-        {/* Stats Chart */}
-        <motion.div 
-          className="mt-16 p-8 rounded-3xl bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-        >
-          <h3 className="text-xl font-bold text-center text-slate-800 dark:text-white mb-6">Endoscopy Detection Rates by Condition</h3>
-          <div className="space-y-4 max-w-3xl mx-auto">
-            {[
-              { label: 'Polyps', value: 35, color: 'bg-blue-500' },
-              { label: 'Inflammation', value: 25, color: 'bg-teal-500' },
-              { label: 'Ulcers', value: 15, color: 'bg-indigo-500' },
-              { label: 'Bleeding Sources', value: 12, color: 'bg-rose-500' },
-              { label: 'Cancer/Neoplasia', value: 8, color: 'bg-amber-500' },
-              { label: 'Other', value: 5, color: 'bg-slate-400' }
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-4">
-                <span className="w-32 text-sm text-slate-600 dark:text-slate-300 text-right">{item.label}</span>
-                <div className="flex-1 h-8 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden">
-                  <motion.div
-                    className={`h-full ${item.color} rounded-full flex items-center justify-end px-3`}
-                    initial={{ width: 0 }}
-                    whileInView={{ width: `${item.value}%` }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1, delay: i * 0.1 }}
-                  >
-                    <span className="text-xs text-white font-bold">{item.value}%</span>
-                  </motion.div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-};
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
 
-const AnesthesiaSection = () => {
-  const [selectedAnesthesia, setSelectedAnesthesia] = useState(0);
-  
-  return (
-    <section className="py-20 px-4 bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800">
-      <div className="max-w-6xl mx-auto">
-        <SectionTitle 
-          title="Anesthesia in Endoscopy" 
-          subtitle="Understanding sedation and anesthesia options for gastrointestinal procedures"
-        />
-        
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Selection Sidebar */}
-          <div className="lg:col-span-1 space-y-3">
-            {anesthesiaTypes.map((anes, i) => (
-              <motion.button
-                key={i}
-                className={`w-full p-4 rounded-xl text-left transition-all ${
-                  selectedAnesthesia === i 
-                    ? 'bg-gradient-to-r ' + anes.color + ' text-white shadow-lg' 
-                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
-                }`}
-                onClick={() => setSelectedAnesthesia(i)}
-                whileHover={{ x: selectedAnesthesia === i ? 0 : 5 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={selectedAnesthesia === i ? 'text-white' : 'text-slate-500'}>
-                    {anes.icon}
-                  </div>
-                  <span className="font-semibold">{anes.name}</span>
-                </div>
-              </motion.button>
-            ))}
-          </div>
-          
-          {/* Detail Card */}
-          <div className="lg:col-span-2">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={selectedAnesthesia}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <GlassCard className="p-8">
-                  <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${anesthesiaTypes[selectedAnesthesia].color} flex items-center justify-center text-white mb-6`}>
-                    {React.cloneElement(anesthesiaTypes[selectedAnesthesia].icon as React.ReactElement, { className: 'w-10 h-10' })}
-                  </div>
-                  
-                  <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-4">{anesthesiaTypes[selectedAnesthesia].name}</h3>
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <span className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase">Definition</span>
-                      <p className="text-slate-600 dark:text-slate-300 mt-1">{anesthesiaTypes[selectedAnesthesia].definition}</p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-bold text-teal-600 dark:text-teal-400 uppercase">Purpose</span>
-                      <p className="text-slate-600 dark:text-slate-300 mt-1">{anesthesiaTypes[selectedAnesthesia].purpose}</p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase">When Used</span>
-                      <p className="text-slate-600 dark:text-slate-300 mt-1">{anesthesiaTypes[selectedAnesthesia].whenUsed}</p>
-                    </div>
-                    
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
-                        <span className="text-sm font-bold text-green-700 dark:text-green-400 uppercase flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4" /> Advantages
-                        </span>
-                        <ul className="mt-2 space-y-1">
-                          {anesthesiaTypes[selectedAnesthesia].advantages.map((adv, a) => (
-                            <li key={a} className="text-sm text-slate-600 dark:text-slate-300 flex items-start gap-2">
-                              <span className="text-green-500 mt-1">•</span> {adv}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-xl">
-                        <span className="text-sm font-bold text-red-700 dark:text-red-400 uppercase flex items-center gap-2">
-                          <AlertTriangle className="w-4 h-4" /> Risks
-                        </span>
-                        <ul className="mt-2 space-y-1">
-                          {anesthesiaTypes[selectedAnesthesia].risks.map((risk, r) => (
-                            <li key={r} className="text-sm text-slate-600 dark:text-slate-300 flex items-start gap-2">
-                              <span className="text-red-500 mt-1">•</span> {risk}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </GlassCard>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
 
-const InstrumentsSection = () => {
-  const [selectedInstrument, setSelectedInstrument] = useState<number | null>(null);
-  
-  return (
-    <section className="py-20 px-4 bg-white dark:bg-slate-900">
-      <div className="max-w-6xl mx-auto">
-        <SectionTitle 
-          title="Endoscopic Instruments" 
-          subtitle="Essential equipment and tools used in modern gastrointestinal endoscopy"
-        />
-        
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {instruments.map((inst, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              onClick={() => setSelectedInstrument(selectedInstrument === i ? null : i)}
-            >
-              <GlassCard className={`p-6 text-center cursor-pointer h-full ${selectedInstrument === i ? 'ring-2 ring-blue-500' : ''}`}>
-                <motion.div
-                  className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-blue-100 to-teal-100 dark:from-blue-900/30 dark:to-teal-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  animate={{ scale: selectedInstrument === i ? 1.1 : 1 }}
-                >
-                  {inst.icon}
-                </motion.div>
-                <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">{inst.name}</h3>
-                
-                <AnimatePresence>
-                  {selectedInstrument === i && (
-                    <motion.p
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="text-sm text-slate-600 dark:text-slate-300 overflow-hidden"
-                    >
-                      {inst.description}
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-              </GlassCard>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
+        .modal {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 480px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
 
-const NursingSection = () => {
-  const [activePhase, setActivePhase] = useState(0);
-  
-  const phases = [
-    {
-      title: 'Preoperative',
-      icon: <ClipboardList className="w-6 h-6" />,
-      color: 'from-blue-500 to-cyan-500',
-      items: [
-        { title: 'Priority Assessments', desc: 'Vital signs, allergy history, comorbidities, medication review, NPO status verification' },
-        { title: 'Patient Preparation', desc: 'Verify identification, ensure informed consent, remove dentures/jewelry, establish IV access' },
-        { title: 'Consent Verification', desc: 'Confirm procedure understanding, risks explained, witness signature, document in chart' },
-        { title: 'Health Teaching', desc: 'Explain procedure steps, sedation effects, what to expect, post-procedure care instructions' },
-        { title: 'Dietary Restrictions', desc: 'NPO 6-8 hours for EGD, clear liquid diet 24h + bowel prep for colonoscopy' },
-        { title: 'Bowel Preparation', desc: 'Administer prescribed laxatives, ensure complete evacuation, document output characteristics' }
-      ]
-    },
-    {
-      title: 'Intraoperative',
-      icon: <Activity className="w-6 h-6" />,
-      color: 'from-teal-500 to-emerald-500',
-      items: [
-        { title: 'Patient Safety', desc: 'Verify correct patient, procedure, site. Time-out protocol. Positioning with pressure point protection' },
-        { title: 'Positioning', desc: 'Left lateral decubitus for EGD, Left lateral or supine for colonoscopy. Ensure airway patency' },
-        { title: 'Aseptic Technique', desc: 'Maintain sterile field, proper scope handling, disinfect equipment, hand hygiene compliance' },
-        { title: 'Monitoring', desc: 'Continuous pulse oximetry, ECG, blood pressure, respiratory rate, oxygen saturation documentation' },
-        { title: 'Sedation Monitoring', desc: 'Assess consciousness level using validated scales, airway patency, respiratory effort' },
-        { title: 'Instrument Handling', desc: 'Assist with scope insertion, manage biopsy specimens, prepare intervention devices' }
-      ]
-    },
-    {
-      title: 'Postoperative',
-      icon: <Heart className="w-6 h-6" />,
-      color: 'from-rose-500 to-pink-500',
-      items: [
-        { title: 'Recovery Priorities', desc: 'Monitor vital signs q15min until stable, assess gag reflex before oral intake, prevent aspiration' },
-        { title: 'Pain Management', desc: 'Assess pain scale, administer analgesics as ordered, position for comfort, treat bloating/cramping' },
-        { title: 'Complication Monitoring', desc: 'Watch for bleeding, perforation signs (severe pain, fever, tachycardia), infection, sedation effects' },
-        { title: 'Patient Education', desc: 'Diet progression instructions, activity restrictions, warning signs to report, medication guidance' },
-        { title: 'Discharge Instructions', desc: 'No driving 24h post-sedation, escort required, return to normal diet gradually, follow-up appointment' }
-      ]
-    }
-  ];
-  
-  return (
-    <section className="py-20 px-4 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
-      <div className="max-w-6xl mx-auto">
-        <SectionTitle 
-          title="Nursing Care in Endoscopy" 
-          subtitle="Comprehensive perioperative nursing interventions for gastrointestinal endoscopic procedures"
-        />
-        
-        {/* Phase Selector */}
-        <div className="flex justify-center gap-4 mb-12">
-          {phases.map((phase, i) => (
-            <motion.button
-              key={i}
-              className={`px-6 py-3 rounded-full font-semibold flex items-center gap-2 transition-all ${
-                activePhase === i 
-                  ? 'bg-gradient-to-r ' + phase.color + ' text-white shadow-lg' 
-                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600'
-              }`}
-              onClick={() => setActivePhase(i)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {phase.icon}
-              {phase.title}
-            </motion.button>
-          ))}
-        </div>
-        
-        {/* Timeline */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activePhase}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4 }}
-          >
-            <div className="relative">
-              {/* Timeline Line */}
-              <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-300 to-teal-300 dark:from-blue-700 dark:to-teal-700" />
-              
-              <div className="space-y-6">
-                {phases[activePhase].items.map((item, i) => (
-                  <motion.div
-                    key={i}
-                    className="relative pl-20"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                  >
-                    {/* Timeline Dot */}
-                    <motion.div 
-                      className={`absolute left-6 w-5 h-5 rounded-full bg-gradient-to-r ${phases[activePhase].color} border-4 border-white dark:border-slate-800`}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: i * 0.1 + 0.2, type: "spring" }}
-                    />
-                    
-                    <GlassCard className="p-5">
-                      <h4 className="text-lg font-bold text-slate-800 dark:text-white mb-2">{item.title}</h4>
-                      <p className="text-sm text-slate-600 dark:text-slate-300">{item.desc}</p>
-                    </GlassCard>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-    </section>
-  );
-};
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
 
-const UpperGISection = () => {
-  const steps = [
-    { title: 'Mouth & Oropharynx', desc: 'Scope insertion through mouth guard. Visualize oropharynx, uvula, and posterior tongue.' },
-    { title: 'Esophagus', desc: 'Advance through upper esophageal sphincter. Examine mucosa for varices, strictures, esophagitis.' },
-    { title: 'Stomach', desc: 'Pass through gastroesophageal junction. Insufflate air, examine cardia, fundus, body, antrum, and pylorus.' },
-    { title: 'Duodenum', desc: 'Advance through pylorus into duodenal bulb and second portion. Examine ampulla of Vater.' }
-  ];
-  
-  const diseases = [
-    { name: 'Esophagitis', desc: 'Inflammation of esophageal lining', color: 'bg-red-100 text-red-700' },
-    { name: 'Gastric Ulcers', desc: 'Erosions in stomach mucosa', color: 'bg-orange-100 text-orange-700' },
-    { name: 'Duodenal Ulcers', desc: 'Ulcers in duodenal bulb', color: 'bg-yellow-100 text-yellow-700' },
-    { name: 'Varices', desc: 'Dilated veins from portal hypertension', color: 'bg-purple-100 text-purple-700' },
-    { name: 'Hiatal Hernia', desc: 'Stomach protrusion through diaphragm', color: 'bg-blue-100 text-blue-700' },
-    { name: 'Gastric Cancer', desc: 'Malignant gastric tumors', color: 'bg-rose-100 text-rose-700' }
-  ];
-  
-  return (
-    <section className="py-20 px-4 bg-white dark:bg-slate-900">
-      <div className="max-w-6xl mx-auto">
-        <SectionTitle 
-          title="Upper GI Endoscopy (EGD)" 
-          subtitle="Detailed examination of the esophagus, stomach, and duodenum"
-        />
-        
-        {/* Anatomy Visualization */}
-        <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-          >
-            <GlassCard className="p-8">
-              <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Procedure Pathway</h3>
-              <div className="space-y-4">
-                {steps.map((step, i) => (
-                  <motion.div
-                    key={i}
-                    className="flex items-start gap-4"
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.15 }}
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center text-white font-bold shrink-0">
-                      {i + 1}
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-800 dark:text-white">{step.title}</h4>
-                      <p className="text-sm text-slate-600 dark:text-slate-300">{step.desc}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </GlassCard>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="relative"
-          >
-            {/* SVG Anatomy Diagram */}
-            <svg viewBox="0 0 300 400" className="w-full max-w-md mx-auto">
-              <defs>
-                <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#e0f2fe" />
-                  <stop offset="100%" stopColor="#ccfbf1" />
-                </linearGradient>
-              </defs>
-              
-              {/* Body outline */}
-              <motion.path
-                d="M100,20 Q150,20 200,20 L200,380 Q150,380 100,380 Z"
-                fill="url(#bodyGrad)"
-                stroke="#0ea5e9"
-                strokeWidth="2"
-                initial={{ pathLength: 0 }}
-                whileInView={{ pathLength: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 2 }}
-              />
-              
-              {/* Esophagus */}
-              <motion.path
-                d="M150,30 L150,120"
-                stroke="#3b82f6"
-                strokeWidth="8"
-                strokeLinecap="round"
-                fill="none"
-                initial={{ pathLength: 0 }}
-                whileInView={{ pathLength: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1, delay: 0.5 }}
-              />
-              <text x="170" y="75" className="text-xs fill-blue-600 dark:fill-blue-400 font-bold">Esophagus</text>
-              
-              {/* Stomach */}
-              <motion.path
-                d="M150,120 Q120,140 120,180 Q120,220 150,240 Q180,220 180,180 Q180,140 150,120"
-                fill="#dbeafe"
-                stroke="#3b82f6"
-                strokeWidth="3"
-                initial={{ scale: 0 }}
-                whileInView={{ scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 1 }}
-              />
-              <text x="190" y="180" className="text-xs fill-blue-600 dark:fill-blue-400 font-bold">Stomach</text>
-              
-              {/* Duodenum */}
-              <motion.path
-                d="M150,240 Q150,260 170,270 Q190,280 190,300"
-                stroke="#3b82f6"
-                strokeWidth="6"
-                strokeLinecap="round"
-                fill="none"
-                initial={{ pathLength: 0 }}
-                whileInView={{ pathLength: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 1.5 }}
-              />
-              <text x="200" y="290" className="text-xs fill-blue-600 dark:fill-blue-400 font-bold">Duodenum</text>
-              
-              {/* Scope */}
-              <motion.line
-                x1="150" y1="10" x2="150" y2="50"
-                stroke="#ef4444"
-                strokeWidth="4"
-                strokeLinecap="round"
-                initial={{ y1: 10, y2: 10 }}
-                whileInView={{ y1: 10, y2: 300 }}
-                viewport={{ once: true }}
-                transition={{ duration: 3, delay: 2 }}
-              />
-            </svg>
-          </motion.div>
-        </div>
-        
-        {/* Common Diseases */}
-        <h3 className="text-2xl font-bold text-center text-slate-800 dark:text-white mb-8">Common Conditions Detected</h3>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {diseases.map((disease, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <GlassCard className="p-4 flex items-center gap-3">
-                <div className={`w-3 h-3 rounded-full ${disease.color.split(' ')[0]}`} />
-                <div>
-                  <h4 className="font-bold text-slate-800 dark:text-white text-sm">{disease.name}</h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{disease.desc}</p>
-                </div>
-              </GlassCard>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
+        /* Form Elements */
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
 
-const LowerGISection = () => {
-  const [comparisonView, setComparisonView] = useState<'colonoscopy' | 'sigmoidoscopy'>('colonoscopy');
-  
-  return (
-    <section className="py-20 px-4 bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800">
-      <div className="max-w-6xl mx-auto">
-        <SectionTitle 
-          title="Lower GI Endoscopy" 
-          subtitle="Colonoscopy and sigmoidoscopy procedures for examining the large intestine"
-        />
-        
-        {/* Comparison Toggle */}
-        <div className="flex justify-center mb-12">
-          <div className="bg-slate-200 dark:bg-slate-700 rounded-full p-1 flex">
-            <button
-              className={`px-6 py-2 rounded-full font-semibold transition-all ${comparisonView === 'colonoscopy' ? 'bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-400 shadow-md' : 'text-slate-600 dark:text-slate-300'}`}
-              onClick={() => setComparisonView('colonoscopy')}
-            >
-              Colonoscopy
-            </button>
-            <button
-              className={`px-6 py-2 rounded-full font-semibold transition-all ${comparisonView === 'sigmoidoscopy' ? 'bg-white dark:bg-slate-600 text-teal-600 dark:text-teal-400 shadow-md' : 'text-slate-600 dark:text-slate-300'}`}
-              onClick={() => setComparisonView('sigmoidoscopy')}
-            >
-              Sigmoidoscopy
-            </button>
-          </div>
-        </div>
-        
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={comparisonView}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <div className="grid lg:grid-cols-2 gap-8">
-              <GlassCard className="p-8">
-                <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-6">
-                  {comparisonView === 'colonoscopy' ? 'Colonoscopy' : 'Flexible Sigmoidoscopy'}
-                </h3>
-                
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                    <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Examination Reach</span>
-                    <span className="font-bold text-blue-600 dark:text-blue-400">
-                      {comparisonView === 'colonoscopy' ? 'Entire Colon (120-180cm)' : 'Rectum & Sigmoid (60cm)'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-teal-50 dark:bg-teal-900/20 rounded-lg">
-                    <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Sedation Required</span>
-                    <span className="font-bold text-teal-600 dark:text-teal-400">
-                      {comparisonView === 'colonoscopy' ? 'Yes (Conscious Sedation)' : 'Usually No'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
-                    <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Preparation</span>
-                    <span className="font-bold text-indigo-600 dark:text-indigo-400">
-                      {comparisonView === 'colonoscopy' ? 'Full Bowel Prep' : 'Enema or Limited Prep'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-                    <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Polyp Removal</span>
-                    <span className="font-bold text-amber-600 dark:text-amber-400">
-                      {comparisonView === 'colonoscopy' ? 'Yes (Polypectomy)' : 'Limited Capability'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-rose-50 dark:bg-rose-900/20 rounded-lg">
-                    <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Screening Interval</span>
-                    <span className="font-bold text-rose-600 dark:text-rose-400">
-                      {comparisonView === 'colonoscopy' ? 'Every 10 years' : 'Every 5 years'}
-                    </span>
-                  </div>
-                </div>
-              </GlassCard>
-              
-              <div className="relative">
-                {/* Large Intestine SVG */}
-                <svg viewBox="0 0 400 500" className="w-full">
-                  <defs>
-                    <linearGradient id="colonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#dbeafe" />
-                      <stop offset="100%" stopColor="#ccfbf1" />
-                    </linearGradient>
-                  </defs>
-                  
-                  {/* Colon outline */}
-                  <motion.path
-                    d={comparisonView === 'colonoscopy' 
-                      ? "M200,50 Q280,50 300,100 Q320,150 300,200 Q280,250 300,300 Q320,350 300,400 Q280,450 200,450 Q120,450 100,400 Q80,350 100,300 Q120,250 100,200 Q80,150 100,100 Q120,50 200,50"
-                      : "M200,350 Q280,350 300,400 Q280,450 200,450 Q120,450 100,400 Q120,350 200,350"
-                    }
-                    fill="none"
-                    stroke="#0ea5e9"
-                    strokeWidth="20"
-                    strokeLinecap="round"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 2 }}
-                  />
-                  
-                  {/* Labels */}
-                  {comparisonView === 'colonoscopy' && (
-                    <>
-                      <text x="310" y="100" className="text-xs fill-blue-600 dark:fill-blue-400 font-bold">Cecum</text>
-                      <text x="330" y="200" className="text-xs fill-blue-600 dark:fill-blue-400 font-bold">Ascending</text>
-                      <text x="200" y="30" className="text-xs fill-blue-600 dark:fill-blue-400 font-bold">Transverse</text>
-                      <text x="50" y="200" className="text-xs fill-blue-600 dark:fill-blue-400 font-bold">Descending</text>
-                      <text x="50" y="400" className="text-xs fill-blue-600 dark:fill-blue-400 font-bold">Sigmoid</text>
-                    </>
-                  )}
-                  <text x="200" y="480" className="text-xs fill-blue-600 dark:fill-blue-400 font-bold">Rectum</text>
-                  
-                  {/* Scope line */}
-                  <motion.line
-                    x1="200" y1="500" x2="200" y2="480"
-                    stroke="#ef4444"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                    initial={{ y2: 500 }}
-                    animate={{ y2: comparisonView === 'colonoscopy' ? 50 : 350 }}
-                    transition={{ duration: 3, delay: 1 }}
-                  />
-                </svg>
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-    </section>
-  );
-};
+        .form-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
 
-const RisksSection = () => {
-  const risks = [
-    { 
-      name: 'Bleeding', 
-      desc: 'Most common complication, especially after biopsy or polypectomy. Usually managed endoscopically.',
-      severity: 'Moderate',
-      icon: <Droplets className="w-8 h-8" />,
-      color: 'from-red-500 to-rose-500'
-    },
-    { 
-      name: 'Perforation', 
-      desc: 'Tear or hole in the GI wall requiring immediate recognition. May need surgical intervention.',
-      severity: 'High',
-      icon: <AlertTriangle className="w-8 h-8" />,
-      color: 'from-orange-500 to-amber-500'
-    },
-    { 
-      name: 'Infection', 
-      desc: 'Rare due to strict disinfection protocols. Risk increases with therapeutic interventions.',
-      severity: 'Low',
-      icon: <Shield className="w-8 h-8" />,
-      color: 'from-yellow-500 to-orange-500'
-    },
-    { 
-      name: 'Sedation Complications', 
-      desc: 'Respiratory depression, hypotension, or paradoxical reactions to sedative medications.',
-      severity: 'Moderate',
-      icon: <Brain className="w-8 h-8" />,
-      color: 'from-purple-500 to-violet-500'
-    },
-    { 
-      name: 'Aspiration', 
-      desc: 'Inhalation of gastric contents into lungs. Prevented by proper NPO status and positioning.',
-      severity: 'High',
-      icon: <Wind className="w-8 h-8" />,
-      color: 'from-blue-500 to-cyan-500'
-    }
-  ];
-  
-  return (
-    <section className="py-20 px-4 bg-white dark:bg-slate-900">
-      <div className="max-w-6xl mx-auto">
-        <SectionTitle 
-          title="Risks & Complications" 
-          subtitle="Understanding potential complications and their management in gastrointestinal endoscopy"
-        />
-        
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {risks.map((risk, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <GlassCard className="p-6 h-full border-l-4 border-l-red-500">
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${risk.color} flex items-center justify-center text-white`}>
-                    {risk.icon}
-                  </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                    risk.severity === 'High' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
-                    risk.severity === 'Moderate' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
-                    'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                  }`}>
-                    {risk.severity} Risk
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">{risk.name}</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-300">{risk.desc}</p>
-                
-                <motion.div
-                  className="mt-4 h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden"
-                >
-                  <motion.div
-                    className={`h-full bg-gradient-to-r ${risk.color}`}
-                    initial={{ width: 0 }}
-                    whileInView={{ width: risk.severity === 'High' ? '90%' : risk.severity === 'Moderate' ? '60%' : '30%' }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1, delay: 0.5 }}
-                  />
-                </motion.div>
-              </GlassCard>
-            </motion.div>
-          ))}
-        </div>
-        
-        {/* Emergency Signs */}
-        <motion.div 
-          className="mt-12 p-6 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-2xl border border-red-200 dark:border-red-800"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <AlertTriangle className="w-8 h-8 text-red-600" />
-            <h3 className="text-xl font-bold text-red-800 dark:text-red-300">Post-Procedure Emergency Signs</h3>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {['Severe abdominal pain', 'Fever > 38°C', 'Heavy rectal bleeding', 'Chest pain/dyspnea'].map((sign, i) => (
-              <motion.div
-                key={i}
-                className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg"
-                initial={{ opacity: 0, x: -10 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <XCircle className="w-5 h-5 text-red-500 shrink-0" />
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{sign}</span>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-};
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
 
-const AnatomySection = () => {
-  const [hoveredOrgan, setHoveredOrgan] = useState<string | null>(null);
-  
-  const organs = [
-    { id: 'mouth', name: 'Mouth', x: 50, y: 5, info: 'Entry point for upper endoscopy. Teeth and tongue examined briefly.' },
-    { id: 'esophagus', name: 'Esophagus', x: 50, y: 15, info: '25cm muscular tube. Examined for varices, strictures, tumors, reflux changes.' },
-    { id: 'stomach', name: 'Stomach', x: 50, y: 30, info: 'J-shaped organ. Cardia, fundus, body, antrum, and pylorus examined.' },
-    { id: 'duodenum', name: 'Duodenum', x: 60, y: 42, info: 'First part of small intestine. Ampulla of Vater visualized.' },
-    { id: 'small-intestine', name: 'Small Intestine', x: 55, y: 55, info: '6 meters long. Examined via capsule endoscopy or push enteroscopy.' },
-    { id: 'cecum', name: 'Cecum', x: 85, y: 55, info: 'Blind pouch where colon begins. Ileocecal valve identified during colonoscopy.' },
-    { id: 'ascending', name: 'Ascending Colon', x: 85, y: 40, info: 'Travels upward on right side. Examined for polyps and inflammation.' },
-    { id: 'transverse', name: 'Transverse Colon', x: 50, y: 25, info: 'Crosses upper abdomen. Often most challenging segment to navigate.' },
-    { id: 'descending', name: 'Descending Colon', x: 15, y: 40, info: 'Travels downward on left side. Common site for diverticulosis.' },
-    { id: 'sigmoid', name: 'Sigmoid Colon', x: 15, y: 55, info: 'S-shaped segment. Examined during sigmoidoscopy and colonoscopy.' },
-    { id: 'rectum', name: 'Rectum', x: 50, y: 70, info: 'Final 15cm. Digital rectal exam performed before scope insertion.' }
-  ];
-  
-  return (
-    <section className="py-20 px-4 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
-      <div className="max-w-6xl mx-auto">
-        <SectionTitle 
-          title="Interactive GI Anatomy" 
-          subtitle="Explore the gastrointestinal tract and endoscopic examination points"
-        />
-        
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Interactive Diagram */}
-          <div className="lg:col-span-2 relative">
-            <GlassCard className="p-8">
-              <svg viewBox="0 0 100 80" className="w-full">
-                {/* Simplified GI Tract */}
-                <motion.path
-                  d="M50,5 L50,15 Q50,20 45,25 Q40,30 40,35 Q40,40 45,42 Q50,45 50,50 Q50,55 45,60 Q40,65 40,70 L40,75"
-                  fill="none"
-                  stroke="#3b82f6"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0 }}
-                  whileInView={{ pathLength: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 3 }}
-                />
-                
-                {/* Colon shape */}
-                <motion.path
-                  d="M40,75 Q30,75 25,70 Q20,65 20,55 Q20,45 25,40 Q30,35 40,35 Q50,30 60,35 Q70,35 75,40 Q80,45 80,55 Q80,65 75,70 Q70,75 60,75"
-                  fill="none"
-                  stroke="#0d9488"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0 }}
-                  whileInView={{ pathLength: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 3, delay: 1 }}
-                />
-                
-                {/* Organ Points */}
-                {organs.map((organ) => (
-                  <g key={organ.id}>
-                    <motion.circle
-                      cx={organ.x}
-                      cy={organ.y}
-                      r="2"
-                      fill={hoveredOrgan === organ.id ? '#ef4444' : '#3b82f6'}
-                      className="cursor-pointer"
-                      onMouseEnter={() => setHoveredOrgan(organ.id)}
-                      onMouseLeave={() => setHoveredOrgan(null)}
-                      whileHover={{ r: 3 }}
-                    />
-                    <text
-                      x={organ.x}
-                      y={organ.y - 3}
-                      textAnchor="middle"
-                      className="text-[2px] fill-slate-600 dark:fill-slate-300 font-bold cursor-pointer"
-                      onMouseEnter={() => setHoveredOrgan(organ.id)}
-                      onMouseLeave={() => setHoveredOrgan(null)}
-                    >
-                      {organ.name}
-                    </text>
-                  </g>
-                ))}
-              </svg>
-            </GlassCard>
-          </div>
-          
-          {/* Info Panel */}
-          <div>
-            <GlassCard className="p-6 h-full">
-              <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Organ Information</h3>
-              <AnimatePresence mode="wait">
-                {hoveredOrgan ? (
-                  <motion.div
-                    key={hoveredOrgan}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                  >
-                    <h4 className="text-xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-                      {organs.find(o => o.id === hoveredOrgan)?.name}
-                    </h4>
-                    <p className="text-sm text-slate-600 dark:text-slate-300">
-                      {organs.find(o => o.id === hoveredOrgan)?.info}
-                    </p>
-                  </motion.div>
-                ) : (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-slate-500 dark:text-slate-400 text-sm"
-                  >
-                    Hover over an organ on the diagram to see detailed information about its endoscopic examination.
-                  </motion.p>
-                )}
-              </AnimatePresence>
-            </GlassCard>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
+        /* Section Transitions */
+        .section {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            padding: 6rem 2rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
 
-const VideosSection = () => {
-  const [activeVideo, setActiveVideo] = useState(0);
-  
-  return (
-    <section className="py-20 px-4 bg-white dark:bg-slate-900">
-      <div className="max-w-6xl mx-auto">
-        <SectionTitle 
-          title="Educational Video Gallery" 
-          subtitle="Learn through expert video demonstrations and nursing education content"
-        />
-        
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Video Player */}
-          <div className="lg:col-span-2">
-            <GlassCard className="p-4 overflow-hidden">
-              <div className="aspect-video bg-slate-900 rounded-xl overflow-hidden relative">
-                <iframe
-                  src={`https://www.youtube.com/embed/${videos[activeVideo].embedId}`}
-                  title={videos[activeVideo].title}
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-              <div className="mt-4">
-                <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase">{videos[activeVideo].category}</span>
-                <h3 className="text-xl font-bold text-slate-800 dark:text-white mt-1">{videos[activeVideo].title}</h3>
-              </div>
-            </GlassCard>
-          </div>
-          
-          {/* Playlist */}
-          <div className="space-y-3">
-            {videos.map((video, i) => (
-              <motion.button
-                key={i}
-                className={`w-full p-4 rounded-xl text-left transition-all flex items-center gap-3 ${
-                  activeVideo === i 
-                    ? 'bg-gradient-to-r from-blue-500 to-teal-500 text-white shadow-lg' 
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                }`}
-                onClick={() => setActiveVideo(i)}
-                whileHover={{ x: 5 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${activeVideo === i ? 'bg-white/20' : 'bg-blue-100 dark:bg-blue-900/30'}`}>
-                  <Play className={`w-5 h-5 ${activeVideo === i ? 'text-white' : 'text-blue-600 dark:text-blue-400'}`} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm truncate">{video.title}</p>
-                  <p className={`text-xs ${activeVideo === i ? 'text-blue-100' : 'text-slate-500'}`}>{video.category}</p>
-                </div>
-              </motion.button>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
+        .section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-const FAQSection = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-  
-  return (
-    <section className="py-20 px-4 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
-      <div className="max-w-3xl mx-auto">
-        <SectionTitle 
-          title="Frequently Asked Questions" 
-          subtitle="Common questions about endoscopic procedures answered"
-        />
-        
-        <div className="space-y-4">
-          {faqs.map((faq, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <GlassCard className="overflow-hidden">
-                <button
-                  className="w-full p-6 text-left flex items-center justify-between"
-                  onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                >
-                  <span className="font-bold text-slate-800 dark:text-white pr-4">{faq.question}</span>
-                  <motion.div
-                    animate={{ rotate: openIndex === i ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <ChevronDown className="w-5 h-5 text-slate-500" />
-                  </motion.div>
-                </button>
-                
-                <AnimatePresence>
-                  {openIndex === i && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <div className="px-6 pb-6 text-slate-600 dark:text-slate-300">
-                        {faq.answer}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </GlassCard>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
+        /* Dashboard Stats */
+        .stat-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
 
-const FunFactsSection = () => {
-  const [flippedIndex, setFlippedIndex] = useState<number | null>(null);
-  
-  return (
-    <section className="py-20 px-4 bg-white dark:bg-slate-900">
-      <div className="max-w-6xl mx-auto">
-        <SectionTitle 
-          title="Did You Know?" 
-          subtitle="Fascinating facts about endoscopy and the gastrointestinal system"
-        />
-        
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {funFacts.map((fact, i) => (
-            <motion.div
-              key={i}
-              className="relative h-64 cursor-pointer"
-              initial={{ opacity: 0, rotateY: 90 }}
-              whileInView={{ opacity: 1, rotateY: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.15 }}
-              onClick={() => setFlippedIndex(flippedIndex === i ? null : i)}
-            >
-              <motion.div
-                className="w-full h-full"
-                animate={{ rotateY: flippedIndex === i ? 180 : 0 }}
-                transition={{ duration: 0.6 }}
-                style={{ transformStyle: 'preserve-3d' }}
-              >
-                {/* Front */}
-                <GlassCard className="absolute inset-0 p-6 flex flex-col items-center justify-center text-center" hover={false}>
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white mb-4">
-                    {fact.icon}
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-800 dark:text-white">{fact.title}</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">Click to reveal</p>
-                </GlassCard>
-                
-                {/* Back */}
-                <GlassCard 
-                  className="absolute inset-0 p-6 flex flex-col items-center justify-center text-center bg-gradient-to-br from-blue-500 to-teal-500 text-white"
-                  hover={false}
-                  style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-                >
-                  <Sparkles className="w-8 h-8 mb-3" />
-                  <p className="text-sm leading-relaxed">{fact.content}</p>
-                </GlassCard>
-              </motion.div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+        }
 
-const ConclusionSection = () => {
-  return (
-    <section className="py-20 px-4 bg-gradient-to-br from-blue-50 via-teal-50 to-cyan-50 dark:from-slate-900 dark:via-slate-800 dark:to-teal-900">
-      <div className="max-w-4xl mx-auto text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <Stethoscope className="w-16 h-16 text-blue-500 mx-auto mb-6" />
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white mb-6">
-            The Critical Role of Endoscopy
-          </h2>
-          <p className="text-lg text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
-            Endoscopy has revolutionized gastrointestinal medicine, enabling early detection of cancers, 
-            immediate therapeutic intervention, and improved patient outcomes. As nursing professionals, 
-            understanding these procedures is essential for providing comprehensive patient care, 
-            ensuring safety, and promoting health education.
-          </p>
-          
-          <div className="grid sm:grid-cols-3 gap-6 mb-12">
-            {[
-              { icon: <Shield className="w-8 h-8" />, title: 'Early Detection', desc: 'Screening saves lives through early cancer identification' },
-              { icon: <Heart className="w-8 h-8" />, title: 'Patient Care', desc: 'Nursing excellence ensures safe, comfortable procedures' },
-              { icon: <Award className="w-8 h-8" />, title: 'Education', desc: 'Informed patients make better health decisions' }
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                className="p-6 bg-white/80 dark:bg-slate-800/80 backdrop-blur rounded-2xl"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.2 }}
-              >
-                <div className="text-blue-500 mb-3">{item.icon}</div>
-                <h3 className="font-bold text-slate-800 dark:text-white mb-2">{item.title}</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-300">{item.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-          
-          <motion.button
-            className="px-8 py-4 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-full font-semibold shadow-lg"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Continue Learning
-          </motion.button>
-        </motion.div>
-      </div>
-    </section>
-  );
-};
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
 
-const Footer = () => {
-  return (
-    <footer className="bg-slate-900 text-slate-300 py-16 px-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-8 mb-12">
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Stethoscope className="w-8 h-8 text-blue-400" />
-              <span className="text-xl font-bold text-white">EndoLearn</span>
-            </div>
-            <p className="text-sm text-slate-400">Premium medical education resource for nursing students and healthcare professionals.</p>
-          </div>
-          
-          <div>
-            <h4 className="font-bold text-white mb-4">Quick Links</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Procedures</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Anatomy</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Nursing Care</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Videos</a></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h4 className="font-bold text-white mb-4">Resources</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-blue-400 transition-colors">ASGE Guidelines</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">SGNA Standards</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Research Papers</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Case Studies</a></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h4 className="font-bold text-white mb-4">Contact</h4>
-            <ul className="space-y-2 text-sm">
-              <li className="flex items-center gap-2"><Mail className="w-4 h-4" /> education@endolearn.com</li>
-              <li className="flex items-center gap-2"><Phone className="w-4 h-4" /> +1 (555) 123-4567</li>
-              <li className="flex items-center gap-2"><MapPin className="w-4 h-4" /> Medical Education Center</li>
-            </ul>
-            <div className="flex gap-4 mt-4">
-              <Facebook className="w-5 h-5 hover:text-blue-400 cursor-pointer transition-colors" />
-              <Twitter className="w-5 h-5 hover:text-blue-400 cursor-pointer transition-colors" />
-              <Linkedin className="w-5 h-5 hover:text-blue-400 cursor-pointer transition-colors" />
-              <Instagram className="w-5 h-5 hover:text-blue-400 cursor-pointer transition-colors" />
-            </div>
-          </div>
-        </div>
-        
-        <div className="border-t border-slate-800 pt-8 text-center text-sm text-slate-500">
-          <p>© 2024 EndoLearn Medical Education. All rights reserved.</p>
-          <p className="mt-2">Designed for educational purposes. Not a substitute for professional medical advice.</p>
-        </div>
-      </div>
-    </footer>
-  );
-};
+        /* Progress Bars */
+        .progress-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 999px;
+            height: 12px;
+            overflow: hidden;
+            position: relative;
+        }
 
-// ==========================================
-// MAIN APP COMPONENT
-// ==========================================
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 999px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
 
-const sections = [
-  { id: 'hero', label: 'Home', icon: <Home className="w-4 h-4" /> },
-  { id: 'introduction', label: 'Introduction', icon: <BookOpen className="w-4 h-4" /> },
-  { id: 'procedures', label: 'Procedures', icon: <Scan className="w-4 h-4" /> },
-  { id: 'conditions', label: 'Conditions', icon: <Activity className="w-4 h-4" /> },
-  { id: 'anesthesia', label: 'Anesthesia', icon: <Brain className="w-4 h-4" /> },
-  { id: 'instruments', label: 'Instruments', icon: <Microscope className="w-4 h-4" /> },
-  { id: 'nursing', label: 'Nursing Care', icon: <Heart className="w-4 h-4" /> },
-  { id: 'upper-gi', label: 'Upper GI', icon: <ArrowUpRight className="w-4 h-4" /> },
-  { id: 'lower-gi', label: 'Lower GI', icon: <ArrowDownRight className="w-4 h-4" /> },
-  { id: 'risks', label: 'Risks', icon: <AlertTriangle className="w-4 h-4" /> },
-  { id: 'anatomy', label: 'Anatomy', icon: <Globe className="w-4 h-4" /> },
-  { id: 'videos', label: 'Videos', icon: <Video className="w-4 h-4" /> },
-  { id: 'faq', label: 'FAQ', icon: <HelpCircle className="w-4 h-4" /> },
-  { id: 'fun-facts', label: 'Fun Facts', icon: <Sparkles className="w-4 h-4" /> },
-  { id: 'conclusion', label: 'Conclusion', icon: <CheckCircle className="w-4 h-4" /> }
-];
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
 
-// Additional icon imports needed
-const Home = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-  </svg>
-);
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
 
-const ArrowDownRight = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-  </svg>
-);
+        /* Case Cards */
+        .case-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
 
-const Target = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);
+        .case-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
 
-const Pin = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-  </svg>
-);
+        .case-card:hover::before {
+            transform: scaleX(1);
+        }
 
-const History = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);
+        .case-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        }
 
-const Ruler = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-  </svg>
-);
+        .case-card.bookmarked {
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.05);
+        }
 
-const Flame = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
-  </svg>
-);
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
 
-const Wind = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-  </svg>
-);
+        .badge-difficulty-beginner {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
 
-const Circle = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <circle cx="12" cy="12" r="10" strokeWidth={2} />
-  </svg>
-);
+        .badge-difficulty-intermediate {
+            background: rgba(234, 179, 8, 0.2);
+            color: #facc15;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
 
-const ClipboardList = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-  </svg>
-);
+        .badge-difficulty-advanced {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
 
-const App = () => {
-  const [activeSection, setActiveSection] = useState('hero');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { darkMode, toggleDarkMode } = useContext(ThemeContext);
-  const mainRef = useRef<HTMLDivElement>(null);
-  
-  const navigateTo = (sectionId: string) => {
-    setActiveSection(sectionId);
-    setMobileMenuOpen(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-  
-  const renderSection = () => {
-    switch (activeSection) {
-      case 'hero': return <HeroSection onNavigate={navigateTo} />;
-      case 'introduction': return <IntroductionSection />;
-      case 'procedures': return <ProceduresSection />;
-      case 'conditions': return <ConditionsSection />;
-      case 'anesthesia': return <AnesthesiaSection />;
-      case 'instruments': return <InstrumentsSection />;
-      case 'nursing': return <NursingSection />;
-      case 'upper-gi': return <UpperGISection />;
-      case 'lower-gi': return <LowerGISection />;
-      case 'risks': return <RisksSection />;
-      case 'anatomy': return <AnatomySection />;
-      case 'videos': return <VideosSection />;
-      case 'faq': return <FAQSection />;
-      case 'fun-facts': return <FunFactsSection />;
-      case 'conclusion': return <ConclusionSection />;
-      default: return <HeroSection onNavigate={navigateTo} />;
-    }
-  };
-  
-  return (
-    <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
-      <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-300">
-        <ScrollProgress />
-        
-        {/* Header */}
-        <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-700">
-          <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <motion.div 
-              className="flex items-center gap-2 cursor-pointer"
-              onClick={() => navigateTo('hero')}
-              whileHover={{ scale: 1.05 }}
-            >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center text-white">
-                <Stethoscope className="w-6 h-6" />
-              </div>
-              <span className="font-bold text-xl bg-gradient-to-r from-blue-600 to-teal-500 bg-clip-text text-transparent hidden sm:block">
-                EndoLearn
-              </span>
-            </motion.div>
+        /* Tabs */
+        .tabs-header {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .tabs-header::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-button {
+            padding: 0.875rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-button::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .tab-button.active {
+            color: white;
+        }
+
+        .tab-button.active::after {
+            transform: scaleX(1);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Collapsible Sections */
+        .collapsible {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .collapsible-header {
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .collapsible-header:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+        }
+
+        .collapsible-content.open {
+            max-height: 2000px;
+            padding: 1.5rem;
+        }
+
+        .collapsible-arrow {
+            transition: transform 0.3s;
+        }
+
+        .collapsible.open .collapsible-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* AI Diagnosis Section */
+        .ai-diagnosis-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-diagnosis-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateX(400px);
+            opacity: 0;
+            animation: slideInToast 0.4s ease forwards;
+            min-width: 300px;
+        }
+
+        @keyframes slideInToast {
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            border-left: 4px solid #22c55e;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .toast.info {
+            border-left: 4px solid #6366f1;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .empty-state-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-icon-wrapper {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .glass-card:hover .feature-icon-wrapper {
+            transform: scale(1.1) rotate(5deg);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
             
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-1">
-              {sections.map((section) => (
-                <motion.button
-                  key={section.id}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1 ${
-                    activeSection === section.id 
-                      ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                  }`}
-                  onClick={() => navigateTo(section.id)}
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {section.icon}
-                  <span className="hidden xl:inline">{section.label}</span>
-                </motion.button>
-              ))}
-            </nav>
+            .section {
+                padding: 5rem 1rem 1rem;
+            }
             
-            <div className="flex items-center gap-2">
-              <motion.button
-                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                onClick={toggleDarkMode}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                {darkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
-              </motion.button>
-              
-              <motion.button
-                className="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                whileTap={{ scale: 0.9 }}
-              >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </motion.button>
+            .modal {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            nav, .btn-primary, .btn-secondary {
+                display: none;
+            }
+            
+            .section {
+                display: block !important;
+                opacity: 1 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="bg-mesh"></div>
+    <div class="float-element" style="width: 300px; height: 300px; background: #6366f1; top: 10%; left: -5%;"></div>
+    <div class="float-element" style="width: 400px; height: 400px; background: #8b5cf6; bottom: 10%; right: -10%; animation-delay: -5s;"></div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="showSection('home')">
+                <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+                    <i data-lucide="brain" class="w-6 h-6 text-white"></i>
+                </div>
+                <span class="text-xl font-bold bg-gradient-to-r from-white to-indigo-200 bg-clip-text text-transparent">NurseCare+</span>
             </div>
-          </div>
-          
-          {/* Mobile Menu */}
-          <AnimatePresence>
-            {mobileMenuOpen && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="lg:hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 overflow-hidden"
-              >
-                <div className="p-4 grid grid-cols-2 gap-2">
-                  {sections.map((section) => (
-                    <button
-                      key={section.id}
-                      className={`p-3 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-                        activeSection === section.id 
-                          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
-                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                      }`}
-                      onClick={() => navigateTo(section.id)}
-                    >
-                      {section.icon}
-                      {section.label}
+            
+            <div class="hidden md:flex items-center gap-8">
+                <a class="nav-link" onclick="showSection('home')">Home</a>
+                <a class="nav-link" onclick="showSection('dashboard')" id="nav-dashboard" style="display: none;">Dashboard</a>
+                <a class="nav-link" onclick="showSection('features')">Features</a>
+                <a class="nav-link" onclick="showSection('contact')">Contact</a>
+            </div>
+            
+            <button class="btn-primary" id="auth-btn" onclick="openAuthModal()">
+                <span id="auth-btn-text">Sign In</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="auth-modal" onclick="closeAuthModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="user" class="w-8 h-8 text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">Welcome to NurseCare+</h2>
+                <p class="text-gray-400">Create your account to start learning</p>
+            </div>
+            
+            <form id="auth-form" onsubmit="handleAuth(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                        <input type="email" id="auth-email" class="form-input" placeholder="you@example.com" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                        <input type="text" id="auth-name" class="form-input" placeholder="Your Name" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Experience Level</label>
+                        <select id="auth-level" class="form-input" required>
+                            <option value="">Select your level...</option>
+                            <option value="beginner">Beginner - First Year Student</option>
+                            <option value="intermediate">Intermediate - 2nd-3rd Year</option>
+                            <option value="advanced">Advanced - Final Year/Graduate</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button type="button" class="btn-secondary flex-1" onclick="closeAuthModal()">Cancel</button>
+                    <button type="submit" class="btn-primary flex-1" id="auth-submit">
+                        <span id="auth-submit-text">Get Started</span>
                     </button>
-                  ))}
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </header>
-        
-        {/* Main Content */}
-        <main ref={mainRef} className="pt-16">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeSection}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-            >
-              {renderSection()}
-            </motion.div>
-          </AnimatePresence>
-          
-          {activeSection !== 'conclusion' && <Footer />}
-        </main>
-      </div>
+            </form>
+            
+            <p class="text-center text-sm text-gray-500 mt-6">
+                Your data is stored locally on your device for privacy
+            </p>
+        </div>
     </div>
-  );
-};
 
-const Root = () => (
-  <ThemeProvider>
-    <App />
-  </ThemeProvider>
-);
+    <!-- Home Section -->
+    <section id="home" class="section active">
+        <div class="hero">
+            <div class="hero-content">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-6">
+                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                    <span class="text-sm font-medium text-gray-300">AI-Powered Learning Platform</span>
+                </div>
+                
+                <h1>Master Nursing<br>with AI Intelligence</h1>
+                <p class="hero-tagline">Next-generation education platform for nursing students</p>
+                <p class="text-lg text-gray-400 mb-8 max-w-2xl mx-auto leading-relaxed">
+                    Experience immersive clinical simulations, AI-generated diagnoses, and personalized learning paths. 
+                    Practice with realistic patient scenarios across all specialties.
+                </p>
+                
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button class="btn-primary text-lg px-8 py-4" onclick="openAuthModal()">
+                        Start Learning Free
+                        <i data-lucide="arrow-right" class="inline w-5 h-5 ml-2"></i>
+                    </button>
+                    <button class="btn-secondary text-lg px-8 py-4" onclick="showSection('features')">
+                        Explore Features
+                    </button>
+                </div>
 
-export default Root;
-'''
+                <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="text-3xl font-bold text-indigo-400 mb-1">50+</div>
+                        <div class="text-gray-400">Clinical Scenarios</div>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="text-3xl font-bold text-purple-400 mb-1">AI</div>
+                        <div class="text-gray-400">Powered Diagnosis</div>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="text-3xl font-bold text-pink-400 mb-1">100%</div>
+                        <div class="text-gray-400">Offline Capable</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-# Write to file
-with open('/mnt/agents/output/endoscopy-website.tsx', 'w', encoding='utf-8') as f:
-    f.write(code)
+        <!-- Features Preview -->
+        <div class="max-w-7xl mx-auto mt-20">
+            <h2 class="text-3xl font-bold text-center mb-12">Platform Features</h2>
+            <div class="feature-grid">
+                <div class="glass-card p-6 rounded-2xl cursor-pointer" onclick="showSection('features'); switchFeatureTab('case-explorer')">
+                    <div class="feature-icon-wrapper">
+                        <i data-lucide="search" class="w-7 h-7 text-indigo-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Dynamic Case Explorer</h3>
+                    <p class="text-gray-400">Browse diverse patient scenarios across pediatrics, adult care, geriatrics, and more.</p>
+                </div>
+                
+                <div class="glass-card p-6 rounded-2xl cursor-pointer" onclick="showSection('features'); switchFeatureTab('assessment-console')">
+                    <div class="feature-icon-wrapper">
+                        <i data-lucide="clipboard-list" class="w-7 h-7 text-purple-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Smart Assessment</h3>
+                    <p class="text-gray-400">Comprehensive patient documentation with system-specific findings and vital signs.</p>
+                </div>
+                
+                <div class="glass-card p-6 rounded-2xl cursor-pointer" onclick="showSection('features'); switchFeatureTab('ai-diagnosis')">
+                    <div class="feature-icon-wrapper">
+                        <i data-lucide="brain-circuit" class="w-7 h-7 text-pink-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">AI Diagnosis Engine</h3>
+                    <p class="text-gray-400">Generate evidence-based nursing diagnoses and personalized care plans instantly.</p>
+                </div>
+                
+                <div class="glass-card p-6 rounded-2xl cursor-pointer" onclick="showSection('features'); switchFeatureTab('progress')">
+                    <div class="feature-icon-wrapper">
+                        <i data-lucide="trending-up" class="w-7 h-7 text-green-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Progress Analytics</h3>
+                    <p class="text-gray-400">Track your skill development with detailed insights and achievement badges.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-print("File created successfully! Length:", len(code), "characters")
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="section">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2">Welcome back, <span id="dashboard-user-name" class="text-indigo-400">Student</span>! 👋</h1>
+            <p class="text-gray-400">Track your progress and continue your learning journey</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="stat-card">
+                <p class="stat-number" id="stat-cases">0</p>
+                <p class="text-gray-400 text-sm mt-1">Cases Completed</p>
+            </div>
+            <div class="stat-card">
+                <p class="stat-number" id="stat-badges">0</p>
+                <p class="text-gray-400 text-sm mt-1">Badges Earned</p>
+            </div>
+            <div class="stat-card">
+                <p class="stat-number" id="stat-score">0%</p>
+                <p class="text-gray-400 text-sm mt-1">Avg Score</p>
+            </div>
+            <div class="stat-card">
+                <p class="stat-number" id="stat-hours">0</p>
+                <p class="text-gray-400 text-sm mt-1">Hours Practiced</p>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="glass-card rounded-2xl p-6 mb-8">
+            <h3 class="text-xl font-semibold mb-6">Skill Development</h3>
+            <div class="space-y-6">
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-300">Assessment Skills</span>
+                        <span class="text-indigo-400 font-semibold" id="progress-assessment-text">0%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progress-assessment" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-300">Care Planning</span>
+                        <span class="text-indigo-400 font-semibold" id="progress-planning-text">0%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progress-planning" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-300">Clinical Reasoning</span>
+                        <span class="text-indigo-400 font-semibold" id="progress-reasoning-text">0%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progress-reasoning" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="glass-card rounded-2xl p-6">
+            <div class="tabs-header">
+                <button class="tab-button active" onclick="switchTab('tab-my-cases', this)">My Cases</button>
+                <button class="tab-button" onclick="switchTab('tab-bookmarked', this)">Bookmarked</button>
+                <button class="tab-button" onclick="switchTab('tab-achievements', this)">Achievements</button>
+            </div>
+
+            <div id="tab-my-cases" class="tab-content active">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">Your Saved Cases</h3>
+                    <button class="btn-primary text-sm" onclick="showSection('features'); switchFeatureTab('assessment-console')">
+                        <i data-lucide="plus" class="inline w-4 h-4 mr-1"></i> New Case
+                    </button>
+                </div>
+                <div id="my-cases-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="empty-state col-span-full">
+                        <div class="empty-state-icon">
+                            <i data-lucide="clipboard-list" class="w-10 h-10 text-gray-500"></i>
+                        </div>
+                        <p>No saved cases yet. Start your first assessment!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-bookmarked" class="tab-content">
+                <h3 class="text-lg font-semibold mb-4">Bookmarked Cases</h3>
+                <div id="bookmarked-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="empty-state col-span-full">
+                        <div class="empty-state-icon">
+                            <i data-lucide="star" class="w-10 h-10 text-gray-500"></i>
+                        </div>
+                        <p>No bookmarked cases yet.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-achievements" class="tab-content">
+                <h3 class="text-lg font-semibold mb-4">Your Achievements</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="achievements-grid">
+                    <!-- Badges injected here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2">Platform Features</h1>
+            <p class="text-gray-400">Explore all tools available for your nursing education</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-2 mb-6 overflow-x-auto">
+            <div class="tabs-header border-0 mb-0">
+                <button class="tab-button active" onclick="switchFeatureTab('case-explorer', this)">Case Explorer</button>
+                <button class="tab-button" onclick="switchFeatureTab('assessment-console', this)">Assessment</button>
+                <button class="tab-button" onclick="switchFeatureTab('ai-diagnosis', this)">AI Diagnosis</button>
+                <button class="tab-button" onclick="switchFeatureTab('resources', this)">Resources</button>
+            </div>
+        </div>
+
+        <!-- Case Explorer -->
+        <div id="case-explorer" class="tab-content active">
+            <div class="flex flex-wrap gap-4 mb-6">
+                <input type="text" id="case-search" class="form-input flex-1 min-w-[200px]" placeholder="Search cases..." onkeyup="filterCases()">
+                <select id="filter-specialty" class="form-input w-full md:w-48" onchange="filterCases()">
+                    <option value="">All Specialties</option>
+                    <option value="pediatrics">Pediatrics</option>
+                    <option value="adult-care">Adult Care</option>
+                    <option value="geriatrics">Geriatrics</option>
+                    <option value="obstetrics">Obstetrics</option>
+                    <option value="critical-care">Critical Care</option>
+                </select>
+                <select id="filter-difficulty" class="form-input w-full md:w-48" onchange="filterCases()">
+                    <option value="">All Levels</option>
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                </select>
+            </div>
+            <div id="case-library" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Cases injected here -->
+            </div>
+        </div>
+
+        <!-- Assessment Console -->
+        <div id="assessment-console" class="tab-content">
+            <div class="glass-card rounded-2xl p-6 md:p-8">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                    <i data-lucide="clipboard-list" class="text-indigo-400"></i>
+                    New Patient Assessment
+                </h2>
+                
+                <form id="assessment-form" onsubmit="saveAssessment(event)">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Case Title</label>
+                            <input type="text" id="case-title" class="form-input" placeholder="e.g., Respiratory Distress Assessment" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Patient Name</label>
+                            <input type="text" id="patient-name" class="form-input" placeholder="Patient identifier" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Age</label>
+                            <input type="text" id="patient-age" class="form-input" placeholder="e.g., 45 years" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Sex</label>
+                            <select id="patient-sex" class="form-input" required>
+                                <option value="">Select...</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Specialty</label>
+                            <select id="specialty" class="form-input" required onchange="toggleObstetricFields()">
+                                <option value="">Select...</option>
+                                <option value="pediatrics">Pediatrics</option>
+                                <option value="adult-care">Adult Care</option>
+                                <option value="geriatrics">Geriatrics</option>
+                                <option value="obstetrics">Obstetrics</option>
+                                <option value="critical-care">Critical Care</option>
+                                <option value="mental-health">Mental Health</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Difficulty</label>
+                            <select id="difficulty-level" class="form-input" required>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Chief Complaint</label>
+                        <textarea id="chief-complaint" class="form-input" rows="3" placeholder="Primary reason for visit..." required></textarea>
+                    </div>
+
+                    <!-- Vital Signs -->
+                    <div class="collapsible open mb-4" id="vitals-section">
+                        <div class="collapsible-header" onclick="toggleCollapsible('vitals-section')">
+                            <span class="font-semibold flex items-center gap-2">
+                                <i data-lucide="activity" class="w-5 h-5"></i> Vital Signs
+                            </span>
+                            <i data-lucide="chevron-down" class="collapsible-arrow w-5 h-5"></i>
+                        </div>
+                        <div class="collapsible-content open">
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Blood Pressure</label>
+                                    <input type="text" id="vitals-bp" class="form-input" placeholder="120/80">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Heart Rate</label>
+                                    <input type="text" id="vitals-hr" class="form-input" placeholder="72 bpm">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Respiratory Rate</label>
+                                    <input type="text" id="vitals-rr" class="form-input" placeholder="16/min">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Temperature</label>
+                                    <input type="text" id="vitals-temp" class="form-input" placeholder="37°C">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">SpO2</label>
+                                    <input type="text" id="vitals-spo2" class="form-input" placeholder="98%">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Pain (0-10)</label>
+                                    <input type="text" id="vitals-pain" class="form-input" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Assessment -->
+                    <div class="collapsible mb-4" id="systems-section">
+                        <div class="collapsible-header" onclick="toggleCollapsible('systems-section')">
+                            <span class="font-semibold flex items-center gap-2">
+                                <i data-lucide="stethoscope" class="w-5 h-5"></i> System Assessment
+                            </span>
+                            <i data-lucide="chevron-down" class="collapsible-arrow w-5 h-5"></i>
+                        </div>
+                        <div class="collapsible-content">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Cardiovascular</label>
+                                    <textarea id="system-cardiovascular" class="form-input" rows="2" placeholder="Heart sounds, pulses, edema..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Respiratory</label>
+                                    <textarea id="system-respiratory" class="form-input" rows="2" placeholder="Breath sounds, effort, cough..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Neurological</label>
+                                    <textarea id="system-neurological" class="form-input" rows="2" placeholder="LOC, orientation, pupils..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Gastrointestinal</label>
+                                    <textarea id="system-gastrointestinal" class="form-input" rows="2" placeholder="Bowel sounds, abdomen..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Obstetric Section (Conditional) -->
+                    <div class="collapsible mb-4 hidden" id="obstetric-section">
+                        <div class="collapsible-header" onclick="toggleCollapsible('obstetric-section')">
+                            <span class="font-semibold flex items-center gap-2">
+                                <i data-lucide="baby" class="w-5 h-5"></i> Obstetric History
+                            </span>
+                            <i data-lucide="chevron-down" class="collapsible-arrow w-5 h-5"></i>
+                        </div>
+                        <div class="collapsible-content">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">LMP</label>
+                                    <input type="date" id="ob-lmp" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">EDC</label>
+                                    <input type="date" id="ob-edc" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Gravida</label>
+                                    <input type="text" id="ob-gravida" class="form-input" placeholder="G3">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-1">Para</label>
+                                    <input type="text" id="ob-para" class="form-input" placeholder="P2">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4 mt-8">
+                        <button type="submit" class="btn-primary flex-1" id="save-btn">
+                            <span id="save-btn-text">Generate AI Diagnosis</span>
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="resetAssessmentForm()">Clear</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- AI Diagnosis -->
+        <div id="ai-diagnosis" class="tab-content">
+            <div id="diagnosis-empty" class="glass-card rounded-2xl p-12 text-center">
+                <div class="w-20 h-20 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="brain-circuit" class="w-10 h-10 text-indigo-400"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">AI Diagnosis Engine</h3>
+                <p class="text-gray-400 mb-6 max-w-md mx-auto">Complete a patient assessment to generate evidence-based nursing diagnoses and care plans.</p>
+                <button class="btn-primary" onclick="switchFeatureTab('assessment-console', document.querySelector('[onclick*=\'assessment-console\']'))">
+                    Start Assessment
+                </button>
+            </div>
+            
+            <div id="diagnosis-results" class="hidden space-y-6">
+                <!-- AI results injected here -->
+            </div>
+        </div>
+
+        <!-- Resources -->
+        <div id="resources" class="tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="https://www.nanda.org/" target="_blank" class="glass-card p-6 rounded-2xl hover:no-underline block">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4">
+                        <i data-lucide="book-open" class="w-6 h-6 text-blue-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">NANDA International</h3>
+                    <p class="text-gray-400 text-sm">Nursing diagnoses definitions and classifications</p>
+                </a>
+                
+                <a href="https://www.who.int/" target="_blank" class="glass-card p-6 rounded-2xl hover:no-underline block">
+                    <div class="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center mb-4">
+                        <i data-lucide="globe" class="w-6 h-6 text-cyan-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">WHO Guidelines</h3>
+                    <p class="text-gray-400 text-sm">Global health standards and protocols</p>
+                </a>
+                
+                <a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" class="glass-card p-6 rounded-2xl hover:no-underline block">
+                    <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-4">
+                        <i data-lucide="microscope" class="w-6 h-6 text-green-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">PubMed</h3>
+                    <p class="text-gray-400 text-sm">Medical research and evidence-based practice</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold mb-4">Get in Touch</h1>
+                <p class="text-gray-400">Have questions or feedback? We'd love to hear from you.</p>
+            </div>
+            
+            <div class="glass-card rounded-2xl p-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div class="w-14 h-14 bg-indigo-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="mail" class="w-7 h-7 text-indigo-400"></i>
+                        </div>
+                        <h3 class="font-semibold mb-1">Email</h3>
+                        <a href="mailto:support@nursecare.ai" class="text-gray-400 hover:text-white transition">support@nursecare.ai</a>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-14 h-14 bg-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="phone" class="w-7 h-7 text-purple-400"></i>
+                        </div>
+                        <h3 class="font-semibold mb-1">Phone</h3>
+                        <p class="text-gray-400">+1 (555) 123-4567</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-14 h-14 bg-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="map-pin" class="w-7 h-7 text-pink-400"></i>
+                        </div>
+                        <h3 class="font-semibold mb-1">Location</h3>
+                        <p class="text-gray-400">San Francisco, CA</p>
+                    </div>
+                </div>
+                
+                <div class="mt-8 pt-8 border-t border-white/10 text-center">
+                    <p class="text-gray-500 text-sm">Available Monday - Friday, 9:00 AM - 6:00 PM PST</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Data Store using IndexedDB for persistence
+        const DB_NAME = 'NurseCareDB';
+        const DB_VERSION = 1;
+        let db;
+        let currentUser = null;
+        let currentCase = null;
+
+        // Initialize IndexedDB
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const database = event.target.result;
+                    
+                    if (!database.objectStoreNames.contains('users')) {
+                        database.createObjectStore('users', { keyPath: 'email' });
+                    }
+                    if (!database.objectStoreNames.contains('cases')) {
+                        const caseStore = database.createObjectStore('cases', { keyPath: 'id', autoIncrement: true });
+                        caseStore.createIndex('user_email', 'user_email', { unique: false });
+                        caseStore.createIndex('is_bookmarked', 'is_bookmarked', { unique: false });
+                    }
+                };
+            });
+        }
+
+        // Data Operations
+        async function saveUser(userData) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['users'], 'readwrite');
+                const store = transaction.objectStore('users');
+                const request = store.put(userData);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function getUser(email) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['users'], 'readonly');
+                const store = transaction.objectStore('users');
+                const request = store.get(email);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function saveCase(caseData) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['cases'], 'readwrite');
+                const store = transaction.objectStore('cases');
+                const request = store.add(caseData);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function updateCase(caseData) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['cases'], 'readwrite');
+                const store = transaction.objectStore('cases');
+                const request = store.put(caseData);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function deleteCase(id) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['cases'], 'readwrite');
+                const store = transaction.objectStore('cases');
+                const request = store.delete(id);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function getUserCases(email) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['cases'], 'readonly');
+                const store = transaction.objectStore('cases');
+                const index = store.index('user_email');
+                const request = index.getAll(email);
+                request.onsuccess = () => resolve(request.result || []);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // UI Functions
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info';
+            toast.innerHTML = `
+                <i data-lucide="${icon}" class="w-5 h-5 ${type === 'success' ? 'text-green-400' : type === 'error' ? 'text-red-400' : 'text-indigo-400'}"></i>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function showSection(sectionId) {
+            // Check auth for protected sections
+            if ((sectionId === 'dashboard') && !currentUser) {
+                openAuthModal();
+                return;
+            }
+
+            // Update nav
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            if (sectionId !== 'home') {
+                const activeLink = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+                if (activeLink) activeLink.classList.add('active');
+            }
+
+            // Switch sections with animation
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            const target = document.getElementById(sectionId);
+            if (target) {
+                target.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Load data if needed
+            if (sectionId === 'dashboard' && currentUser) {
+                loadDashboard();
+            } else if (sectionId === 'features') {
+                loadCaseLibrary();
+            }
+        }
+
+        function openAuthModal() {
+            document.getElementById('auth-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAuthModal(event) {
+            if (event && event.target !== document.getElementById('auth-modal') && event.target.closest('.modal')) return;
+            document.getElementById('auth-modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        async function handleAuth(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('auth-email').value;
+            const name = document.getElementById('auth-name').value;
+            const level = document.getElementById('auth-level').value;
+            
+            const submitBtn = document.getElementById('auth-submit');
+            const submitText = document.getElementById('auth-submit-text');
+            
+            submitBtn.disabled = true;
+            submitText.innerHTML = '<div class="spinner mx-auto"></div>';
+            
+            try {
+                // Check existing user or create new
+                let user = await getUser(email);
+                if (!user) {
+                    user = {
+                        email,
+                        name,
+                        level,
+                        created_at: new Date().toISOString(),
+                        last_login: new Date().toISOString()
+                    };
+                    await saveUser(user);
+                    showToast('Account created successfully!', 'success');
+                } else {
+                    user.last_login = new Date().toISOString();
+                    await saveUser(user);
+                    showToast(`Welcome back, ${user.name}!`, 'success');
+                }
+                
+                currentUser = user;
+                updateUIForUser();
+                closeAuthModal();
+                showSection('dashboard');
+            } catch (error) {
+                console.error('Auth error:', error);
+                showToast('Authentication failed. Please try again.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitText.textContent = 'Get Started';
+            }
+        }
+
+        function updateUIForUser() {
+            if (!currentUser) return;
+            
+            document.getElementById('auth-btn').onclick = () => showSection('dashboard');
+            document.getElementById('auth-btn-text').textContent = 'Dashboard';
+            document.getElementById('nav-dashboard').style.display = 'block';
+            document.getElementById('dashboard-user-name').textContent = currentUser.name;
+        }
+
+        async function loadDashboard() {
+            if (!currentUser) return;
+            
+            try {
+                const cases = await getUserCases(currentUser.email);
+                const bookmarked = cases.filter(c => c.is_bookmarked);
+                
+                // Update stats
+                document.getElementById('stat-cases').textContent = cases.length;
+                document.getElementById('stat-badges').textContent = calculateBadges(cases.length);
+                document.getElementById('stat-score').textContent = cases.length > 0 ? 
+                    Math.round(cases.reduce((sum, c) => sum + (c.score || 0), 0) / cases.length) + '%' : '0%';
+                document.getElementById('stat-hours').textContent = Math.floor(cases.length * 0.5);
+                
+                // Update progress bars
+                const progress = Math.min(cases.length * 10, 100);
+                updateProgress('progress-assessment', progress);
+                updateProgress('progress-planning', Math.min(progress * 0.8, 100));
+                updateProgress('progress-reasoning', Math.min(progress * 0.9, 100));
+                
+                // Render cases
+                renderMyCases(cases);
+                renderBookmarkedCases(bookmarked);
+                renderAchievements(cases.length);
+                
+            } catch (error) {
+                console.error('Dashboard load error:', error);
+            }
+        }
+
+        function updateProgress(id, value) {
+            const bar = document.getElementById(id);
+            const text = document.getElementById(id + '-text');
+            if (bar && text) {
+                bar.style.width = value + '%';
+                text.textContent = Math.round(value) + '%';
+            }
+        }
+
+        function calculateBadges(caseCount) {
+            let badges = 0;
+            if (caseCount >= 1) badges++;
+            if (caseCount >= 5) badges++;
+            if (caseCount >= 10) badges++;
+            if (caseCount >= 25) badges++;
+            return badges;
+        }
+
+        function renderMyCases(cases) {
+            const container = document.getElementById('my-cases-container');
+            
+            if (cases.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state col-span-full">
+                        <div class="empty-state-icon">
+                            <i data-lucide="clipboard-list" class="w-10 h-10 text-gray-500"></i>
+                        </div>
+                        <p>No saved cases yet. Start your first assessment!</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+            
+            container.innerHTML = cases.map(c => createCaseCard(c)).join('');
+            lucide.createIcons();
+        }
+
+        function renderBookmarkedCases(cases) {
+            const container = document.getElementById('bookmarked-container');
+            
+            if (cases.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state col-span-full">
+                        <div class="empty-state-icon">
+                            <i data-lucide="star" class="w-10 h-10 text-gray-500"></i>
+                        </div>
+                        <p>No bookmarked cases yet.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+            
+            container.innerHTML = cases.map(c => createCaseCard(c)).join('');
+            lucide.createIcons();
+        }
+
+        function createCaseCard(c) {
+            const date = new Date(c.created_at).toLocaleDateString();
+            return `
+                <div class="case-card ${c.is_bookmarked ? 'bookmarked' : ''}">
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="font-semibold text-lg pr-8">${c.case_title}</h4>
+                        <button onclick="toggleBookmark(${c.id})" class="absolute top-4 right-4 text-yellow-400 hover:scale-110 transition">
+                            <i data-lucide="${c.is_bookmarked ? 'star' : 'star-off'}" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-2">${c.patient_name} • ${c.patient_age}</p>
+                    <p class="text-gray-500 text-sm mb-4 line-clamp-2">${c.chief_complaint}</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="badge badge-difficulty-${c.difficulty_level}">${c.difficulty_level}</span>
+                        <span class="px-2 py-1 rounded-full text-xs bg-white/10 text-gray-300">${c.specialty}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="viewCase(${c.id})" class="btn-primary text-sm py-2 px-4 flex-1">View</button>
+                        <button onclick="deleteCaseHandler(${c.id})" class="btn-secondary text-sm py-2 px-4">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-3">${date}</p>
+                </div>
+            `;
+        }
+
+        function renderAchievements(caseCount) {
+            const achievements = [
+                { id: 'first-case', name: 'First Steps', icon: 'footprints', unlocked: caseCount >= 1 },
+                { id: 'five-cases', name: 'Quick Learner', icon: 'zap', unlocked: caseCount >= 5 },
+                { id: 'ten-cases', name: 'Dedicated', icon: 'award', unlocked: caseCount >= 10 },
+                { id: 'expert', name: 'Expert Nurse', icon: 'crown', unlocked: caseCount >= 25 }
+            ];
+            
+            const grid = document.getElementById('achievements-grid');
+            grid.innerHTML = achievements.map(a => `
+                <div class="glass-card p-4 rounded-xl text-center ${a.unlocked ? '' : 'opacity-40 grayscale'}">
+                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="${a.icon}" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <p class="font-semibold text-sm">${a.name}</p>
+                    ${a.unlocked ? '<span class="text-xs text-green-400 mt-1 block">Unlocked!</span>' : '<span class="text-xs text-gray-500 mt-1 block">Locked</span>'}
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        async function toggleBookmark(id) {
+            try {
+                const transaction = db.transaction(['cases'], 'readwrite');
+                const store = transaction.objectStore('cases');
+                const request = store.get(id);
+                
+                request.onsuccess = async () => {
+                    const caseData = request.result;
+                    if (caseData && caseData.user_email === currentUser.email) {
+                        caseData.is_bookmarked = !caseData.is_bookmarked;
+                        await updateCase(caseData);
+                        showToast(caseData.is_bookmarked ? 'Case bookmarked!' : 'Bookmark removed', 'success');
+                        loadDashboard();
+                        loadCaseLibrary();
+                    }
+                };
+            } catch (error) {
+                showToast('Failed to update bookmark', 'error');
+            }
+        }
+
+        async function deleteCaseHandler(id) {
+            if (!confirm('Are you sure you want to delete this case?')) return;
+            
+            try {
+                await deleteCase(id);
+                showToast('Case deleted', 'success');
+                loadDashboard();
+                loadCaseLibrary();
+            } catch (error) {
+                showToast('Failed to delete case', 'error');
+            }
+        }
+
+        function viewCase(id) {
+            // Implementation for viewing case details
+            showToast('Case details view coming soon', 'info');
+        }
+
+        // Tab Functions
+        function switchTab(tabId, btn) {
+            // Update buttons
+            btn.parentElement.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function switchFeatureTab(tabId, btn) {
+            if (!btn) {
+                btn = document.querySelector(`[onclick="switchFeatureTab('${tabId}', this)"]`);
+            }
+            if (btn) {
+                btn.parentElement.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            
+            document.querySelectorAll('#features .tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            if (tabId === 'case-explorer') {
+                loadCaseLibrary();
+            }
+        }
+
+        // Assessment Form Functions
+        function toggleObstetricFields() {
+            const specialty = document.getElementById('specialty').value;
+            const section = document.getElementById('obstetric-section');
+            if (specialty === 'obstetrics') {
+                section.classList.remove('hidden');
+            } else {
+                section.classList.add('hidden');
+            }
+        }
+
+        function toggleCollapsible(id) {
+            const el = document.getElementById(id);
+            const content = el.querySelector('.collapsible-content');
+            const arrow = el.querySelector('.collapsible-arrow');
+            
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                content.style.maxHeight = '0';
+                content.style.padding = '0 1.5rem';
+                arrow.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('open');
+                content.style.maxHeight = content.scrollHeight + 'px';
+                content.style.padding = '1.5rem';
+                arrow.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        async function saveAssessment(event) {
+            event.preventDefault();
+            
+            if (!currentUser) {
+                showToast('Please sign in first', 'error');
+                openAuthModal();
+                return;
+            }
+            
+            const btn = document.getElementById('save-btn');
+            const btnText = document.getElementById('save-btn-text');
+            
+            btn.disabled = true;
+            btnText.innerHTML = '<div class="spinner inline-block mr-2"></div> Generating AI Diagnosis...';
+            
+            try {
+                const caseData = {
+                    user_email: currentUser.email,
+                    case_title: document.getElementById('case-title').value,
+                    patient_name: document.getElementById('patient-name').value,
+                    patient_age: document.getElementById('patient-age').value,
+                    patient_sex: document.getElementById('patient-sex').value,
+                    specialty: document.getElementById('specialty').value,
+                    difficulty_level: document.getElementById('difficulty-level').value,
+                    chief_complaint: document.getElementById('chief-complaint').value,
+                    vitals: {
+                        bp: document.getElementById('vitals-bp').value,
+                        hr: document.getElementById('vitals-hr').value,
+                        rr: document.getElementById('vitals-rr').value,
+                        temp: document.getElementById('vitals-temp').value,
+                        spo2: document.getElementById('vitals-spo2').value,
+                        pain: document.getElementById('vitals-pain').value
+                    },
+                    systems: {
+                        cardiovascular: document.getElementById('system-cardiovascular').value,
+                        respiratory: document.getElementById('system-respiratory').value,
+                        neurological: document.getElementById('system-neurological').value,
+                        gastrointestinal: document.getElementById('system-gastrointestinal').value
+                    },
+                    is_bookmarked: false,
+                    score: Math.floor(Math.random() * 30) + 70,
+                    created_at: new Date().toISOString()
+                };
+                
+                // Add obstetric data if applicable
+                if (caseData.specialty === 'obstetrics') {
+                    caseData.obstetric = {
+                        lmp: document.getElementById('ob-lmp').value,
+                        edc: document.getElementById('ob-edc').value,
+                        gravida: document.getElementById('ob-gravida').value,
+                        para: document.getElementById('ob-para').value
+                    };
+                }
+                
+                // Generate AI Diagnosis
+                const diagnoses = generateAIDiagnosis(caseData);
+                caseData.ai_diagnoses = diagnoses;
+                
+                await saveCase(caseData);
+                
+                showToast('Assessment saved with AI diagnosis!', 'success');
+                resetAssessmentForm();
+                
+                // Show diagnosis results
+                showDiagnosisResults(diagnoses);
+                switchFeatureTab('ai-diagnosis', null);
+                
+            } catch (error) {
+                console.error('Save error:', error);
+                showToast('Failed to save assessment', 'error');
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = 'Generate AI Diagnosis';
+            }
+        }
+
+        function generateAIDiagnosis(caseData) {
+            const diagnoses = [];
+            const complaint = (caseData.chief_complaint || '').toLowerCase();
+            
+            if (complaint.includes('pain') || complaint.includes('chest')) {
+                diagnoses.push({
+                    title: 'Acute Pain',
+                    priority: 'High',
+                    rationale: 'Patient reports pain as primary complaint requiring immediate intervention.',
+                    interventions: [
+                        'Assess pain level q2h using standardized scale',
+                        'Administer prescribed analgesics',
+                        'Implement non-pharmacological measures',
+                        'Monitor for adverse effects'
+                    ],
+                    outcomes: 'Patient reports pain ≤3/10 within 24 hours'
+                });
+            }
+            
+            if (complaint.includes('breath') || complaint.includes('respiratory') || complaint.includes('cough')) {
+                diagnoses.push({
+                    title: 'Impaired Gas Exchange',
+                    priority: 'High',
+                    rationale: 'Respiratory symptoms indicate potential oxygenation compromise.',
+                    interventions: [
+                        'Monitor SpO2 continuously',
+                        'Assess respiratory rate and effort',
+                        'Position for optimal ventilation',
+                        'Administer O2 as prescribed'
+                    ],
+                    outcomes: 'SpO2 maintained >95% on room air'
+                });
+            }
+            
+            if (caseData.specialty === 'obstetrics') {
+                diagnoses.push({
+                    title: 'Risk for Maternal-Fetal Injury',
+                    priority: 'High',
+                    rationale: 'Obstetric patient requires continuous monitoring.',
+                    interventions: [
+                        'Monitor fetal heart rate',
+                        'Assess maternal vital signs',
+                        'Monitor for complications',
+                        'Educate on warning signs'
+                    ],
+                    outcomes: 'Normal maternal and fetal status maintained'
+                });
+            }
+            
+            if (diagnoses.length === 0) {
+                diagnoses.push({
+                    title: 'Health Management Deficit',
+                    priority: 'Medium',
+                    rationale: 'Patient requires education and support for condition management.',
+                    interventions: [
+                        'Assess current knowledge',
+                        'Provide disease-specific education',
+                        'Develop self-care plan',
+                        'Arrange follow-up care'
+                    ],
+                    outcomes: 'Patient verbalizes understanding of condition'
+                });
+            }
+            
+            return diagnoses;
+        }
+
+        function showDiagnosisResults(diagnoses) {
+            document.getElementById('diagnosis-empty').classList.add('hidden');
+            const container = document.getElementById('diagnosis-results');
+            container.classList.remove('hidden');
+            
+            container.innerHTML = diagnoses.map((d, i) => `
+                <div class="ai-diagnosis-card" style="animation: fadeInUp 0.5s ease ${i * 0.1}s both;">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center">
+                            <i data-lucide="activity" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">${d.title}</h3>
+                            <span class="text-sm ${d.priority === 'High' ? 'text-red-400' : 'text-yellow-400'}">${d.priority} Priority</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-semibold text-indigo-300 mb-1">Rationale</h4>
+                            <p class="text-gray-300">${d.rationale}</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold text-indigo-300 mb-2">Nursing Interventions</h4>
+                            <ul class="space-y-2">
+                                ${d.interventions.map(i => `
+                                    <li class="flex items-start gap-2 text-gray-300">
+                                        <i data-lucide="check" class="w-4 h-4 text-green-400 mt-1 flex-shrink-0"></i>
+                                        <span>${i}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-white/5 rounded-lg p-4 mt-4">
+                            <h4 class="font-semibold text-green-300 mb-1">Expected Outcomes</h4>
+                            <p class="text-gray-300">${d.outcomes}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            lucide.createIcons();
+        }
+
+        function resetAssessmentForm() {
+            document.getElementById('assessment-form').reset();
+            document.getElementById('obstetric-section').classList.add('hidden');
+        }
+
+        async function loadCaseLibrary() {
+            if (!currentUser) {
+                document.getElementById('case-library').innerHTML = `
+                    <div class="empty-state col-span-full">
+                        <div class="empty-state-icon">
+                            <i data-lucide="lock" class="w-10 h-10 text-gray-500"></i>
+                        </div>
+                        <p>Please sign in to view your cases</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+            
+            filterCases();
+        }
+
+        async function filterCases() {
+            if (!currentUser) return;
+            
+            const search = document.getElementById('case-search').value.toLowerCase();
+            const specialty = document.getElementById('filter-specialty').value;
+            const difficulty = document.getElementById('filter-difficulty').value;
+            
+            try {
+                let cases = await getUserCases(currentUser.email);
+                
+                if (search) {
+                    cases = cases.filter(c => 
+                        (c.case_title && c.case_title.toLowerCase().includes(search)) ||
+                        (c.patient_name && c.patient_name.toLowerCase().includes(search)) ||
+                        (c.chief_complaint && c.chief_complaint.toLowerCase().includes(search))
+                    );
+                }
+                
+                if (specialty) {
+                    cases = cases.filter(c => c.specialty === specialty);
+                }
+                
+                if (difficulty) {
+                    cases = cases.filter(c => c.difficulty_level === difficulty);
+                }
+                
+                const container = document.getElementById('case-library');
+                
+                if (cases.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state col-span-full">
+                            <div class="empty-state-icon">
+                                <i data-lucide="search-x" class="w-10 h-10 text-gray-500"></i>
+                            </div>
+                            <p>No cases found matching your filters</p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = cases.map(c => createCaseCard(c)).join('');
+                }
+                
+                lucide.createIcons();
+            } catch (error) {
+                console.error('Filter error:', error);
+            }
+        }
+
+        // Navigation scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await initDB();
+                console.log('Database initialized');
+                
+                // Check for existing session
+                // Note: In a real app, you'd check for a session token here
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showToast('Failed to initialize app', 'error');
+            }
+        });
+    </script>
+</body>
+</html>
